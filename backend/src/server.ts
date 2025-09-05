@@ -1,0 +1,45 @@
+import "dotenv/config";
+import express, { Request, Response } from "express";
+import cors from "cors";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
+import { config } from "./config";
+import authRoutes from "./auth/routes";
+import leagueRoutes from "./leagues/routes";
+import teamRoutes from "./teams/routes";
+import matchRoutes from "./matches/routes";
+import { syncRoutes } from "./sync/routes";
+import seedRoutes from "./seed/routes";
+
+const app = express();
+const PORT = config.port;
+
+app.use(
+  cors({
+    origin: [config.frontendOrigin, "http://localhost:3001"],
+    credentials: true,
+  })
+);
+app.use(helmet());
+app.use(cookieParser());
+app.use(express.json());
+
+app.get("/health", (_req: Request, res: Response) => {
+  res.json({ status: "ok" });
+});
+
+app.get("/api/hello", (_req: Request, res: Response) => {
+  res.json({ message: "Welcome to Manager Simulator Backend!" });
+});
+
+app.use("/auth", authRoutes);
+app.use("/api/leagues", leagueRoutes);
+app.use("/api/teams", teamRoutes);
+app.use("/api/matches", matchRoutes);
+app.use("/api/sync", syncRoutes);
+app.use("/api/seed", seedRoutes);
+
+app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
+  console.log(`Backend server running on http://localhost:${PORT}`);
+});

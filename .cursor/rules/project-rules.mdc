@@ -1,0 +1,47 @@
+## UI Component Rules
+
+### Shadcn UI Usage
+
+- Always use Shadcn UI components for UI elements (forms, buttons, inputs, cards, toasts, etc.)
+- Prefer Shadcn UI components over custom implementations
+- When Shadcn UI doesn't have a specific component, create custom components that follow Shadcn UI design patterns
+- Use Shadcn UI's built-in variants and styling system (e.g., button variants, form field variants)
+
+### Component Reuse
+
+- Always check for existing components before creating new ones
+- Reuse existing components by importing them from `frontend/src/components`
+- When modifying existing components, ensure changes don't break other usages
+- Create composable, reusable components that can be used across different pages
+- Use component composition over duplication
+
+### Component Organization
+
+- Place shared components in `frontend/src/components`
+- Create component-specific directories for complex components with multiple files
+- Use descriptive component names that clearly indicate their purpose
+- Export components from index files for clean imports
+
+### Styling Guidelines
+
+- Use Tailwind CSS classes for styling (Shadcn UI is built on Tailwind)
+- Follow Shadcn UI's design system and color palette
+- Use CSS variables for theming when available
+- Avoid custom CSS when Shadcn UI provides equivalent functionality
+
+### Form Components
+
+- Use Shadcn UI form components with `react-hook-form` and `zod` validation
+- Follow the established form patterns in the codebase
+- Reuse form field components and validation schemas when possible
+
+### Accessibility
+
+- Ensure all components follow accessibility best practices
+- Use Shadcn UI's built-in accessibility features
+- Test components with screen readers and keyboard navigation
+
+### following Instructions
+
+- Please focus mainly on the task given, do not freestyle and make other stuff that we did not asked you to do
+- If you are unsecure if you should do something, please ask before implementing

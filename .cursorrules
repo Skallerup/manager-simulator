@@ -1,0 +1,12 @@
+## Project rules
+
+- Always implement backend data access with Prisma against Postgres (no Docker assumed for local; use local Postgres connection).
+- Use Express for backend HTTP routes under `backend/src`, keep auth in `backend/src/auth`.
+- Passwords must be hashed with Argon2, never stored or logged.
+- Authentication uses short-lived access JWTs and rotating refresh tokens, stored in httpOnly, secure cookies. Verify access token for protected routes; rotate refresh tokens on `/auth/refresh`.
+- Expose auth endpoints: POST `/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, and GET `/auth/me`.
+- Configure CORS with `credentials: true` and strict `origin` (Next app domain). Cookies: `httpOnly`, `sameSite: "lax"`, `secure` in production.
+- Frontend is Next.js App Router. Prefer Shadcn/UI components for UI (forms, buttons, inputs, cards, toasts). Use `react-hook-form` + `zod` for validation.
+- All frontend API calls must use `fetch` with `credentials: "include"` to send cookies to the backend.
+- Place shared frontend helpers in `frontend/src/lib`, components in `frontend/src/components`, and auth guard/provider in `frontend/src/components/auth`.
+- Add tests for auth logic when feasible (unit tests for token utils, integration tests for routes).

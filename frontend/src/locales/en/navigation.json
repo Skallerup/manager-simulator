@@ -1,0 +1,17 @@
+{
+  "dashboard": "Dashboard",
+  "leagues": "Leagues",
+  "browseLeagues": "Browse Leagues",
+  "account": "Account",
+  "profile": "Profile",
+  "settings": "Settings",
+  "logout": "Log out",
+  "language": "Language",
+  "danish": "Danish",
+  "english": "English",
+  "managerHub": "Manager Hub",
+  "myLeagues": "My Leagues",
+  "scoutLeagues": "Scout Leagues",
+  "createLeague": "Create League",
+  "leaderboard": "Leaderboard"
+}

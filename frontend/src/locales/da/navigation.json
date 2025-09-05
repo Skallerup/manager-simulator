@@ -1,0 +1,17 @@
+{
+  "dashboard": "Dashboard",
+  "leagues": "Ligaer",
+  "browseLeagues": "Gennemse ligaer",
+  "account": "Konto",
+  "profile": "Profil",
+  "settings": "Indstillinger",
+  "logout": "Log ud",
+  "language": "Sprog",
+  "danish": "Dansk",
+  "english": "Engelsk",
+  "managerHub": "Manager Hub",
+  "myLeagues": "Mine Ligaer",
+  "scoutLeagues": "Spejde Ligaer",
+  "createLeague": "Opret Liga",
+  "leaderboard": "Rangliste"
+}

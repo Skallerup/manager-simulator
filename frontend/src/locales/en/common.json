@@ -1,0 +1,91 @@
+{
+  "loading": "Loading...",
+  "error": "Error",
+  "success": "Success",
+  "user": "User",
+  "guest": "Guest",
+  "home": {
+    "title": "Build Your Dream Team",
+    "subtitle": "The ultimate fantasy football draft manager. Create leagues, draft players, and compete with friends.",
+    "getStarted": "Get Started",
+    "login": "Log In",
+    "signIn": "Sign In",
+    "activePlayers": "Active Players",
+    "leaguesCreated": "Leagues Created",
+    "draftsCompleted": "Drafts Completed",
+    "whyChoose": "Why Choose Draft Manager?",
+    "whyChooseSubtitle": "Experience the most comprehensive fantasy football platform designed for serious managers",
+    "competitiveLeagues": "Competitive Leagues",
+    "competitiveLeaguesDesc": "Join or create leagues with custom rules, scoring systems, and competitive matchups that keep you engaged all season long.",
+    "teamManagement": "Team Management",
+    "teamManagementDesc": "Build and manage your roster with advanced tools for trades, waivers, and lineup optimization to maximize your team's potential.",
+    "realTimeDrafts": "Real-Time Drafts",
+    "realTimeDraftsDesc": "Experience live draft events with real-time updates, player suggestions, and seamless integration with your league settings.",
+    "advancedAnalytics": "Advanced Analytics",
+    "advancedAnalyticsDesc": "Make data-driven decisions with comprehensive player stats, matchup analysis, and performance tracking throughout the season.",
+    "secureReliable": "Secure & Reliable",
+    "secureReliableDesc": "Your data is protected with enterprise-grade security. Our platform is built for reliability with 99.9% uptime guarantee.",
+    "globalCommunity": "Global Community",
+    "globalCommunityDesc": "Connect with fantasy football enthusiasts worldwide. Share strategies, compete in global tournaments, and learn from the best.",
+    "howItWorks": "How It Works",
+    "howItWorksSubtitle": "Get started in three simple steps and begin your fantasy football journey",
+    "createAccount": "Create Account",
+    "createAccountDesc": "Sign up for free and set up your profile. Choose your favorite teams and leagues to get personalized recommendations.",
+    "joinOrCreateLeague": "Join or Create League",
+    "joinOrCreateLeagueDesc": "Find existing leagues to join or create your own with custom rules, scoring, and draft settings tailored to your preferences.",
+    "draftCompete": "Draft & Compete",
+    "draftCompeteDesc": "Participate in live drafts, manage your roster, and compete against other managers throughout the season for the championship.",
+    "readyToStart": "Ready to Start Your Fantasy Football Journey?",
+    "readyToStartSubtitle": "Join thousands of managers who trust Draft Manager for their leagues and start building your dream team today.",
+    "startFreeTrial": "Start Free Trial",
+    "copyright": "© 2024 Draft Manager. All rights reserved.",
+    "features": {
+      "title": "Everything you need to manage your fantasy football league",
+      "subtitle": "From draft day to championship, we've got you covered",
+      "draft": {
+        "title": "Smart Drafting",
+        "description": "AI-powered draft suggestions and real-time player analysis"
+      },
+      "leagues": {
+        "title": "League Management",
+        "description": "Create and manage multiple leagues with custom rules"
+      },
+      "analytics": {
+        "title": "Advanced Analytics",
+        "description": "Track performance and make data-driven decisions"
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Get started in three simple steps",
+      "step1": {
+        "title": "Create Your League",
+        "description": "Set up your league with custom rules and invite friends"
+      },
+      "step2": {
+        "title": "Draft Your Team",
+        "description": "Use our smart drafting tools to build your perfect team"
+      },
+      "step3": {
+        "title": "Compete & Win",
+        "description": "Track your performance and compete for the championship"
+      }
+    },
+    "finalCta": {
+      "title": "Ready to Start Your Fantasy Football Journey?",
+      "subtitle": "Join thousands of managers who trust Draft Manager for their leagues",
+      "getStarted": "Get Started Now",
+      "learnMore": "Learn More"
+    },
+    "footer": {
+      "copyright": "© 2024 Draft Manager. All rights reserved."
+    }
+  },
+  "app": {
+    "title": "Draft Manager",
+    "description": "Fantasy Football Draft Manager"
+  },
+  "management": "Management",
+  "english": "English",
+  "danish": "Danish"
+}
