@@ -1,0 +1,21 @@
+{
+  "myTeam": "My Team",
+  "teamStats": "Team Statistics",
+  "squad": "Squad",
+  "players": "Players",
+  "formation": "Formation",
+  "matches": "Matches",
+  "wins": "Wins",
+  "draws": "Draws",
+  "losses": "Losses",
+  "goalsFor": "Goals For",
+  "goalsAgainst": "Goals Against",
+  "editTeam": "Edit Team",
+  "playerRating": "Player Rating",
+  "age": "Age",
+  "position": "Position",
+  "goalkeeper": "Goalkeeper",
+  "defender": "Defender",
+  "midfielder": "Midfielder",
+  "forward": "Forward"
+}

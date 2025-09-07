@@ -12,6 +12,7 @@ model User {
   email         String         @unique
   passwordHash  String
   name          String?
+  isAdmin       Boolean        @default(false)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   refreshTokens RefreshToken[]
@@ -20,6 +21,7 @@ model User {
   adminLeagues  League[]       @relation("LeagueAdmin")
   teams         Team[]
   leagueMembers LeagueMember[]
+  botMatches    BotMatch[]
 }
 
 model RefreshToken {
@@ -38,7 +40,8 @@ model League {
   id          String   @id @default(cuid())
   name        String
   description String?
-  maxTeams    Int      @default(8)
+  level       Int      // 1 = Superliga, 2 = 1. Division, 3 = 2. Division
+  maxTeams    Int      @default(12)
   status      LeagueStatus @default(ACTIVE)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -49,25 +52,42 @@ model League {
   teams       Team[]
   leagueMembers LeagueMember[]
   matches     Match[]
+  seasons     Season[]
 }
 
 model Team {
   id        String   @id @default(cuid())
   name      String
-  formation String   @default("4-4-2") // Default formation
+  formation String   @default("4-3-3") // Default formation
+  colors    String?  // JSON string for primary and secondary colors
+  logo      String?  // Logo identifier
+  budget    Int      @default(10000000) // Starting budget in øre
+  captainId String?  @unique // Captain player ID
+  isBot     Boolean  @default(false) // True for bot teams
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
   // Relations
-  owner     User     @relation(fields: [ownerId], references: [id])
-  ownerId   String
-  league    League   @relation(fields: [leagueId], references: [id])
-  leagueId  String
+  owner     User?    @relation(fields: [ownerId], references: [id])
+  ownerId   String?
+  league    League?  @relation(fields: [leagueId], references: [id])
+  leagueId  String?
+  rookieLeague RookieLeague? @relation(fields: [rookieLeagueId], references: [id])
+  rookieLeagueId String?
+  captain   Player?  @relation("TeamCaptain", fields: [captainId], references: [id])
   
   // Game related
   players   TeamPlayer[]
   homeMatches Match[] @relation("HomeTeam")
   awayMatches Match[] @relation("AwayTeam")
+  botMatches BotMatch[]
+  
+  // Transfer related
+  transfersFrom Transfer[] @relation("TransferFrom")
+  transfersTo   Transfer[] @relation("TransferTo")
+  
+  // Season related
+  seasonStats SeasonStats[]
 }
 
 model LeagueMember {
@@ -99,19 +119,37 @@ model Club {
 
 model Player {
   id          String   @id @default(cuid())
-  externalId  Int      @unique // API-Football player ID
+  externalId  Int?     @unique // API-Football player ID (optional for generated players)
   name        String
-  age         Int?
+  age         Int
   number      Int?
   position    PlayerPosition
   photo       String?
+  
+  // Player stats (1-100 scale)
+  speed       Int      @default(50)
+  shooting   Int      @default(50)
+  passing    Int      @default(50)
+  defending  Int      @default(50)
+  stamina    Int      @default(50)
+  reflexes   Int      @default(50)
+  
+  // Market value in øre
+  marketValue Int      @default(1000000)
+  
+  // Player status
+  isGenerated Boolean  @default(false) // True for AI-generated players
+  isCaptain   Boolean  @default(false)
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   // Relations
-  club        Club     @relation(fields: [clubId], references: [id])
-  clubId      String
+  club        Club?    @relation(fields: [clubId], references: [id])
+  clubId      String?
   teamPlayers TeamPlayer[]
+  captainOf   Team?    @relation("TeamCaptain")
+  transfers   Transfer[]
 }
 
 model TeamPlayer {
@@ -129,6 +167,20 @@ model TeamPlayer {
   @@unique([teamId, playerId]) // En spiller kan kun være på ét hold ad gangen
 }
 
+model RookieLeague {
+  id          String   @id @default(cuid())
+  name        String   @default("Rookie League")
+  description String   @default("League for new players")
+  maxTeams    Int      @default(50)
+  status      LeagueStatus @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  teams       Team[]
+  matches     Match[]
+}
+
 model Match {
   id          String   @id @default(cuid())
   homeScore   Int      @default(0)
@@ -139,8 +191,12 @@ model Match {
   updatedAt   DateTime @updatedAt
   
   // Relations
-  league      League   @relation(fields: [leagueId], references: [id])
-  leagueId    String
+  league      League?  @relation(fields: [leagueId], references: [id])
+  leagueId    String?
+  rookieLeague RookieLeague? @relation(fields: [rookieLeagueId], references: [id])
+  rookieLeagueId String?
+  season      Season?  @relation(fields: [seasonId], references: [id])
+  seasonId    String?
   homeTeam    Team     @relation("HomeTeam", fields: [homeTeamId], references: [id])
   homeTeamId  String
   awayTeam    Team     @relation("AwayTeam", fields: [awayTeamId], references: [id])
@@ -148,6 +204,9 @@ model Match {
 }
 
 enum LeagueStatus {
+  SIGNUP
+  DRAFT_READY
+  DRAFT_IN_PROGRESS
   ACTIVE
   COMPLETED
   PAUSED
@@ -170,6 +229,93 @@ enum MatchStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
+}
+
+model BotMatch {
+  id            String      @id @default(cuid())
+  ownerId       String
+  userTeamId    String
+  botDifficulty String      // Easy, Medium, Hard, Expert
+  botRating     Int         // 65, 75, 85, 95
+  userScore     Int?        @default(0)
+  botScore      Int?        @default(0)
+  status        MatchStatus @default(SCHEDULED)
+  events        String?     // JSON string of match events
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Relations
+  owner     User @relation(fields: [ownerId], references: [id])
+  userTeam  Team @relation(fields: [userTeamId], references: [id])
+}
+
+model Transfer {
+  id          String        @id @default(cuid())
+  playerId    String
+  fromTeamId  String?       // null for free agents
+  toTeamId    String?       // null for selling to market
+  askingPrice Int           // Price in øre
+  status      TransferStatus @default(LISTED)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  completedAt DateTime?
+  
+  // Relations
+  player   Player @relation(fields: [playerId], references: [id])
+  fromTeam Team?  @relation("TransferFrom", fields: [fromTeamId], references: [id])
+  toTeam   Team?  @relation("TransferTo", fields: [toTeamId], references: [id])
+}
+
+enum TransferStatus {
+  LISTED      // Available for transfer
+  PENDING     // Transfer in progress
+  COMPLETED   // Transfer completed
+  CANCELLED   // Transfer cancelled
+}
+
+model Season {
+  id          String   @id @default(cuid())
+  year        Int
+  status      SeasonStatus @default(ACTIVE)
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  league      League   @relation(fields: [leagueId], references: [id])
+  leagueId    String
+  matches     Match[]
+  seasonStats SeasonStats[]
+}
+
+model SeasonStats {
+  id        String   @id @default(cuid())
+  points    Int      @default(0)
+  played    Int      @default(0)
+  won       Int      @default(0)
+  drawn     Int      @default(0)
+  lost      Int      @default(0)
+  goalsFor  Int      @default(0)
+  goalsAgainst Int   @default(0)
+  goalDiff  Int      @default(0)
+  position  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  team      Team     @relation(fields: [teamId], references: [id])
+  teamId    String
+  season    Season   @relation(fields: [seasonId], references: [id])
+  seasonId  String
+  
+  @@unique([teamId, seasonId])
+}
+
+enum SeasonStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
 }
 
 

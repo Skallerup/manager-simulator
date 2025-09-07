@@ -99,13 +99,16 @@ export class GameEngine {
     // Chance of an event happening this minute
     const eventChance = Math.random();
     
-    if (eventChance < 0.05) { // 5% chance of goal
-      const goalEvent = this.simulateGoal(attackingTeam, teamSide, minute);
+    if (eventChance < 0.15) { // 15% chance of goal attempt
+      const goalEvent = this.simulateGoal(attackingTeam, teamSide, minute, homeStrength, awayStrength);
       if (goalEvent) events.push(goalEvent);
-    } else if (eventChance < 0.08) { // 3% chance of card
+    } else if (eventChance < 0.25) { // 10% chance of shot
+      const shotEvent = this.simulateShot(attackingTeam, teamSide, minute);
+      if (shotEvent) events.push(shotEvent);
+    } else if (eventChance < 0.28) { // 3% chance of card
       const cardEvent = this.simulateCard(attackingTeam, teamSide, minute);
       if (cardEvent) events.push(cardEvent);
-    } else if (eventChance < 0.1) { // 2% chance of substitution
+    } else if (eventChance < 0.30) { // 2% chance of substitution
       const subEvent = this.simulateSubstitution(attackingTeam, teamSide, minute);
       if (subEvent) events.push(subEvent);
     }
@@ -116,12 +119,22 @@ export class GameEngine {
   /**
    * Simulate a goal attempt
    */
-  private simulateGoal(team: Team, teamSide: 'home' | 'away', minute: number): MatchEvent | null {
+  private simulateGoal(team: Team, teamSide: 'home' | 'away', minute: number, homeStrength: number, awayStrength: number): MatchEvent | null {
     const attackers = team.players.filter(p => p.isStarter && p.position === 'ATTACKER');
     if (attackers.length === 0) return null;
     
     const attacker = attackers[Math.floor(Math.random() * attackers.length)];
-    const goalChance = (attacker.shooting + attacker.overall) / 200; // Normalize to 0-1
+    
+    // Calculate goal chance based on team strength difference
+    const attackingStrength = teamSide === 'home' ? homeStrength : awayStrength;
+    const defendingStrength = teamSide === 'home' ? awayStrength : homeStrength;
+    
+    // Base goal chance from player stats
+    const playerGoalChance = (attacker.shooting + attacker.overall) / 200;
+    
+    // Modify by team strength difference
+    const strengthDifference = (attackingStrength - defendingStrength) / 100;
+    const goalChance = Math.max(0.05, Math.min(0.8, playerGoalChance + strengthDifference * 0.3));
     
     if (Math.random() < goalChance) {
       return {
@@ -134,6 +147,24 @@ export class GameEngine {
     }
     
     return null;
+  }
+
+  /**
+   * Simulate a shot attempt
+   */
+  private simulateShot(team: Team, teamSide: 'home' | 'away', minute: number): MatchEvent | null {
+    const attackers = team.players.filter(p => p.isStarter && (p.position === 'ATTACKER' || p.position === 'MIDFIELDER'));
+    if (attackers.length === 0) return null;
+    
+    const attacker = attackers[Math.floor(Math.random() * attackers.length)];
+    
+    return {
+      minute,
+      type: 'shot',
+      team: teamSide,
+      player: attacker.name,
+      description: `${attacker.name} shoots!`
+    };
   }
 
   /**

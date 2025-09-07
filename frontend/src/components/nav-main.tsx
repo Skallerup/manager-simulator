@@ -2,6 +2,7 @@
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 import {
   Collapsible,
@@ -28,6 +29,7 @@ export function NavMain({
     url: string;
     icon?: LucideIcon;
     isActive?: boolean;
+    action?: string;
     items?: {
       title: string;
       url: string;
@@ -36,6 +38,33 @@ export function NavMain({
   label?: string;
 }) {
   const pathname = usePathname();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleAdminAction = async (action: string) => {
+    setIsLoading(true);
+    try {
+      // Convert camelCase action to kebab-case for backend
+      const kebabAction = action.replace(/([A-Z])/g, '-$1').toLowerCase();
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/${kebabAction}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        // Reload page to update user context
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Admin action error:', error);
+      alert('An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <SidebarGroup>
       {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
@@ -91,19 +120,32 @@ export function NavMain({
             );
           }
 
-          // If item has no sub-items, render as simple link
+          // If item has no sub-items, render as simple link or action button
           return (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                asChild
-                tooltip={item.title}
-                isActive={isItemActive}
-              >
-                <a href={item.url}>
+              {item.action ? (
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  isActive={isItemActive}
+                  disabled={isLoading}
+                  onClick={() => handleAdminAction(item.action!)}
+                >
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
+                  {isLoading && <span className="ml-2">...</span>}
+                </SidebarMenuButton>
+              ) : (
+                <SidebarMenuButton
+                  asChild
+                  tooltip={item.title}
+                  isActive={isItemActive}
+                >
+                  <a href={item.url}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                  </a>
+                </SidebarMenuButton>
+              )}
             </SidebarMenuItem>
           );
         })}

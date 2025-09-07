@@ -43,41 +43,36 @@ const leagues = [
     description:
       "The ultimate fantasy football experience with Premier League players",
     maxTeams: 8,
-    draftMethod: "SNAKE" as const,
-    signupDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-    status: "SIGNUP" as const,
+    // draftMethod: "SNAKE" as const, // Removed - no longer exists
+    status: "ACTIVE" as const,
   },
   {
     name: "Champions League Draft",
     description: "Draft your dream team from Champions League players",
     maxTeams: 6,
-    draftMethod: "LINEAR" as const,
-    signupDeadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
-    status: "SIGNUP" as const,
+    // draftMethod: "LINEAR" as const, // Removed - no longer exists
+    status: "ACTIVE" as const,
   },
   {
     name: "World Cup Fantasy",
     description: "Build your team with the best World Cup players",
     maxTeams: 10,
-    draftMethod: "SNAKE" as const,
-    signupDeadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
-    status: "SIGNUP" as const,
+    // draftMethod: "SNAKE" as const, // Removed - no longer exists
+    status: "ACTIVE" as const,
   },
   {
     name: "La Liga Masters",
     description: "Spanish league fantasy draft with top La Liga talent",
     maxTeams: 8,
-    draftMethod: "SNAKE" as const,
-    signupDeadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-    status: "SIGNUP" as const,
+    // draftMethod: "SNAKE" as const, // Removed - no longer exists
+    status: "ACTIVE" as const,
   },
   {
     name: "Serie A Champions",
     description: "Italian league fantasy with Serie A superstars",
     maxTeams: 6,
-    draftMethod: "LINEAR" as const,
-    signupDeadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-    status: "SIGNUP" as const,
+    // draftMethod: "LINEAR" as const, // Removed - no longer exists
+    status: "ACTIVE" as const,
   },
 ];
 
@@ -355,7 +350,10 @@ async function main() {
 
   // Clear existing data
   console.log("🧹 Clearing existing data...");
-  await prisma.draftPick.deleteMany();
+  // await prisma.draftPick.deleteMany(); // Removed - no longer exists
+  await prisma.teamPlayer.deleteMany();
+  await prisma.transfer.deleteMany();
+  await prisma.botMatch.deleteMany();
   await prisma.team.deleteMany();
   await prisma.leagueMember.deleteMany();
   await prisma.league.deleteMany();
@@ -474,7 +472,7 @@ async function main() {
           name: `${owner.name}'s Team`,
           ownerId: owner.id,
           leagueId: league.id,
-          draftPosition: j + 1,
+          // draftPosition: j + 1, // Removed - no longer exists
         },
       });
 

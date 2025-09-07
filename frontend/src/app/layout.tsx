@@ -27,8 +27,8 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Draft Manager",
-  description: "Fantasy Football Draft Manager",
+  title: "Manager Simulator",
+  description: "Football Manager Simulator Game",
 };
 
 export default function RootLayout({

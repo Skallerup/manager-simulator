@@ -39,7 +39,7 @@ export interface MatchResult {
 
 export interface MatchEvent {
   minute: number;
-  type: 'goal' | 'yellow_card' | 'red_card' | 'substitution' | 'penalty';
+  type: 'goal' | 'shot' | 'save' | 'yellow_card' | 'red_card' | 'substitution' | 'penalty';
   team: 'home' | 'away';
   player: string;
   description: string;

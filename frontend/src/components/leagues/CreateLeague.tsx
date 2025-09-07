@@ -23,8 +23,6 @@ const createLeagueSchema = z.object({
   name: z.string().min(1, "League name is required").max(100),
   description: z.string().optional(),
   maxTeams: z.number().int().min(2).max(20),
-  draftMethod: z.enum(["SNAKE", "LINEAR"]),
-  signupDeadline: z.string().min(1, "Signup deadline is required"),
 });
 
 type CreateLeagueForm = z.infer<typeof createLeagueSchema>;
@@ -53,17 +51,14 @@ export function CreateLeague({
     resolver: zodResolver(createLeagueSchema),
     defaultValues: {
       maxTeams: 8,
-      draftMethod: "SNAKE",
     },
   });
 
   const onSubmit = async (data: CreateLeagueForm) => {
     try {
       setIsSubmitting(true);
-      // Convert datetime-local to ISO string
       const leagueData: CreateLeagueData = {
         ...data,
-        signupDeadline: new Date(data.signupDeadline).toISOString(),
       };
       await createLeague(leagueData);
       reset();
@@ -145,36 +140,6 @@ export function CreateLeague({
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="draftMethod">{t('draftMethod')}</Label>
-            <select
-              id="draftMethod"
-              {...register("draftMethod")}
-              className="w-full p-2 border border-gray-300 rounded-md bg-background text-foreground"
-            >
-              <option value="SNAKE">{t('snakeDraft')}</option>
-              <option value="LINEAR">{t('linearDraft')}</option>
-            </select>
-            {errors.draftMethod && (
-              <p className="text-sm text-red-600">
-                {errors.draftMethod.message}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="signupDeadline">{t('signupDeadline')}</Label>
-            <Input
-              id="signupDeadline"
-              type="datetime-local"
-              {...register("signupDeadline")}
-            />
-            {errors.signupDeadline && (
-              <p className="text-sm text-red-600">
-                {errors.signupDeadline.message}
-              </p>
-            )}
-          </div>
 
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>

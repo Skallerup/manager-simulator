@@ -14,6 +14,12 @@ import enLeagues from '../locales/en/leagues.json';
 import daLeagues from '../locales/da/leagues.json';
 import enAccount from '../locales/en/account.json';
 import daAccount from '../locales/da/account.json';
+import enMatch from '../locales/en/match.json';
+import daMatch from '../locales/da/match.json';
+import enTeam from '../locales/en/team.json';
+import daTeam from '../locales/da/team.json';
+import enTransfers from '../locales/en/transfers.json';
+import daTransfers from '../locales/da/transfers.json';
 
 // Create i18next instance
 const i18n = createInstance();
@@ -28,7 +34,10 @@ i18n
         dashboard: enDashboard,
         auth: enAuth,
         leagues: enLeagues,
-        account: enAccount
+        account: enAccount,
+        match: enMatch,
+        team: enTeam,
+        transfers: enTransfers
       },
       da: {
         common: daCommon,
@@ -36,7 +45,10 @@ i18n
         dashboard: daDashboard,
         auth: daAuth,
         leagues: daLeagues,
-        account: daAccount
+        account: daAccount,
+        match: daMatch,
+        team: daTeam,
+        transfers: daTransfers
       }
     },
     fallbackLng: 'da', // Set Danish as fallback
@@ -61,7 +73,7 @@ i18n
       },
     },
     
-    ns: ['common', 'navigation', 'dashboard', 'auth', 'leagues', 'account'],
+    ns: ['common', 'navigation', 'dashboard', 'auth', 'leagues', 'account', 'match', 'team', 'transfers'],
     defaultNS: 'common',
   });
 

@@ -1,30 +1,23 @@
-import { Router } from "express";
-import rateLimit from "express-rate-limit";
-import {
-  createLeagueHandler,
-  getLeaguesHandler,
-  browseLeaguesHandler,
-  getLeagueHandler,
-  updateLeagueHandler,
-  deleteLeagueHandler,
-  joinLeagueHandler,
-  leaveLeagueHandler,
-} from "./handlers";
+import { Router } from 'express';
+import { 
+  getAllLeagues, 
+  getLeagueById,
+  getLeagueStandings, 
+  getUserLeague, 
+  assignUserTeamToLeague,
+  getLeagueMatches 
+} from './handlers';
 
 const router = Router();
 
-const leagueLimiter = rateLimit({ windowMs: 60_000, max: 30 });
+// Public routes (no auth required)
+router.get('/', getAllLeagues);
+router.get('/:leagueId', getLeagueById);
+router.get('/:leagueId/standings', getLeagueStandings);
+router.get('/:leagueId/matches', getLeagueMatches);
 
-// League management routes
-router.post("/", leagueLimiter, createLeagueHandler);
-router.get("/", leagueLimiter, getLeaguesHandler);
-router.get("/browse", leagueLimiter, browseLeaguesHandler);
-router.get("/:id", leagueLimiter, getLeagueHandler);
-router.put("/:id", leagueLimiter, updateLeagueHandler);
-router.delete("/:id", leagueLimiter, deleteLeagueHandler);
-
-// League membership routes
-router.post("/:id/join", leagueLimiter, joinLeagueHandler);
-router.delete("/:id/leave", leagueLimiter, leaveLeagueHandler);
+// Protected routes (auth required)
+router.get('/user/current', getUserLeague);
+router.post('/assign-team', assignUserTeamToLeague);
 
 export default router;

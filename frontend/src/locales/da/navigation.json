@@ -11,7 +11,15 @@
   "english": "Engelsk",
   "managerHub": "Manager Hub",
   "myLeagues": "Mine Ligaer",
+  "allLeagues": "Alle Ligaer",
   "scoutLeagues": "Spejde Ligaer",
+  "myTeam": "Mit Hold",
+  "transfers": "Transferliste",
+  "match": "Kamp",
   "createLeague": "Opret Liga",
-  "leaderboard": "Rangliste"
+  "leaderboard": "Rangliste",
+  "admin": "Admin",
+  "testAccount": "Test Konto",
+  "switchToTest": "Skift til Test Konto",
+  "switchToAdmin": "Skift til Admin"
 }

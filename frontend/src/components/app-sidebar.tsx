@@ -9,6 +9,11 @@ import {
   Target,
   TrendingUp,
   Settings,
+  Users,
+  Gamepad2,
+  ShoppingCart,
+  Shield,
+  UserCheck,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -25,7 +30,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 // This is sample data.
-const getData = (t: any) => ({
+const getData = (t: any, isAdmin: boolean = false, isTestAccount: boolean = false) => ({
   user: {
     name: "shadcn",
     email: "m@example.com",
@@ -38,37 +43,58 @@ const getData = (t: any) => ({
       icon: Home,
     },
   ],
-  leagues: [
-    {
-      title: t('myLeagues'),
-      url: "/leagues",
-      icon: Trophy,
-    },
-    {
-      title: t('scoutLeagues'),
-      url: "/browse-leagues",
-      icon: Search,
-    },
-  ],
+        leagues: [
+          {
+            title: t('allLeagues'),
+            url: "/leagues",
+            icon: Trophy,
+          },
+        ],
   management: [
     {
-      title: t('createLeague'),
-      url: "/create-league",
-      icon: Target,
+      title: t('myTeam'),
+      url: "/my-team",
+      icon: Users,
     },
     {
-      title: t('leaderboard'),
-      url: "/leaderboard",
-      icon: TrendingUp,
+      title: t('transfers'),
+      url: "/transfers",
+      icon: ShoppingCart,
+    },
+    {
+      title: t('match'),
+      url: "/match",
+      icon: Gamepad2,
     },
   ],
+  admin: isAdmin ? [
+    {
+      title: t('switchToTest'),
+      url: "/admin/switch-test",
+      icon: UserCheck,
+      action: "switchToTest",
+    },
+  ] : [],
+  testAccount: isTestAccount ? [
+    {
+      title: t('switchToAdmin'),
+      url: "/admin/switch-admin",
+      icon: Shield,
+      action: "switchToAdmin",
+    },
+  ] : [],
   projects: [],
 });
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
   const { t } = useTranslation('navigation');
-  const data = getData(t);
+  
+  // Check if user is admin or test account
+  const isAdmin = user?.email === 'skallerup+3@gmail.com';
+  const isTestAccount = user?.email === 'skallerup+4@gmail.com';
+  
+  const data = getData(t, isAdmin, isTestAccount);
 
   // Create user object for NavUser component
   const userData = user
@@ -92,7 +118,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Draft Manager
+              Manager Simulator
             </span>
             <span className="text-xs text-muted-foreground">Football Game</span>
           </div>
@@ -102,6 +128,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.home} />
         <NavMain items={data.leagues} label={t('leagues')} />
         <NavMain items={data.management} label={t('management')} />
+        {data.admin.length > 0 && <NavMain items={data.admin} label={t('admin')} />}
+        {data.testAccount.length > 0 && <NavMain items={data.testAccount} label={t('testAccount')} />}
         {data.projects.length > 0 && <NavProjects projects={data.projects} />}
       </SidebarContent>
       <SidebarFooter>

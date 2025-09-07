@@ -2,9 +2,28 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { GameEngine } from '../services/game-engine/engine';
 import { CreateMatchRequest, MatchResponse, SimulateMatchRequest, SimulateMatchResponse } from './types';
+import { verifyAccessToken } from '../auth/tokens';
 
 const prisma = new PrismaClient();
 const gameEngine = new GameEngine();
+
+async function getUserFromToken(req: Request) {
+  const accessToken = req.cookies?.access_token as string | undefined;
+  if (!accessToken) {
+    throw new Error("No access token provided");
+  }
+
+  const payload = verifyAccessToken(accessToken);
+  const user = await prisma.user.findUnique({
+    where: { id: payload.sub },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+}
 
 export const createMatch = async (req: Request<{}, MatchResponse, CreateMatchRequest>, res: Response) => {
   try {
@@ -234,5 +253,140 @@ export const getMatchById = async (req: Request<{ id: string }>, res: Response) 
   } catch (error) {
     console.error('Error fetching match:', error);
     res.status(500).json({ error: 'Failed to fetch match' });
+  }
+};
+
+// Bot match handlers
+export const createBotMatch = async (req: Request, res: Response) => {
+  try {
+    const user = await getUserFromToken(req);
+    const { botDifficulty, botRating } = req.body;
+
+    // Get user's team
+    const userTeam = await prisma.team.findFirst({
+      where: { ownerId: user.id },
+      include: {
+        players: {
+          include: {
+            player: true
+          }
+        }
+      }
+    });
+
+    if (!userTeam) {
+      return res.status(404).json({ error: 'User team not found' });
+    }
+
+    // Create bot match record
+    const botMatch = await prisma.botMatch.create({
+      data: {
+        ownerId: user.id,
+        userTeamId: userTeam.id,
+        botDifficulty,
+        botRating,
+        status: 'SCHEDULED'
+      }
+    });
+
+    res.status(201).json({
+      id: botMatch.id,
+      userTeamId: userTeam.id,
+      botDifficulty,
+      botRating,
+      status: botMatch.status,
+      createdAt: botMatch.createdAt.toISOString()
+    });
+  } catch (error) {
+    console.error('Error creating bot match:', error);
+    res.status(500).json({ error: 'Failed to create bot match' });
+  }
+};
+
+export const simulateBotMatch = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { events } = req.body; // Events from frontend simulation
+
+    // Get bot match
+    const botMatch = await prisma.botMatch.findUnique({
+      where: { id },
+      include: {
+        userTeam: {
+          include: {
+            players: {
+              include: {
+                player: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!botMatch) {
+      return res.status(404).json({ error: 'Bot match not found' });
+    }
+
+    if (botMatch.status !== 'SCHEDULED' && botMatch.status !== 'COMPLETED') {
+      return res.status(400).json({ error: 'Match is not in scheduled or completed status' });
+    }
+
+    // Calculate final score from events
+    const userScore = events.filter((e: any) => e.type === 'goal' && e.team === 'player').length;
+    const botScore = events.filter((e: any) => e.type === 'goal' && e.team === 'bot').length;
+
+    // Update bot match with results
+    const updatedMatch = await prisma.botMatch.update({
+      where: { id },
+      data: {
+        userScore,
+        botScore,
+        status: 'COMPLETED',
+        events: JSON.stringify(events)
+      }
+    });
+
+    res.json({
+      id: updatedMatch.id,
+      userScore: updatedMatch.userScore,
+      botScore: updatedMatch.botScore,
+      status: updatedMatch.status,
+      events: JSON.parse(updatedMatch.events || '[]')
+    });
+  } catch (error) {
+    console.error('Error simulating bot match:', error);
+    res.status(500).json({ error: 'Failed to simulate bot match' });
+  }
+};
+
+export const getBotMatches = async (req: Request, res: Response) => {
+  try {
+    const user = await getUserFromToken(req);
+
+    const botMatches = await prisma.botMatch.findMany({
+      where: { ownerId: user.id },
+      include: {
+        userTeam: { select: { id: true, name: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const response = botMatches.map(match => ({
+      id: match.id,
+      userTeam: match.userTeam,
+      botDifficulty: match.botDifficulty,
+      botRating: match.botRating,
+      userScore: match.userScore,
+      botScore: match.botScore,
+      status: match.status,
+      events: match.events ? JSON.parse(match.events) : [],
+      createdAt: match.createdAt.toISOString()
+    }));
+
+    res.json(response);
+  } catch (error) {
+    console.error('Error fetching bot matches:', error);
+    res.status(500).json({ error: 'Failed to fetch bot matches' });
   }
 };

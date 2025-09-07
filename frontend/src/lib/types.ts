@@ -68,17 +68,12 @@ export interface CreateLeagueData {
   name: string;
   description?: string;
   maxTeams: number;
-  draftMethod: "SNAKE" | "LINEAR";
-  signupDeadline: string;
 }
 
 export interface UpdateLeagueData {
   name?: string;
   description?: string;
   maxTeams?: number;
-  draftMethod?: "SNAKE" | "LINEAR";
-  signupDeadline?: string;
-  draftStartTime?: string;
 }
 
 export interface CreateTeamData {

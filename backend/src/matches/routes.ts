@@ -1,7 +1,12 @@
 import { Router } from 'express';
-import { createMatch, getMatches, simulateMatch, getMatchById } from './handlers';
+import { createMatch, getMatches, simulateMatch, getMatchById, createBotMatch, simulateBotMatch, getBotMatches } from './handlers';
 
 const router = Router();
+
+// Bot match routes (must be before /:id routes)
+router.post('/bot', createBotMatch);
+router.get('/bot', getBotMatches);
+router.post('/bot/:id/simulate', simulateBotMatch);
 
 // Create a new match
 router.post('/', createMatch);

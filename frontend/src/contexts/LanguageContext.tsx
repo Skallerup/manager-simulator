@@ -118,7 +118,7 @@ const translations = {
     "home.activePlayers": "Aktive spillere",
     "home.leaguesCreated": "Ligaer oprettet",
     "home.draftsCompleted": "Drafts gennemført",
-    "home.whyChoose": "Hvorfor vælge Draft Manager?",
+    "home.whyChoose": "Hvorfor vælge Manager Simulator?",
     "home.experienceAdvanced": "Oplev den mest avancerede fantasy fodbold draft platform med banebrydende funktioner.",
     "home.competitiveLeagues": "Konkurrencedygtige ligaer",
     "home.competitiveLeaguesDesc": "Deltag i eller opret ligaer med venner og konkurrer i snake eller lineære draft formater. Følg din fremskridt og klatr på ranglisten.",
@@ -143,7 +143,7 @@ const translations = {
     "home.draftAndCompete": "Draft og konkurrer",
     "home.draftAndCompeteDesc": "Deltag i live drafts, administrer dit hold, og konkurrer om mesterskabstitlen.",
     "home.readyToStart": "Klar til at begynde at draft?",
-    "home.joinThousands": "Deltag med tusindvis af fantasy fodbold managere der stoler på Draft Manager til deres ligaer.",
+    "home.joinThousands": "Deltag med tusindvis af fantasy fodbold managere der stoler på Manager Simulator til deres ligaer.",
     "home.startFreeTrial": "Start gratis prøveperiode",
     
     // Auth
@@ -162,7 +162,7 @@ const translations = {
     "auth.signIn": "Log ind",
     "auth.signUp": "Tilmeld dig",
     "auth.welcomeBack": "Velkommen tilbage",
-    "auth.joinDraftManager": "Tilmeld dig Draft Manager og start din fantasy fodbold rejse",
+    "auth.joinDraftManager": "Bliv en del af Manager Simulator og start med at bygge dit drømmehold",
     "auth.passwordMinLength": "Adgangskode skal være mindst 8 karakterer lang",
     "auth.agreeToTerms": "Jeg accepterer",
     "auth.termsOfService": "Servicevilkår",
@@ -178,7 +178,7 @@ const translations = {
     "auth.createPassword": "Opret en adgangskode",
     "auth.pleaseAgreeToTerms": "Du skal acceptere Servicevilkår og Privatlivspolitik",
     "auth.enterValidEmail": "Indtast en gyldig e-mail adresse",
-    "auth.loginToAccount": "Log ind på din Draft Manager konto",
+    "auth.loginToAccount": "Log ind på din Manager Simulator konto",
     "auth.signingIn": "Logger ind...",
     "auth.creatingAccount": "Opretter konto...",
     
@@ -552,7 +552,7 @@ const translations = {
     "home.activePlayers": "Active Players",
     "home.leaguesCreated": "Leagues Created",
     "home.draftsCompleted": "Drafts completed",
-    "home.whyChoose": "Why Choose Draft Manager?",
+    "home.whyChoose": "Why Choose Manager Simulator?",
     "home.experienceAdvanced": "Experience the most advanced fantasy football draft platform with cutting-edge features.",
     "home.competitiveLeagues": "Competitive Leagues",
     "home.competitiveLeaguesDesc": "Join or create leagues with friends and compete in snake or linear draft formats. Track your progress and climb the leaderboards.",
@@ -577,7 +577,7 @@ const translations = {
     "home.draftAndCompete": "Draft & Compete",
     "home.draftAndCompeteDesc": "Participate in live drafts, manage your team, and compete for the championship title.",
     "home.readyToStart": "Ready to Start Drafting?",
-    "home.joinThousands": "Join thousands of fantasy football managers who trust Draft Manager for their leagues.",
+    "home.joinThousands": "Join thousands of fantasy football managers who trust Manager Simulator for their leagues.",
     "home.startFreeTrial": "Start Free Trial",
     
     // Auth
@@ -596,7 +596,7 @@ const translations = {
     "auth.signIn": "Sign In",
     "auth.signUp": "Sign Up",
     "auth.welcomeBack": "Welcome Back",
-    "auth.joinDraftManager": "Join Draft Manager and start your fantasy football journey",
+    "auth.joinDraftManager": "Bliv en del af Manager Simulator og start med at bygge dit drømmehold",
     "auth.passwordMinLength": "Password must be at least 8 characters long",
     "auth.agreeToTerms": "I agree to the",
     "auth.termsOfService": "Terms of Service",
@@ -612,7 +612,7 @@ const translations = {
     "auth.createPassword": "Create a password",
     "auth.pleaseAgreeToTerms": "You must agree to Terms of Service and Privacy Policy",
     "auth.enterValidEmail": "Enter a valid email address",
-    "auth.loginToAccount": "Login to your Draft Manager account",
+    "auth.loginToAccount": "Login to your Manager Simulator account",
     "auth.signingIn": "Signing in...",
     "auth.creatingAccount": "Creating account...",
     

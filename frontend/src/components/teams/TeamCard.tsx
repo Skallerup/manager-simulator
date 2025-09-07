@@ -29,7 +29,7 @@ export function TeamCard({ team, onEdit, onDelete }: TeamCardProps) {
           <div>
             <CardTitle className="text-lg">{team.name}</CardTitle>
             <CardDescription>
-              Owned by {team.owner.name || team.owner.email}
+              Owned by {team.owner?.name || team.owner?.email || 'Unknown'}
             </CardDescription>
           </div>
           {isOwner && <Badge variant="outline">Your Team</Badge>}

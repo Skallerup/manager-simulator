@@ -192,7 +192,7 @@ npm test
 
 ## 📝 Development Notes
 
-- The backend runs on port 5000 by default
+- The backend runs on port 5002 by default
 - The frontend runs on port 3001 by default
 - Both servers support hot reloading in development
 - Database migrations are handled by Prisma

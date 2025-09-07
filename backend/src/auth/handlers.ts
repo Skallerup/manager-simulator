@@ -10,24 +10,48 @@ import {
   signAccessToken,
   verifyAccessToken,
 } from "./tokens";
+import { TeamService } from "../services/team-service";
 
 export async function registerHandler(req: Request, res: Response) {
   const parsed = registerSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Invalid input" });
   }
-  const { email, password, name } = parsed.data;
+  const { email, password, name, teamName } = parsed.data;
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     return res.status(409).json({ error: "Email already in use" });
   }
-  const passwordHash = await argon2.hash(password);
-  const user = await prisma.user.create({
-    data: { email, passwordHash, name },
-  });
-  return res
-    .status(201)
-    .json({ id: user.id, email: user.email, name: user.name });
+  
+  try {
+    const passwordHash = await argon2.hash(password);
+    const user = await prisma.user.create({
+      data: { email, passwordHash, name },
+    });
+
+    // Create team with generated players
+    const teamNameToUse = teamName || `${name || 'Manager'}'s Team`;
+    const team = await TeamService.createTeamWithGeneratedPlayers({
+      name: teamNameToUse,
+      ownerId: user.id
+    });
+
+    return res
+      .status(201)
+      .json({ 
+        id: user.id, 
+        email: user.email, 
+        name: user.name,
+        team: {
+          id: team.id,
+          name: team.name,
+          overallRating: TeamService.calculateTeamRating(team.players)
+        }
+      });
+  } catch (error) {
+    console.error('Registration error:', error);
+    return res.status(500).json({ error: "Failed to create user and team" });
+  }
 }
 
 export async function loginHandler(req: Request, res: Response) {

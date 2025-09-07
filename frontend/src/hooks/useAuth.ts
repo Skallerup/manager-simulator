@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, authApiFetch } from "@/lib/api";
 
 export interface User {
   id: string;
@@ -24,6 +24,9 @@ export interface RegisterCredentials {
   email: string;
   password: string;
   name?: string;
+  teamName?: string;
+  colors?: string;
+  logo?: string;
 }
 
 export interface AuthContextType extends AuthState {
@@ -33,48 +36,87 @@ export interface AuthContextType extends AuthState {
   refreshAuth: () => Promise<void>;
 }
 
-// SWR fetcher for auth
-const authFetcher = async (url: string): Promise<User> => {
-  try {
-    return await apiFetch<User>(url);
-  } catch (error) {
-    // If /auth/me fails, try to refresh the token
-    try {
-      await apiFetch("/auth/refresh", { method: "POST" });
-      // If refresh succeeds, try /auth/me again
-      return await apiFetch<User>(url);
-    } catch (refreshError) {
-      // If refresh also fails, return null instead of throwing
-      // This prevents console errors on unauthenticated pages
-      return null as any;
-    }
+// SWR fetcher for auth - only runs when key is not null
+const authFetcher = async (url: string | null): Promise<User | null> => {
+  if (!url) {
+    return null;
   }
+  
+  // First try to get user data
+  const user = await authApiFetch<User>(url);
+  if (user) {
+    return user;
+  }
+  
+  // If no user, try to refresh token
+  const refreshResult = await authApiFetch("/auth/refresh", { method: "POST" });
+  if (refreshResult) {
+    // If refresh succeeded, try to get user data again
+    return await authApiFetch<User>(url);
+  }
+  
+  // If both failed, return null (user is not authenticated)
+  return null;
 };
 
 export function useAuth(): AuthContextType {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start with loading true
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
 
+  // Only use SWR when we have a user (after login)
   const {
-    data: user,
+    data: swrUser,
     error,
     mutate,
     isLoading: swrLoading,
-  } = useSWR<User>("/auth/me", authFetcher, {
+  } = useSWR<User | null>(user ? "/auth/me" : null, authFetcher, {
     revalidateOnFocus: false,
-    revalidateOnReconnect: true,
+    revalidateOnReconnect: false,
     shouldRetryOnError: false,
     errorRetryCount: 0,
-    onError: (error) => {
-      // Silently handle auth errors - don't log to console
-      // This prevents "Unauthenticated" errors from showing in console
-      if (error.message !== "Unauthenticated") {
-        console.error("Auth error:", error);
-      }
+    dedupingInterval: 30000,
+    refreshInterval: 0,
+    onError: () => {
+      // Completely silent - no console errors for auth
     },
   });
 
-  const isAuthenticated = !!user && !error;
+  // Initial auth check on mount
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const userData = await authApiFetch<User>("/auth/me");
+        if (userData) {
+          setUser(userData);
+          setIsAuthenticated(true);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        setUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
+  // Update local state when SWR data changes
+  React.useEffect(() => {
+    if (swrUser) {
+      setUser(swrUser);
+      setIsAuthenticated(true);
+    } else if (error) {
+      setUser(null);
+      setIsAuthenticated(false);
+    }
+  }, [swrUser, error]);
+
   const isAuthLoading = swrLoading || isLoading;
 
   const login = useCallback(
@@ -85,8 +127,9 @@ export function useAuth(): AuthContextType {
           method: "POST",
           body: JSON.stringify(credentials),
         });
-        // Update SWR cache with new user data
-        mutate(userData, false);
+        // Set user state and enable auth checking
+        setUser(userData);
+        setIsAuthenticated(true);
         router.push("/dashboard");
       } catch (error: unknown) {
         throw new Error(
@@ -103,10 +146,18 @@ export function useAuth(): AuthContextType {
     async (credentials: RegisterCredentials) => {
       setIsLoading(true);
       try {
-        await apiFetch("/auth/register", {
+        const response = await apiFetch("/auth/register", {
           method: "POST",
           body: JSON.stringify(credentials),
         });
+        
+        // If registration includes team creation, show team info
+        if ((response as any).team) {
+          alert(`Konto og hold oprettet succesfuldt!\n\nHold: ${(response as any).team.name}\nSamlet rating: ${(response as any).team.overallRating}/100`);
+        } else {
+          alert("Bruger oprettet succesfuldt! Du kan nu logge ind.");
+        }
+        
         router.push("/login");
       } catch (error: unknown) {
         throw new Error(
@@ -129,7 +180,9 @@ export function useAuth(): AuthContextType {
       // Even if logout fails on server, clear local state
       console.error("Logout error:", error);
     } finally {
-      // Clear SWR cache
+      // Clear all state
+      setUser(null);
+      setIsAuthenticated(false);
       mutate(undefined, false);
       setIsLoading(false);
       router.push("/login");

@@ -41,6 +41,16 @@ export function LeagueDetails({ leagueId, onBack }: LeagueDetailsProps) {
   const [showCreateTeamForm, setShowCreateTeamForm] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
 
+  // Calculate derived values
+  const isFull = league ? league.teams.length >= league.maxTeams : false;
+
+  // useEffect must be called before any conditional returns
+  useEffect(() => {
+    if (league) {
+      setIsSignupOpen(league.status === "ACTIVE" && !isFull);
+    }
+  }, [league, isFull]);
+
   if (leagueLoading) {
     return (
       <div className="space-y-4">
@@ -69,19 +79,10 @@ export function LeagueDetails({ leagueId, onBack }: LeagueDetailsProps) {
   }
 
   const isAdmin = league.adminId === user?.id;
-  const isMember = league.leagueMembers.some(
+  const isMember = league.leagueMembers?.some(
     (member) => member.userId === user?.id
-  );
+  ) || false;
   const hasTeam = league.teams.some((team) => team.ownerId === user?.id);
-
-  const signupDeadline = new Date(league.signupDeadline);
-  const isFull = league.teams.length >= league.maxTeams;
-
-  useEffect(() => {
-    if (league) {
-      setIsSignupOpen(league.status === "SIGNUP" && new Date() < signupDeadline);
-    }
-  }, [league, signupDeadline]);
 
   // Mock data for enhanced UI - in a real app, this would come from your backend
   const mockLeaderboard = [
@@ -94,22 +95,22 @@ export function LeagueDetails({ leagueId, onBack }: LeagueDetailsProps) {
 
   const mockUpcomingEvents = [
     {
-      type: "draft" as const,
-      title: "Draft Day",
+      type: "match" as const,
+      title: "Match Day 1",
       date: "Tomorrow 2:00 PM",
-      description: "Final draft preparation",
+      description: "Season opener - Champions United vs Elite Squad",
     },
     {
       type: "match" as const,
-      title: "Match Day 5",
+      title: "Match Day 2",
       date: "Friday 8:00 PM",
-      description: "Champions United vs Elite Squad",
+      description: "Victory FC vs Thunder Bolts",
     },
     {
-      type: "transfer" as const,
-      title: "Transfer Window",
+      type: "match" as const,
+      title: "Match Day 3",
       date: "Next Monday",
-      description: "Player transfers open",
+      description: "Storm Riders vs Champions United",
     },
   ];
 
@@ -161,19 +162,19 @@ export function LeagueDetails({ leagueId, onBack }: LeagueDetailsProps) {
         />
         <StatsCard
           icon={Calendar}
-          value={league.draftMethod}
-          label="Draft Method"
+          value={league.status}
+          label="Status"
           iconColor="text-green-500"
         />
         <StatsCard
           icon={Clock}
-          value={signupDeadline.toLocaleDateString()}
-          label="Deadline"
+          value={league.maxTeams}
+          label="Max Teams"
           iconColor="text-orange-500"
         />
         <StatsCard
           icon={Shield}
-          value={league.admin.name || league.admin.email}
+          value={league.admin?.name || league.admin?.email || "System"}
           label="Admin"
           iconColor="text-purple-500"
         />
@@ -184,7 +185,7 @@ export function LeagueDetails({ leagueId, onBack }: LeagueDetailsProps) {
         <UpcomingEvents events={mockUpcomingEvents} />
       </div>
 
-      <MemberCard members={league.leagueMembers} />
+      <MemberCard members={league.leagueMembers || []} />
 
       {/* Teams */}
       <Card>
