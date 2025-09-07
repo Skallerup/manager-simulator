@@ -267,6 +267,7 @@ export async function getMyTeamHandler(req: Request, res: Response) {
         id: tp.player.id,
         name: tp.player.name,
         position: tp.position,
+        formationPosition: tp.formationPosition,
         age: tp.player.age,
         rating: Math.floor(Math.random() * 40) + 60, // Random overall 60-100
         isStarter: tp.isStarter,
@@ -321,4 +322,153 @@ export async function setCaptainHandler(req: Request, res: Response) {
       .status(500)
       .json({ error: error.message || "Failed to set captain" });
   }
+}
+
+// Update team formation
+export async function updateFormationHandler(req: Request, res: Response) {
+  try {
+    const user = await getUserFromToken(req);
+    const { teamId } = req.params;
+    const { formation } = req.body;
+
+    const validFormations = ['4-4-2', '4-3-3', '3-5-2', '5-3-2'];
+    if (!validFormations.includes(formation)) {
+      return res.status(400).json({ error: 'Invalid formation' });
+    }
+
+    // Check if team exists and user is the owner
+    const team = await prisma.team.findFirst({
+      where: { id: teamId, ownerId: user.id },
+      include: { players: { include: { player: true } } }
+    });
+
+    if (!team) {
+      return res.status(404).json({
+        error: "Team not found or you don't have permission to update it",
+      });
+    }
+
+    // Update formation
+    await prisma.team.update({
+      where: { id: teamId },
+      data: { formation }
+    });
+
+    // Update formation positions for starters
+    const starters = team.players.filter(tp => tp.isStarter).slice(0, 11);
+    const formationPositions = getFormationPositions(formation);
+
+    for (let i = 0; i < starters.length && i < formationPositions.length; i++) {
+      await prisma.teamPlayer.update({
+        where: { id: starters[i].id },
+        data: { formationPosition: formationPositions[i] }
+      });
+    }
+
+    res.json({ success: true, formation });
+  } catch (error) {
+    console.error("Error updating formation:", error);
+    res.status(500).json({ error: "Failed to update formation" });
+  }
+}
+
+// Swap players in formation
+export async function swapPlayersHandler(req: Request, res: Response) {
+  try {
+    const user = await getUserFromToken(req);
+    const { teamId } = req.params;
+    const { fromPlayerId, toPlayerId } = req.body;
+
+    // Check if team exists and user is the owner
+    const team = await prisma.team.findFirst({
+      where: { id: teamId, ownerId: user.id },
+    });
+
+    if (!team) {
+      return res.status(404).json({
+        error: "Team not found or you don't have permission to update it",
+      });
+    }
+
+    // Get both players
+    const fromPlayer = await prisma.teamPlayer.findFirst({
+      where: { teamId, playerId: fromPlayerId },
+      include: { player: true }
+    });
+
+    const toPlayer = await prisma.teamPlayer.findFirst({
+      where: { teamId, playerId: toPlayerId },
+      include: { player: true }
+    });
+
+    if (!fromPlayer || !toPlayer) {
+      return res.status(404).json({ error: "One or both players not found" });
+    }
+
+    // Validate position compatibility
+    if (!isPositionCompatible(fromPlayer.player.position, toPlayer.player.position)) {
+      return res.status(400).json({ 
+        error: "Players cannot be swapped - incompatible positions",
+        fromPosition: fromPlayer.player.position,
+        toPosition: toPlayer.player.position
+      });
+    }
+
+    // Swap their starter status and formation positions
+    const fromStarter = fromPlayer.isStarter;
+    const fromFormationPosition = fromPlayer.formationPosition;
+
+    await prisma.teamPlayer.update({
+      where: { id: fromPlayer.id },
+      data: { 
+        isStarter: toPlayer.isStarter,
+        formationPosition: toPlayer.formationPosition
+      }
+    });
+
+    await prisma.teamPlayer.update({
+      where: { id: toPlayer.id },
+      data: { 
+        isStarter: fromStarter,
+        formationPosition: fromFormationPosition
+      }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error swapping players:", error);
+    res.status(500).json({ error: "Failed to swap players" });
+  }
+}
+
+// Helper function to get formation positions
+function getFormationPositions(formation: string): string[] {
+  const formations = {
+    '4-4-2': ['GK', 'LB', 'CB', 'CB', 'RB', 'LM', 'CM', 'CM', 'RM', 'ST', 'ST'],
+    '4-3-3': ['GK', 'LB', 'CB', 'CB', 'RB', 'CM', 'CM', 'CM', 'LW', 'ST', 'RW'],
+    '3-5-2': ['GK', 'CB', 'CB', 'CB', 'LM', 'CM', 'CM', 'CM', 'RM', 'ST', 'ST'],
+    '5-3-2': ['GK', 'LB', 'CB', 'CB', 'RB', 'LWB', 'CM', 'CM', 'RWB', 'ST', 'ST']
+  };
+  
+  return formations[formation as keyof typeof formations] || formations['4-4-2'];
+}
+
+// Helper function to check position compatibility
+function isPositionCompatible(position1: string, position2: string): boolean {
+  // Same position is always compatible
+  if (position1 === position2) return true;
+  
+  // Goalkeepers can only play goalkeeper
+  if (position1 === 'GOALKEEPER' || position2 === 'GOALKEEPER') return false;
+  
+  // Defenders can play with defenders
+  if (position1 === 'DEFENDER' && position2 === 'DEFENDER') return true;
+  
+  // Midfielders can play with midfielders
+  if (position1 === 'MIDFIELDER' && position2 === 'MIDFIELDER') return true;
+  
+  // Attackers can play with attackers
+  if (position1 === 'ATTACKER' && position2 === 'ATTACKER') return true;
+  
+  return false;
 }

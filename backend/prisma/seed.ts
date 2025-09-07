@@ -3,6 +3,19 @@ import { hash } from 'argon2';
 
 const prisma = new PrismaClient();
 
+// Helper function to get formation position based on player index and formation
+function getFormationPosition(playerIndex: number, formation: string): string {
+  const formations = {
+    '4-4-2': ['GK', 'LB', 'CB', 'CB', 'RB', 'LM', 'CM', 'CM', 'RM', 'ST', 'ST'],
+    '4-3-3': ['GK', 'LB', 'CB', 'CB', 'RB', 'CM', 'CM', 'CM', 'LW', 'ST', 'RW'],
+    '3-5-2': ['GK', 'CB', 'CB', 'CB', 'LM', 'CM', 'CM', 'CM', 'RM', 'ST', 'ST'],
+    '5-3-2': ['GK', 'LB', 'CB', 'CB', 'RB', 'LWB', 'CM', 'CM', 'RWB', 'ST', 'ST']
+  };
+  
+  const positions = formations[formation as keyof typeof formations] || formations['4-4-2'];
+  return positions[playerIndex] || 'SUB';
+}
+
 async function main() {
   console.log('🌱 Starting database seeding...');
 
@@ -111,6 +124,62 @@ async function main() {
 
   console.log('✅ Bot teams created');
 
+  // Create players for bot teams
+  const botTeams = await prisma.team.findMany({
+    where: { isBot: true },
+    include: { players: true }
+  });
+
+  for (const team of botTeams) {
+    if (team.players.length === 0) {
+      // Create 16 players for bot teams
+      const botPlayerNames = [
+        'Bot Player 1', 'Bot Player 2', 'Bot Player 3', 'Bot Player 4',
+        'Bot Player 5', 'Bot Player 6', 'Bot Player 7', 'Bot Player 8',
+        'Bot Player 9', 'Bot Player 10', 'Bot Player 11', 'Bot Player 12',
+        'Bot Player 13', 'Bot Player 14', 'Bot Player 15', 'Bot Player 16'
+      ];
+
+      // Position distribution: 2 GK, 5 DEF, 5 MID, 4 ATT
+      const positions = [
+        'GOALKEEPER', 'GOALKEEPER', // 2 goalkeepers
+        'DEFENDER', 'DEFENDER', 'DEFENDER', 'DEFENDER', 'DEFENDER', // 5 defenders
+        'MIDFIELDER', 'MIDFIELDER', 'MIDFIELDER', 'MIDFIELDER', 'MIDFIELDER', // 5 midfielders
+        'ATTACKER', 'ATTACKER', 'ATTACKER', 'ATTACKER' // 4 attackers
+      ];
+
+      for (let i = 0; i < 16; i++) {
+        const player = await prisma.player.create({
+          data: {
+            name: botPlayerNames[i],
+            age: Math.floor(Math.random() * 10) + 20, // 20-29 years old
+            position: positions[i] as any,
+            speed: Math.floor(Math.random() * 40) + 60,
+            shooting: Math.floor(Math.random() * 40) + 60,
+            passing: Math.floor(Math.random() * 40) + 60,
+            defending: Math.floor(Math.random() * 40) + 60,
+            stamina: Math.floor(Math.random() * 40) + 60,
+            reflexes: Math.floor(Math.random() * 40) + 60,
+            photo: `https://api.dicebear.com/7.x/avataaars/svg?seed=${botPlayerNames[i]}&backgroundColor=transparent&backgroundType=gradientLinear&gradientDirection=45`
+          }
+        });
+
+        // First 11 players are starters, rest are substitutes
+        await prisma.teamPlayer.create({
+          data: {
+            teamId: team.id,
+            playerId: player.id,
+            position: player.position,
+            isStarter: i < 11,
+            formationPosition: i < 11 ? getFormationPosition(i, team.formation) : null
+          }
+        });
+      }
+    }
+  }
+
+  console.log('✅ Players created for bot teams');
+
   // Create user teams if they don't exist
   const user1Team = await prisma.team.findFirst({
     where: { ownerId: testUser1.id }
@@ -188,21 +257,28 @@ async function main() {
 
   for (const team of userTeams) {
     if (team.players.length === 0) {
-      // Create 11 players for the team
+      // Create 16 players for the team (11 starters + 5 substitutes)
       const playerNames = [
         'Lars Nielsen', 'Mikkel Hansen', 'Anders Andersen', 'Thomas Larsen',
         'Michael Christensen', 'Jesper Sørensen', 'Martin Pedersen', 'Nikolaj Madsen',
-        'Daniel Rasmussen', 'Christian Jørgensen', 'Simon Poulsen'
+        'Daniel Rasmussen', 'Christian Jørgensen', 'Simon Poulsen', 'Emil Hansen',
+        'Frederik Nielsen', 'Magnus Andersen', 'Oliver Larsen', 'Victor Christensen'
       ];
 
-      for (let i = 0; i < 11; i++) {
+      // Position distribution: 2 GK, 5 DEF, 5 MID, 4 ATT
+      const positions = [
+        'GOALKEEPER', 'GOALKEEPER', // 2 goalkeepers
+        'DEFENDER', 'DEFENDER', 'DEFENDER', 'DEFENDER', 'DEFENDER', // 5 defenders
+        'MIDFIELDER', 'MIDFIELDER', 'MIDFIELDER', 'MIDFIELDER', 'MIDFIELDER', // 5 midfielders
+        'ATTACKER', 'ATTACKER', 'ATTACKER', 'ATTACKER' // 4 attackers
+      ];
+
+      for (let i = 0; i < 16; i++) {
         const player = await prisma.player.create({
           data: {
             name: playerNames[i],
             age: Math.floor(Math.random() * 10) + 20, // 20-29 years old
-            position: i === 0 ? 'GOALKEEPER' : 
-                     i < 5 ? 'DEFENDER' : 
-                     i < 9 ? 'MIDFIELDER' : 'ATTACKER',
+            position: positions[i] as any,
             speed: Math.floor(Math.random() * 40) + 60,
             shooting: Math.floor(Math.random() * 40) + 60,
             passing: Math.floor(Math.random() * 40) + 60,
@@ -213,12 +289,14 @@ async function main() {
           }
         });
 
+        // First 11 players are starters, rest are substitutes
         await prisma.teamPlayer.create({
           data: {
             teamId: team.id,
             playerId: player.id,
             position: player.position,
-            isStarter: true
+            isStarter: i < 11,
+            formationPosition: i < 11 ? getFormationPosition(i, team.formation) : null
           }
         });
       }

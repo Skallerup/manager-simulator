@@ -58,7 +58,7 @@ model League {
 model Team {
   id        String   @id @default(cuid())
   name      String
-  formation String   @default("4-3-3") // Default formation
+  formation String   @default("4-4-2") // Default formation: 4-4-2, 4-3-3, 3-5-2, 5-3-2
   colors    String?  // JSON string for primary and secondary colors
   logo      String?  // Logo identifier
   budget    Int      @default(10000000) // Starting budget in øre
@@ -156,6 +156,7 @@ model TeamPlayer {
   id        String   @id @default(cuid())
   position  String   // Field position (GK, DEF, MID, FWD)
   isStarter Boolean  @default(false)
+  formationPosition String? // Specific position in formation (e.g., "GK", "LB", "CB", "RB", "LM", "CM", "RM", "LW", "ST", "RW")
   createdAt DateTime @default(now())
   
   // Relations

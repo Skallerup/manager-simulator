@@ -5,7 +5,8 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Trophy, Target, Calendar, Star, Crown } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Users, Trophy, Target, Calendar, Star, Crown, Settings } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { authApiFetch } from "@/lib/api";
 import { PlayerAvatar } from "@/components/player-avatar";
@@ -14,6 +15,7 @@ interface Player {
   id: string;
   name: string;
   position: string;
+  formationPosition?: string;
   age: number;
   rating: number;
   isCaptain: boolean;
@@ -39,6 +41,7 @@ export default function MyTeamPage() {
   const [teamData, setTeamData] = useState<TeamData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isUpdatingFormation, setIsUpdatingFormation] = useState(false);
 
   useEffect(() => {
     const fetchTeamData = async () => {
@@ -77,6 +80,57 @@ export default function MyTeamPage() {
       }
     } catch (err) {
       setError('Failed to set captain');
+    }
+  };
+
+  const updateFormation = async (formation: string) => {
+    if (!teamData) return;
+    
+    try {
+      setIsUpdatingFormation(true);
+      const response = await authApiFetch(`/api/teams/${teamData.id}/formation`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formation })
+      });
+      
+      if (response) {
+        // Refresh team data
+        const updatedTeam = await authApiFetch('/api/teams/my-team');
+        if (updatedTeam) {
+          setTeamData(updatedTeam);
+        }
+      } else {
+        setError('Failed to update formation');
+      }
+    } catch (err) {
+      setError('Failed to update formation');
+    } finally {
+      setIsUpdatingFormation(false);
+    }
+  };
+
+  const swapPlayers = async (fromPlayerId: string, toPlayerId: string) => {
+    if (!teamData) return;
+    
+    try {
+      const response = await authApiFetch(`/api/teams/${teamData.id}/swap-players`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fromPlayerId, toPlayerId })
+      });
+      
+      if (response) {
+        // Refresh team data
+        const updatedTeam = await authApiFetch('/api/teams/my-team');
+        if (updatedTeam) {
+          setTeamData(updatedTeam);
+        }
+      } else {
+        setError('Failed to swap players');
+      }
+    } catch (err) {
+      setError('Failed to swap players');
     }
   };
 
@@ -161,10 +215,23 @@ export default function MyTeamPage() {
             <p className="text-sm text-muted-foreground">Samlet rating: {teamData.overallRating}</p>
           </div>
         </div>
-        <Button>
-          <Trophy className="w-4 h-4 mr-2" />
-          Rediger Hold
-        </Button>
+        <div className="flex gap-2">
+          <Select value={teamData.formation} onValueChange={updateFormation} disabled={isUpdatingFormation}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Formation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="4-4-2">4-4-2</SelectItem>
+              <SelectItem value="4-3-3">4-3-3</SelectItem>
+              <SelectItem value="3-5-2">3-5-2</SelectItem>
+              <SelectItem value="5-3-2">5-3-2</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button>
+            <Settings className="w-4 h-4 mr-2" />
+            Rediger Hold
+          </Button>
+        </div>
       </div>
 
       {/* Team Stats */}
@@ -209,6 +276,55 @@ export default function MyTeamPage() {
         </Card>
       </div>
 
+      {/* Formation View */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Trophy className="w-5 h-5 mr-2" />
+            Formation: {teamData.formation}
+          </CardTitle>
+          <CardDescription>
+            Din start-11 i {teamData.formation} formation. Træk spillere fra bænken for at skifte dem ud.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="relative bg-gradient-to-b from-green-400 to-green-600 rounded-lg p-8 min-h-[400px]">
+            {/* Football field background */}
+            <div className="absolute inset-0 bg-green-600 rounded-lg opacity-20"></div>
+            <div className="absolute inset-0 border-4 border-white rounded-lg"></div>
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-white"></div>
+            <div className="absolute top-1/2 left-0 w-16 h-16 border-2 border-white rounded-full"></div>
+            <div className="absolute top-1/2 right-0 w-16 h-16 border-2 border-white rounded-full"></div>
+            
+            {/* Formation positions */}
+            <div className="relative z-10 grid grid-cols-11 gap-2 h-full">
+              {teamData.players
+                .filter(player => player.isStarter)
+                .slice(0, 11)
+                .map((player, index) => (
+                  <div
+                    key={player.id}
+                    className="flex flex-col items-center p-2 bg-white/90 rounded-lg shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+                    onClick={() => {/* Handle player click */}}
+                  >
+                    <PlayerAvatar 
+                      playerName={player.name}
+                      position={player.position}
+                      size={32}
+                      className="rounded-full"
+                    />
+                    <span className="text-xs font-medium mt-1 text-center">{player.name}</span>
+                    <span className="text-xs text-gray-500">{player.formationPosition}</span>
+                    {player.isCaptain && (
+                      <Crown className="w-3 h-3 text-yellow-500" />
+                    )}
+                  </div>
+                ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Players List */}
       <Card>
         <CardHeader>
@@ -222,13 +338,18 @@ export default function MyTeamPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {teamData.players.map((player) => (
-              <div
-                key={player.id}
-                className={`flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors ${
-                  player.isCaptain ? 'ring-2 ring-yellow-400 bg-yellow-100' : ''
-                }`}
-              >
+            {/* Starters */}
+            <div className="space-y-2">
+              <h4 className="font-semibold text-green-600">Start-11</h4>
+              {teamData.players
+                .filter(player => player.isStarter)
+                .map((player) => (
+                  <div
+                    key={player.id}
+                    className={`flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors ${
+                      player.isCaptain ? 'ring-2 ring-yellow-400 bg-yellow-100' : 'bg-green-50'
+                    }`}
+                  >
                 <div className="flex items-center space-x-3">
                   <div className="relative">
                     <PlayerAvatar 
@@ -277,6 +398,69 @@ export default function MyTeamPage() {
                 </div>
               </div>
             ))}
+            </div>
+
+            {/* Substitutes */}
+            <div className="space-y-2 mt-6">
+              <h4 className="font-semibold text-blue-600">Udskiftere (5)</h4>
+              {teamData.players
+                .filter(player => !player.isStarter)
+                .map((player) => (
+                  <div
+                    key={player.id}
+                    className={`flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors ${
+                      player.isCaptain ? 'ring-2 ring-yellow-400 bg-yellow-100' : 'bg-blue-50'
+                    }`}
+                  >
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <PlayerAvatar 
+                      playerName={player.name}
+                      position={player.position}
+                      size={40}
+                      className="rounded-full"
+                    />
+                    {player.isCaptain && (
+                      <Crown className="absolute -top-1 -right-1 w-4 h-4 text-yellow-500" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <p className={`font-medium ${player.isCaptain ? 'text-gray-900' : ''}`}>{player.name}</p>
+                      {player.isCaptain && (
+                        <Badge className="bg-yellow-200 text-yellow-900 border-yellow-300">
+                          Kaptajn
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Badge className={getPositionColor(player.position)}>
+                        {getPositionName(player.position)}
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">Alder: {player.age}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center">
+                    <Star className="w-4 h-4 mr-1" />
+                    <span className={`font-bold ${getRatingColor(player.rating)}`}>
+                      {player.rating}
+                    </span>
+                  </div>
+                      {!player.isCaptain && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setCaptain(player.id)}
+                        >
+                          Sæt Kaptajn
+                        </Button>
+                      )}
+                </div>
+              </div>
+            ))}
+            </div>
           </div>
         </CardContent>
       </Card>
