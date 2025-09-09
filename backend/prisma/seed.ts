@@ -195,6 +195,21 @@ async function main() {
     });
     
     if (botTeamToRemove) {
+      // Delete team players first
+      await prisma.teamPlayer.deleteMany({
+        where: { teamId: botTeamToRemove.id }
+      });
+      
+      // Delete players associated with this team
+      await prisma.player.deleteMany({
+        where: { 
+          teamPlayers: {
+            some: { teamId: botTeamToRemove.id }
+          }
+        }
+      });
+      
+      // Delete the team
       await prisma.team.delete({
         where: { id: botTeamToRemove.id }
       });
@@ -228,6 +243,21 @@ async function main() {
     });
     
     if (botTeamToRemove) {
+      // Delete team players first
+      await prisma.teamPlayer.deleteMany({
+        where: { teamId: botTeamToRemove.id }
+      });
+      
+      // Delete players associated with this team
+      await prisma.player.deleteMany({
+        where: { 
+          teamPlayers: {
+            some: { teamId: botTeamToRemove.id }
+          }
+        }
+      });
+      
+      // Delete the team
       await prisma.team.delete({
         where: { id: botTeamToRemove.id }
       });

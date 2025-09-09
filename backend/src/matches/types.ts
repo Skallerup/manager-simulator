@@ -51,3 +51,4 @@ export interface SimulateMatchResponse {
     away: number;
   };
 }
+
