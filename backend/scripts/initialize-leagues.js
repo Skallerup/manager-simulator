@@ -238,3 +238,4 @@ function calculateBotPlayerStats(level, position) {
 
 // Run the initialization
 initializeLeagues();
+
