@@ -1,0 +1,21 @@
+{
+  "myTeam": "Mit Hold",
+  "teamStats": "Hold Statistikker",
+  "squad": "Trup",
+  "players": "Spillere",
+  "formation": "Formation",
+  "matches": "Kampe",
+  "wins": "Sejre",
+  "draws": "Uafgjorte",
+  "losses": "Nederlag",
+  "goalsFor": "Mål For",
+  "goalsAgainst": "Mål Imod",
+  "editTeam": "Rediger Hold",
+  "playerRating": "Spiller Rating",
+  "age": "Alder",
+  "position": "Position",
+  "goalkeeper": "Målmand",
+  "defender": "Forsvarer",
+  "midfielder": "Midtbanespiller",
+  "forward": "Angriber"
+}

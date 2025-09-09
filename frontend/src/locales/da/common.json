@@ -1,0 +1,91 @@
+{
+  "loading": "Indlæser...",
+  "error": "Fejl",
+  "success": "Succes",
+  "user": "Bruger",
+  "guest": "Gæst",
+  "home": {
+    "title": "Byg Dit Drømmehold",
+    "subtitle": "Den ultimative fantasy fodbold draft manager. Opret ligaer, draft spillere og konkurrér med venner.",
+    "getStarted": "Kom i Gang",
+    "login": "Log Ind",
+    "signIn": "Log Ind",
+    "activePlayers": "Aktive Spillere",
+    "leaguesCreated": "Ligaer Oprettet",
+    "draftsCompleted": "Drafts Gennemført",
+    "whyChoose": "Hvorfor Vælge Manager Simulator?",
+    "whyChooseSubtitle": "Oplev den mest omfattende fantasy fodbold platform designet til seriøse managere",
+    "competitiveLeagues": "Konkurrencedygtige Ligaer",
+    "competitiveLeaguesDesc": "Deltag i eller opret ligaer med brugerdefinerede regler, point systemer og konkurrencedygtige kampe der holder dig engageret hele sæsonen.",
+    "teamManagement": "Hold Administration",
+    "teamManagementDesc": "Byg og administrer din trup med avancerede værktøjer til handler, waivers og hold optimering for at maksimere dit holds potentiale.",
+    "realTimeDrafts": "Realtids Drafts",
+    "realTimeDraftsDesc": "Oplev live draft begivenheder med realtids opdateringer, spiller forslag og sømløs integration med dine liga indstillinger.",
+    "advancedAnalytics": "Avancerede Analytics",
+    "advancedAnalyticsDesc": "Træf datadrevne beslutninger med omfattende spiller statistikker, kamp analyse og præstations sporing gennem hele sæsonen.",
+    "secureReliable": "Sikker & Pålidelig",
+    "secureReliableDesc": "Dine data er beskyttet med enterprise-grade sikkerhed. Vores platform er bygget til pålidelighed med 99,9% oppetid garanti.",
+    "globalCommunity": "Globalt Fællesskab",
+    "globalCommunityDesc": "Forbind med fantasy fodbold entusiaster verden over. Del strategier, konkurrér i globale turneringer og lær fra de bedste.",
+    "howItWorks": "Sådan Fungerer Det",
+    "howItWorksSubtitle": "Kom i gang i tre simple trin og begynd din fantasy fodbold rejse",
+    "createAccount": "Opret Konto",
+    "createAccountDesc": "Tilmeld dig gratis og sæt din profil op. Vælg dine favorit hold og ligaer for at få personaliserede anbefalinger.",
+    "joinOrCreateLeague": "Deltag eller Opret Liga",
+    "joinOrCreateLeagueDesc": "Find eksisterende ligaer at deltage i eller opret din egen med brugerdefinerede regler, point og draft indstillinger skræddersyet til dine præferencer.",
+    "draftCompete": "Draft & Konkurrér",
+    "draftCompeteDesc": "Deltag i live drafts, administrer din trup og konkurrér mod andre managere gennem hele sæsonen om mesterskabet.",
+    "readyToStart": "Klar til at Starte Din Fantasy Fodbold Rejse?",
+    "readyToStartSubtitle": "Bliv en del af tusindvis af managere der stoler på Manager Simulator til deres ligaer og begynd at bygge dit drømmehold i dag.",
+    "startFreeTrial": "Start Gratis Prøveperiode",
+    "copyright": "© 2024 Manager Simulator. Alle rettigheder forbeholdes.",
+    "features": {
+      "title": "Alt hvad du behøver til at administrere din fantasy fodbold liga",
+      "subtitle": "Fra draft dag til mesterskab, har vi dig dækket",
+      "draft": {
+        "title": "Smart Drafting",
+        "description": "AI-drevet draft forslag og realtids spiller analyse"
+      },
+      "leagues": {
+        "title": "Liga Administration",
+        "description": "Opret og administrer flere ligaer med brugerdefinerede regler"
+      },
+      "analytics": {
+        "title": "Avancerede Analytics",
+        "description": "Spor præstation og træf datadrevne beslutninger"
+      }
+    },
+    "howItWorks": {
+      "title": "Sådan Fungerer Det",
+      "subtitle": "Kom i gang i tre simple trin",
+      "step1": {
+        "title": "Opret Din Liga",
+        "description": "Sæt din liga op med brugerdefinerede regler og inviter venner"
+      },
+      "step2": {
+        "title": "Draft Dit Hold",
+        "description": "Brug vores smarte draft værktøjer til at bygge dit perfekte hold"
+      },
+      "step3": {
+        "title": "Konkurrér og Vind",
+        "description": "Spor din præstation og konkurrér om mesterskabet"
+      }
+    },
+    "finalCta": {
+      "title": "Klar til at Starte Din Fantasy Fodbold Rejse?",
+      "subtitle": "Bliv en del af tusindvis af managere der stoler på Manager Simulator til deres ligaer",
+      "getStarted": "Kom i Gang Nu",
+      "learnMore": "Lær Mere"
+    },
+    "footer": {
+      "copyright": "© 2024 Manager Simulator. Alle rettigheder forbeholdes."
+    }
+  },
+  "app": {
+    "title": "Manager Simulator",
+    "description": "Fantasy Fodbold Manager Simulator"
+  },
+  "management": "Management",
+  "english": "Engelsk",
+  "danish": "Dansk"
+}
