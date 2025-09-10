@@ -221,13 +221,13 @@ export class TransferService {
         throw new Error("Insufficient budget");
       }
 
-      // Check if buyer team has space (max 11 players)
+      // Check if buyer team has space (max 16 players)
       const playerCount = await prisma.teamPlayer.count({
         where: { teamId: buyerTeamId },
       });
 
-      if (playerCount >= 11) {
-        throw new Error("Team is full (max 11 players)");
+      if (playerCount >= 16) {
+        throw new Error("Team is full (max 16 players)");
       }
 
       // Check if player is already on the buyer's team
@@ -524,13 +524,13 @@ export class TransferService {
         throw new Error("Buyer team not found");
       }
 
-      // Check if buyer team has space (max 11 players)
+      // Check if buyer team has space (max 16 players)
       const playerCount = await prisma.teamPlayer.count({
         where: { teamId },
       });
 
-      if (playerCount >= 11) {
-        throw new Error("Team is full (max 11 players)");
+      if (playerCount >= 16) {
+        throw new Error("Team is full (max 16 players)");
       }
 
       // Check if player is already on a team

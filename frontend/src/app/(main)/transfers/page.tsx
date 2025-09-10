@@ -301,8 +301,8 @@ export default function TransfersPage() {
             <div>
               <p className="text-sm text-muted-foreground">Spillere</p>
               <p className="text-lg font-semibold">
-                {teamData.players?.length || 0}/11
-                {(teamData.players?.length || 0) >= 11 && (
+                {teamData.players?.length || 0}/16
+                {(teamData.players?.length || 0) >= 16 && (
                   <span className="text-red-500 ml-1">(Fuld)</span>
                 )}
               </p>
@@ -338,7 +338,7 @@ export default function TransfersPage() {
                 </p>
               ) : (
                 <div className="space-y-4">
-                  {(teamData?.players?.length || 0) >= 11 && (
+                  {(teamData?.players?.length || 0) >= 16 && (
                     <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
                       <p className="text-orange-600 dark:text-orange-400 font-semibold mb-1">
                         {t('teamFull')}
@@ -403,13 +403,13 @@ export default function TransfersPage() {
                             <Button
                               size="sm"
                               onClick={() => buyPlayer(transfer.id)}
-                              disabled={!teamData || teamData.budget < transfer.askingPrice || (teamData?.players?.length || 0) >= 11}
+                              disabled={!teamData || teamData.budget < transfer.askingPrice || (teamData?.players?.length || 0) >= 16}
                               title={
                                 !teamData 
                                   ? t('loading') 
                                   : teamData.budget < transfer.askingPrice 
                                     ? t('insufficientBudget') 
-                                    : (teamData?.players?.length || 0) >= 11
+                                    : (teamData?.players?.length || 0) >= 16
                                       ? t('teamFull')
                                       : t('buy')
                               }
@@ -447,7 +447,7 @@ export default function TransfersPage() {
                 </p>
               ) : (
                 <div className="space-y-4">
-                  {(teamData?.players?.length || 0) >= 11 && (
+                  {(teamData?.players?.length || 0) >= 16 && (
                     <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
                       <p className="text-orange-600 dark:text-orange-400 font-semibold mb-1">
                         {t('teamFull')}
@@ -510,9 +510,9 @@ export default function TransfersPage() {
                             <Button
                               size="sm"
                               onClick={() => signFreeTransferPlayer(transfer.playerId)}
-                              disabled={(teamData?.players?.length || 0) >= 11}
+                              disabled={(teamData?.players?.length || 0) >= 16}
                               title={
-                                (teamData?.players?.length || 0) >= 11
+                                (teamData?.players?.length || 0) >= 16
                                   ? t('teamFull')
                                   : t('signFree')
                               }

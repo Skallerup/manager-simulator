@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { apiFetch, authApiFetch } from "@/lib/api";
 import { PlayerAvatar } from "@/components/player-avatar";
+import { MatchHighlights } from "@/components/highlights/MatchHighlights";
 
 // Match simulation types
 interface MatchEvent {
@@ -42,6 +43,7 @@ interface MatchResult {
   botTeam: string;
   events: MatchEvent[];
   duration: number; // in minutes
+  highlights?: any[];
 }
 
 // Bot teams configuration
@@ -79,6 +81,7 @@ export default function MatchPage() {
         // Load user team
         const teamResponse = await authApiFetch('/api/teams/my-team');
         if (teamResponse) {
+          console.log('Team response:', teamResponse);
           setUserTeam(teamResponse);
         }
         
@@ -93,7 +96,8 @@ export default function MatchPage() {
             playerTeam: match.userTeam?.name || 'Your Team',
             botTeam: `Bot ${match.botDifficulty}`,
             duration: 90,
-            events: match.events || []
+            events: match.events || [],
+            highlights: match.highlights || []
           }));
           setMatchHistory(formattedHistory);
         }
@@ -126,19 +130,33 @@ export default function MatchPage() {
           }
           
           // Simulate random events
-          if (Math.random() < 0.1) { // 10% chance per second
+          if (Math.random() < 0.03) { // 3% chance per second (reduced from 10%)
             const eventTypes: MatchEvent['type'][] = ['shot', 'save', 'yellow_card'];
             const randomType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
             // Calculate team strength difference
-            const playerRating = userTeam?.overallRating || 50;
+            const playerRating = userTeam?.overallRating || 
+              (userTeam?.players?.filter(p => p.isStarter)?.length > 0 ? 
+                Math.round(userTeam.players.filter(p => p.isStarter).reduce((sum, p) => sum + p.rating, 0) / userTeam.players.filter(p => p.isStarter).length) : 
+                50
+              );
             const botRating = selectedBot.rating;
             const totalRating = playerRating + botRating;
             
+            // Check if player team has only goalkeeper
+            const playerStarters = userTeam?.players?.filter(p => p.isStarter) || [];
+            const hasOnlyGoalkeeper = playerStarters.length === 1 && playerStarters[0]?.position === 'GOALKEEPER';
+            
             // Player team gets ball based on their relative strength
-            const playerPossession = playerRating / totalRating;
+            let playerPossession = playerRating / totalRating;
+            
+            // If player has only goalkeeper, drastically reduce their possession
+            if (hasOnlyGoalkeeper) {
+              playerPossession = Math.min(0.1, playerPossession * 0.1); // Max 10% possession
+            }
+            
             const team = Math.random() < playerPossession ? 'player' : 'bot';
             const player = team === 'player' 
-              ? (userTeam?.players?.[Math.floor(Math.random() * (userTeam?.players?.length || 1))]?.name || 'Player')
+              ? (userTeam?.players?.filter(p => p.isStarter)?.[Math.floor(Math.random() * (userTeam?.players?.filter(p => p.isStarter)?.length || 1))]?.name || 'Player')
               : `${selectedBot.name} Player`;
             
             const newEvent: MatchEvent = {
@@ -159,9 +177,14 @@ export default function MatchPage() {
               const attackingTeamRating = team === 'player' ? playerRating : botRating;
               const defendingTeamRating = team === 'player' ? botRating : playerRating;
               
-              // Base goal chance is 20%, modified by strength difference
+              // Base goal chance is much lower, modified by strength difference
               const strengthDifference = (attackingTeamRating - defendingTeamRating) / 100;
-              const goalChance = Math.max(0.05, Math.min(0.6, 0.2 + strengthDifference * 0.3));
+              let goalChance = Math.max(0.01, Math.min(0.15, 0.05 + strengthDifference * 0.1));
+              
+              // If player has only goalkeeper, drastically reduce goal chance
+              if (team === 'player' && hasOnlyGoalkeeper) {
+                goalChance = Math.max(0.001, goalChance * 0.01); // 1% of normal chance
+              }
               
               if (Math.random() < goalChance) {
                 if (team === 'player') {
@@ -337,8 +360,9 @@ export default function MatchPage() {
       </div>
 
       <Tabs defaultValue="play" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="play">{t('play', { ns: 'match' })}</TabsTrigger>
+          <TabsTrigger value="highlights">{t('highlights', { ns: 'match' })}</TabsTrigger>
           <TabsTrigger value="history">{t('history', { ns: 'match' })}</TabsTrigger>
           <TabsTrigger value="documentation">{t('documentation', { ns: 'match' })}</TabsTrigger>
         </TabsList>
@@ -412,7 +436,14 @@ export default function MatchPage() {
                 <div>
                   <h3 className="font-bold text-lg">{userTeam?.name || 'Your Team'}</h3>
                   <div className="text-4xl font-bold text-blue-600">{playerScore}</div>
-                  <p className="text-sm text-muted-foreground">Rating: {userTeam?.overallRating || 'N/A'}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Rating: {userTeam?.overallRating || 
+                      (userTeam?.players?.filter(p => p.isStarter)?.length > 0 ? 
+                        Math.round(userTeam.players.filter(p => p.isStarter).reduce((sum, p) => sum + p.rating, 0) / userTeam.players.filter(p => p.isStarter).length) : 
+                        'N/A'
+                      )
+                    }
+                  </p>
                 </div>
                 <div className="text-2xl font-bold">VS</div>
                 <div>
@@ -442,6 +473,34 @@ export default function MatchPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="highlights" className="space-y-4">
+          {currentMatchId ? (
+            <MatchHighlights 
+              matchId={currentMatchId} 
+              isProUser={user?.email === 'skallerup+3@gmail.com' || user?.email === 'skallerup+4@gmail.com' || user?.email === 'skallerup+5@gmail.com'}
+              highlights={matchHistory.find(match => match.id === currentMatchId)?.highlights}
+            />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Play className="w-5 h-5 mr-2" />
+                  {t('highlights', { ns: 'match' })}
+                </CardTitle>
+                <CardDescription>
+                  {t('highlightsDescription', { ns: 'match' })}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <Play className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">{t('noMatchSelected', { ns: 'match' })}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">

@@ -1,4 +1,4 @@
-import { Player, Team, MatchResult, MatchEvent, GameEngineConfig } from './types';
+import { Player, Team, MatchResult, MatchEvent, MatchHighlight, GameEngineConfig } from './types';
 
 export class GameEngine {
   private config: GameEngineConfig;
@@ -16,6 +16,7 @@ export class GameEngine {
    */
   public simulateMatch(homeTeam: Team, awayTeam: Team): MatchResult {
     const events: MatchEvent[] = [];
+    const highlights: MatchHighlight[] = [];
     let homeScore = 0;
     let awayScore = 0;
     
@@ -32,6 +33,10 @@ export class GameEngine {
     for (let minute = 1; minute <= this.config.matchLength; minute++) {
       const minuteEvents = this.simulateMinute(homeTeam, awayTeam, homeStrength, awayStrength, minute);
       events.push(...minuteEvents);
+      
+      // Generate highlights for important events
+      const minuteHighlights = this.generateHighlights(minuteEvents, minute);
+      highlights.push(...minuteHighlights);
       
       // Count goals
       minuteEvents.forEach(event => {
@@ -50,6 +55,7 @@ export class GameEngine {
       homeScore,
       awayScore,
       events: events.sort((a, b) => a.minute - b.minute),
+      highlights: highlights.sort((a, b) => a.minute - b.minute),
       possession: {
         home: Math.round(homePossession),
         away: Math.round(awayPossession)
@@ -87,10 +93,15 @@ export class GameEngine {
 
     const averageStats = totalStats / (starters.length * 6); // 6 stats per player
     
-    // Penalty for incomplete teams (less than 11 players)
-    if (starters.length < 11) {
-      const penalty = (11 - starters.length) * 15; // 15 points penalty per missing player
+    // Penalty for incomplete teams (less than 16 players)
+    if (starters.length < 16) {
+      const penalty = (16 - starters.length) * 5; // 5 points penalty per missing player (reduced from 15)
       return Math.max(0, Math.round(averageStats - penalty));
+    }
+    
+    // Minimum team strength requirement
+    if (starters.length < 5) {
+      return 0; // Teams with less than 5 players have 0 strength
     }
     
     return Math.round(averageStats);
@@ -115,20 +126,36 @@ export class GameEngine {
     const attackingTeam = ballWithHome ? homeTeam : awayTeam;
     const defendingTeam = ballWithHome ? awayTeam : homeTeam;
     const teamSide = ballWithHome ? 'home' : 'away';
+    const defendingSide = ballWithHome ? 'away' : 'home';
     
     // Chance of an event happening this minute
     const eventChance = Math.random();
     
-    if (eventChance < 0.15) { // 15% chance of goal attempt
-      const goalEvent = this.simulateGoal(attackingTeam, teamSide, minute, homeStrength, awayStrength);
-      if (goalEvent) events.push(goalEvent);
-    } else if (eventChance < 0.25) { // 10% chance of shot
-      const shotEvent = this.simulateShot(attackingTeam, teamSide, minute);
-      if (shotEvent) events.push(shotEvent);
-    } else if (eventChance < 0.28) { // 3% chance of card
+    // Check if attacking team has any attackers
+    const hasAttackers = attackingTeam.players.some(p => p.isStarter && p.position === 'ATTACKER');
+    
+    if (eventChance < 0.05) { // 5% chance of goal attempt (reduced from 15%)
+      if (hasAttackers) {
+        const goalEvent = this.simulateGoal(attackingTeam, teamSide, minute, homeStrength, awayStrength);
+        if (goalEvent) events.push(goalEvent);
+      } else {
+        // If no attackers, simulate a save instead
+        const saveEvent = this.simulateSave(defendingTeam, defendingSide, minute);
+        if (saveEvent) events.push(saveEvent);
+      }
+    } else if (eventChance < 0.10) { // 5% chance of shot (reduced from 10%)
+      if (hasAttackers) {
+        const shotEvent = this.simulateShot(attackingTeam, teamSide, minute);
+        if (shotEvent) events.push(shotEvent);
+      } else {
+        // If no attackers, simulate a save instead
+        const saveEvent = this.simulateSave(defendingTeam, defendingSide, minute);
+        if (saveEvent) events.push(saveEvent);
+      }
+    } else if (eventChance < 0.12) { // 2% chance of card (reduced from 3%)
       const cardEvent = this.simulateCard(attackingTeam, teamSide, minute);
       if (cardEvent) events.push(cardEvent);
-    } else if (eventChance < 0.30) { // 2% chance of substitution
+    } else if (eventChance < 0.13) { // 1% chance of substitution (reduced from 2%)
       const subEvent = this.simulateSubstitution(attackingTeam, teamSide, minute);
       if (subEvent) events.push(subEvent);
     }
@@ -149,12 +176,12 @@ export class GameEngine {
     const attackingStrength = teamSide === 'home' ? homeStrength : awayStrength;
     const defendingStrength = teamSide === 'home' ? awayStrength : homeStrength;
     
-    // Base goal chance from player stats
-    const playerGoalChance = (attacker.shooting + attacker.overall) / 200;
+    // Base goal chance from player stats (much lower)
+    const playerGoalChance = (attacker.shooting + attacker.overall) / 400; // Reduced from 200 to 400
     
     // Modify by team strength difference
     const strengthDifference = (attackingStrength - defendingStrength) / 100;
-    const goalChance = Math.max(0.05, Math.min(0.8, playerGoalChance + strengthDifference * 0.3));
+    const goalChance = Math.max(0.01, Math.min(0.3, playerGoalChance + strengthDifference * 0.1)); // Much lower max chance
     
     if (Math.random() < goalChance) {
       return {
@@ -184,6 +211,24 @@ export class GameEngine {
       team: teamSide,
       player: attacker.name,
       description: `${attacker.name} shoots!`
+    };
+  }
+
+  /**
+   * Simulate a save attempt
+   */
+  private simulateSave(team: Team, teamSide: 'home' | 'away', minute: number): MatchEvent | null {
+    const goalkeepers = team.players.filter(p => p.isStarter && p.position === 'GOALKEEPER');
+    if (goalkeepers.length === 0) return null;
+    
+    const goalkeeper = goalkeepers[Math.floor(Math.random() * goalkeepers.length)];
+    
+    return {
+      minute,
+      type: 'save',
+      team: teamSide,
+      player: goalkeeper.name,
+      description: `${goalkeeper.name} saved!`
     };
   }
 
@@ -236,6 +281,98 @@ export class GameEngine {
     }
     
     return null;
+  }
+
+  /**
+   * Generate highlights from match events
+   */
+  private generateHighlights(events: MatchEvent[], minute: number): MatchHighlight[] {
+    const highlights: MatchHighlight[] = [];
+    
+    events.forEach(event => {
+      if (this.isHighlightWorthy(event)) {
+        highlights.push(this.createHighlight(event, minute));
+      }
+    });
+    
+    return highlights;
+  }
+
+  /**
+   * Check if an event is worth highlighting
+   */
+  private isHighlightWorthy(event: MatchEvent): boolean {
+    return ['goal', 'save', 'red_card', 'penalty'].includes(event.type);
+  }
+
+  /**
+   * Create a highlight from a match event
+   */
+  private createHighlight(event: MatchEvent, minute: number): MatchHighlight {
+    const highlightId = Math.random().toString(36).substr(2, 9);
+    
+    return {
+      id: highlightId,
+      eventType: event.type,
+      minute,
+      player: event.player,
+      description: event.description,
+      videoUrl: this.generateVideoUrl(event.type, event.team),
+      thumbnailUrl: this.generateThumbnailUrl(event.type, event.team),
+      duration: this.getHighlightDuration(event.type),
+      isProOnly: true
+    };
+  }
+
+  /**
+   * Generate simulated video URL for highlights
+   */
+  private generateVideoUrl(eventType: string, team: 'home' | 'away'): string {
+    // Return a placeholder since we're using JavaScript animation now
+    return `data:application/json;base64,${Buffer.from(JSON.stringify({
+      eventType,
+      team,
+      animated: true
+    })).toString('base64')}`;
+  }
+
+  /**
+   * Generate simulated thumbnail URL for highlights
+   */
+  private generateThumbnailUrl(eventType: string, team: 'home' | 'away'): string {
+    // Use football-related placeholder images
+    const baseUrl = 'https://images.unsplash.com';
+    
+    switch (eventType) {
+      case 'goal':
+        return `${baseUrl}/photo-1431324155629-1a6deb1dec8d?w=64&h=48&fit=crop&crop=center`;
+      case 'save':
+        return `${baseUrl}/photo-1574629810360-7efbbe195018?w=64&h=48&fit=crop&crop=center`;
+      case 'red_card':
+        return `${baseUrl}/photo-1571019613454-1cb2f99b2d8b?w=64&h=48&fit=crop&crop=center`;
+      case 'penalty':
+        return `${baseUrl}/photo-1574629810360-7efbbe195018?w=64&h=48&fit=crop&crop=center`;
+      default:
+        return `${baseUrl}/photo-1431324155629-1a6deb1dec8d?w=64&h=48&fit=crop&crop=center`;
+    }
+  }
+
+  /**
+   * Get highlight duration based on event type
+   */
+  private getHighlightDuration(eventType: string): number {
+    switch (eventType) {
+      case 'goal':
+        return 15; // 15 seconds for goals
+      case 'save':
+        return 8;  // 8 seconds for saves
+      case 'red_card':
+        return 12; // 12 seconds for red cards
+      case 'penalty':
+        return 20; // 20 seconds for penalties
+      default:
+        return 10; // 10 seconds default
+    }
   }
 
   /**

@@ -352,23 +352,31 @@ export const simulateBotMatch = async (req: Request, res: Response) => {
     const userScore = events.filter((e: any) => e.type === 'goal' && e.team === 'player').length;
     const botScore = events.filter((e: any) => e.type === 'goal' && e.team === 'bot').length;
 
-    // Update bot match with results
+    // Generate highlights from events
+    const highlights = generateHighlightsFromEvents(events);
+
+    // Update bot match with results and highlights
     const updatedMatch = await prisma.botMatch.update({
       where: { id },
       data: {
         userScore,
         botScore,
         status: 'COMPLETED',
-        events: JSON.stringify(events)
+        events: JSON.stringify(events),
+        highlights: JSON.stringify(highlights)
       }
     });
+
+    // Save highlights to database
+    await saveHighlightsToDatabase(id, highlights);
 
     res.json({
       id: updatedMatch.id,
       userScore: updatedMatch.userScore,
       botScore: updatedMatch.botScore,
       status: updatedMatch.status,
-      events: JSON.parse(updatedMatch.events || '[]')
+      events: JSON.parse(updatedMatch.events || '[]'),
+      highlights: highlights
     });
   } catch (error) {
     console.error('Error simulating bot match:', error);
@@ -383,7 +391,8 @@ export const getBotMatches = async (req: Request, res: Response) => {
     const botMatches = await prisma.botMatch.findMany({
       where: { ownerId: user.id },
       include: {
-        userTeam: { select: { id: true, name: true } }
+        userTeam: { select: { id: true, name: true } },
+        highlightsClips: true
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -397,6 +406,17 @@ export const getBotMatches = async (req: Request, res: Response) => {
       botScore: match.botScore,
       status: match.status,
       events: match.events ? JSON.parse(match.events) : [],
+      highlights: match.highlightsClips.map(highlight => ({
+        id: highlight.id,
+        eventType: highlight.eventType,
+        minute: highlight.minute,
+        player: highlight.player,
+        description: highlight.description,
+        videoUrl: highlight.videoUrl,
+        thumbnailUrl: highlight.thumbnailUrl,
+        duration: highlight.duration,
+        isProOnly: highlight.isProOnly
+      })),
       createdAt: match.createdAt.toISOString()
     }));
 
@@ -406,3 +426,167 @@ export const getBotMatches = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch bot matches' });
   }
 };
+
+export const getMatchHighlights = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const user = await getUserFromToken(req);
+
+    // Get bot match
+    const botMatch = await prisma.botMatch.findUnique({
+      where: { id, ownerId: user.id },
+      include: {
+        highlightsClips: true
+      }
+    });
+
+    if (!botMatch) {
+      return res.status(404).json({ error: 'Match not found' });
+    }
+
+    // Check if user has PRO access
+    const hasProAccess = await checkProAccess(user.id);
+    
+    if (!hasProAccess) {
+      return res.status(403).json({ 
+        error: 'PRO feature - highlights require PRO subscription',
+        isProFeature: true
+      });
+    }
+
+    res.json({
+      matchId: botMatch.id,
+      highlights: botMatch.highlightsClips.map(highlight => ({
+        id: highlight.id,
+        eventType: highlight.eventType,
+        minute: highlight.minute,
+        player: highlight.player,
+        description: highlight.description,
+        videoUrl: highlight.videoUrl,
+        thumbnailUrl: highlight.thumbnailUrl,
+        duration: highlight.duration,
+        isProOnly: highlight.isProOnly
+      }))
+    });
+  } catch (error) {
+    console.error('Error fetching match highlights:', error);
+    res.status(500).json({ error: 'Failed to fetch match highlights' });
+  }
+};
+
+// Helper function to generate highlights from events
+function generateHighlightsFromEvents(events: any[]): any[] {
+  const highlights: any[] = [];
+  
+  events.forEach(event => {
+    if (isHighlightWorthy(event)) {
+      highlights.push({
+        id: Math.random().toString(36).substr(2, 9),
+        eventType: event.type,
+        minute: event.minute,
+        player: event.player,
+        description: event.description,
+        videoUrl: generateVideoUrl(event.type, event.team),
+        thumbnailUrl: generateThumbnailUrl(event.type, event.team),
+        duration: getHighlightDuration(event.type),
+        isProOnly: true
+      });
+    }
+  });
+  
+  return highlights;
+}
+
+// Helper function to check if event is highlight worthy
+function isHighlightWorthy(event: any): boolean {
+  return ['goal', 'save', 'red_card', 'penalty'].includes(event.type);
+}
+
+// Helper function to generate video URL
+function generateVideoUrl(eventType: string, team: string): string {
+  // Return a placeholder since we're using JavaScript animation now
+  return `data:application/json;base64,${Buffer.from(JSON.stringify({
+    eventType,
+    team,
+    animated: true
+  })).toString('base64')}`;
+}
+
+// Helper function to generate thumbnail URL
+function generateThumbnailUrl(eventType: string, team: string): string {
+  // Use football-related placeholder images
+  const baseUrl = 'https://images.unsplash.com';
+  
+  switch (eventType) {
+    case 'goal':
+      return `${baseUrl}/photo-1431324155629-1a6deb1dec8d?w=64&h=48&fit=crop&crop=center`;
+    case 'save':
+      return `${baseUrl}/photo-1574629810360-7efbbe195018?w=64&h=48&fit=crop&crop=center`;
+    case 'red_card':
+      return `${baseUrl}/photo-1571019613454-1cb2f99b2d8b?w=64&h=48&fit=crop&crop=center`;
+    case 'penalty':
+      return `${baseUrl}/photo-1574629810360-7efbbe195018?w=64&h=48&fit=crop&crop=center`;
+    default:
+      return `${baseUrl}/photo-1431324155629-1a6deb1dec8d?w=64&h=48&fit=crop&crop=center`;
+  }
+}
+
+// Helper function to get highlight duration
+function getHighlightDuration(eventType: string): number {
+  switch (eventType) {
+    case 'goal':
+      return 15; // 15 seconds for goals
+    case 'save':
+      return 8;  // 8 seconds for saves
+    case 'red_card':
+      return 12; // 12 seconds for red cards
+    case 'penalty':
+      return 20; // 20 seconds for penalties
+    default:
+      return 10; // 10 seconds default
+  }
+}
+
+// Helper function to save highlights to database
+async function saveHighlightsToDatabase(matchId: string, highlights: any[]) {
+  try {
+    // Delete existing highlights for this match
+    await prisma.matchHighlight.deleteMany({
+      where: { matchId }
+    });
+
+    // Create new highlights
+    const highlightData = highlights.map(highlight => ({
+      matchId,
+      eventType: highlight.eventType,
+      minute: highlight.minute,
+      player: highlight.player,
+      description: highlight.description,
+      videoUrl: highlight.videoUrl,
+      thumbnailUrl: highlight.thumbnailUrl,
+      duration: highlight.duration,
+      isProOnly: highlight.isProOnly
+    }));
+
+    await prisma.matchHighlight.createMany({
+      data: highlightData
+    });
+  } catch (error) {
+    console.error('Error saving highlights to database:', error);
+  }
+}
+
+// Helper function to check PRO access (simplified for now)
+async function checkProAccess(userId: string): Promise<boolean> {
+  // For now, we'll simulate PRO access based on user email
+  // In a real implementation, this would check a subscription service
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true }
+  });
+  
+  if (!user) return false;
+  
+  // Simulate PRO access for admin users
+  return user.email === 'skallerup+3@gmail.com' || user.email === 'skallerup+4@gmail.com' || user.email === 'skallerup+5@gmail.com';
+}

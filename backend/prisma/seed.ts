@@ -42,6 +42,17 @@ async function main() {
     }
   });
 
+  const testUser3 = await prisma.user.upsert({
+    where: { email: 'skallerup+5@gmail.com' },
+    update: {},
+    create: {
+      email: 'skallerup+5@gmail.com',
+      name: 'Test User 3',
+      passwordHash: await hash('12345678'),
+      isAdmin: false
+    }
+  });
+
   console.log('✅ Test users created');
 
   // Create leagues
@@ -277,6 +288,54 @@ async function main() {
     });
   }
 
+  const user3Team = await prisma.team.findFirst({
+    where: { ownerId: testUser3.id }
+  });
+
+  if (!user3Team) {
+    // Remove a bot team from division2 to make room for user team
+    const botTeamToRemove = await prisma.team.findFirst({
+      where: { 
+        leagueId: division2.id,
+        isBot: true
+      }
+    });
+    
+    if (botTeamToRemove) {
+      // Delete team players first
+      await prisma.teamPlayer.deleteMany({
+        where: { teamId: botTeamToRemove.id }
+      });
+      
+      // Delete players associated with this team
+      await prisma.player.deleteMany({
+        where: { 
+          teamPlayers: {
+            some: { teamId: botTeamToRemove.id }
+          }
+        }
+      });
+      
+      // Delete the team
+      await prisma.team.delete({
+        where: { id: botTeamToRemove.id }
+      });
+    }
+
+    await prisma.team.create({
+      data: {
+        name: 'Test Team 3',
+        formation: '4-4-2',
+        colors: JSON.stringify({ primary: '#00FF00', secondary: '#000000' }),
+        logo: 'team-logo-3',
+        budget: 1000000,
+        leagueId: division2.id,
+        ownerId: testUser3.id,
+        isBot: false
+      }
+    });
+  }
+
   console.log('✅ User teams created');
 
   // Create players for user teams
@@ -341,7 +400,7 @@ async function main() {
 main()
   .catch((e) => {
     console.error('❌ Seeding failed:', e);
-    process.exit(1);
+    throw e;
   })
   .finally(async () => {
     await prisma.$disconnect();
