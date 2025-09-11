@@ -7,7 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Plus, Star, Crown, Zap, Swords, ArrowRightLeft, Shield } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Search, Plus, Star, Crown, Zap, Swords, ArrowRightLeft, Shield, DollarSign, TrendingUp } from "lucide-react";
 import { authApiFetch } from "@/lib/api";
 import { PlayerAvatar } from "@/components/player-avatar";
 
@@ -109,6 +111,11 @@ export default function MyTeamPage() {
   const [selectedFormation, setSelectedFormation] = useState("5-3-2");
   const [formationPlayers, setFormationPlayers] = useState<{[key: string]: Player}>({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [transferModalOpen, setTransferModalOpen] = useState(false);
+  const [selectedPlayerForTransfer, setSelectedPlayerForTransfer] = useState<Player | null>(null);
+  const [askingPrice, setAskingPrice] = useState("");
+  const [minimumPrice, setMinimumPrice] = useState(0);
+  const [isListingTransfer, setIsListingTransfer] = useState(false);
 
   // Load team data
   useEffect(() => {
@@ -376,6 +383,59 @@ export default function MyTeamPage() {
 
   const currentTeamRating = calculateDynamicTeamRating();
 
+  // Transfer functions
+  const handleTransferClick = async (player: Player) => {
+    try {
+      setSelectedPlayerForTransfer(player);
+      setAskingPrice("");
+      
+      // Get minimum price for the player
+      const response = await authApiFetch(`/api/transfers/minimum-price/${player.id}`) as any;
+      if (response) {
+        setMinimumPrice(response.minimumPrice);
+        setAskingPrice(response.suggestedPrice.toString());
+      }
+      
+      setTransferModalOpen(true);
+    } catch (error) {
+      console.error("Error getting minimum price:", error);
+      setError("Kunne ikke hente minimumspris for spilleren");
+    }
+  };
+
+  const handleListForTransfer = async () => {
+    if (!selectedPlayerForTransfer || !askingPrice) return;
+    
+    try {
+      setIsListingTransfer(true);
+      const response = await authApiFetch(`/api/transfers/list/${selectedPlayerForTransfer.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          askingPrice: parseInt(askingPrice)
+        })
+      });
+      
+      if (response) {
+        setTransferModalOpen(false);
+        setSelectedPlayerForTransfer(null);
+        setAskingPrice("");
+        // Reload team data to reflect changes
+        const data = await authApiFetch('/api/teams/my-team');
+        if (data) {
+          setTeamData(data as TeamData);
+        }
+      }
+    } catch (error: any) {
+      console.error("Error listing player for transfer:", error);
+      setError(error.message || "Kunne ikke sætte spiller på transfer");
+    } finally {
+      setIsListingTransfer(false);
+    }
+  };
+
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
@@ -612,15 +672,29 @@ export default function MyTeamPage() {
                       </div>
                     </div>
                     
-                    <div className="w-8 h-8 rounded-full shadow-lg font-bold flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground">
-                      <Plus className="w-4 h-4" />
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTransferClick(player);
+                        }}
+                        className="text-xs px-2 py-1 h-7"
+                      >
+                        <TrendingUp className="w-3 h-3 mr-1" />
+                        Transfer
+                      </Button>
+                      <div className="w-8 h-8 rounded-full shadow-lg font-bold flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground">
+                        <Plus className="w-4 h-4" />
+                      </div>
                     </div>
                   </div>
                   
                   {/* Rating */}
-                  <div className="flex items-center justify-center bg-yellow-100 px-3 py-2 rounded-lg border border-yellow-300 mb-3">
-                    <Star className="w-4 h-4 mr-2 text-yellow-700" />
-                    <span className="font-bold text-xl">
+                  <div className="flex items-center justify-center bg-yellow-200 px-2 py-1 rounded-md border-2 border-yellow-400 mb-3">
+                    <Star className="w-3 h-3 mr-1 text-yellow-800" />
+                    <span className="font-bold text-sm text-yellow-900">
                       {player.rating}
                     </span>
                   </div>
@@ -628,35 +702,35 @@ export default function MyTeamPage() {
                   {/* Player Stats */}
                   <div className="space-y-2">
                     <div className="text-xs text-muted-foreground font-semibold text-center">Evner:</div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="flex justify-center space-x-3">
                       {/* Speed */}
                       <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center border border-blue-300">
-                          <Zap className="w-4 h-4 text-blue-800" />
+                        <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center border border-blue-300">
+                          <Zap className="w-3 h-3 text-blue-800" />
                         </div>
                         <div className="text-xs font-bold mt-1">{player.speed || 'N/A'}</div>
                       </div>
                       
                       {/* Shooting */}
                       <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center border border-red-300">
-                          <Swords className="w-4 h-4 text-red-800" />
+                        <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center border border-red-300">
+                          <Swords className="w-3 h-3 text-red-800" />
                         </div>
                         <div className="text-xs font-bold mt-1">{player.shooting || 'N/A'}</div>
                       </div>
                       
                       {/* Passing */}
                       <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center border border-green-300">
-                          <ArrowRightLeft className="w-4 h-4 text-green-800" />
+                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center border border-green-300">
+                          <ArrowRightLeft className="w-3 h-3 text-green-800" />
                         </div>
                         <div className="text-xs font-bold mt-1">{player.passing || 'N/A'}</div>
                       </div>
                       
                       {/* Defense */}
                       <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center border border-purple-300">
-                          <Shield className="w-4 h-4 text-purple-800" />
+                        <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center border border-purple-300">
+                          <Shield className="w-3 h-3 text-purple-800" />
                         </div>
                         <div className="text-xs font-bold mt-1">{player.defending || 'N/A'}</div>
                       </div>
@@ -668,6 +742,69 @@ export default function MyTeamPage() {
             })}
         </div>
       </div>
+
+      {/* Transfer Modal */}
+      <Dialog open={transferModalOpen} onOpenChange={setTransferModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sæt spiller på transfer</DialogTitle>
+            <DialogDescription>
+              Sæt {selectedPlayerForTransfer?.name} på transfermarkedet
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <PlayerAvatar 
+                playerName={selectedPlayerForTransfer?.name || ''}
+                position={selectedPlayerForTransfer?.position || ''}
+                size={40}
+                className="rounded-full"
+              />
+              <div>
+                <p className="font-semibold text-black">{selectedPlayerForTransfer?.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {getPositionName(selectedPlayerForTransfer?.position || '')} • Rating: {selectedPlayerForTransfer?.rating}
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="askingPrice">Asking pris</Label>
+              <div className="flex items-center space-x-2">
+                <DollarSign className="w-4 h-4 text-muted-foreground" />
+                <Input
+                  id="askingPrice"
+                  type="number"
+                  value={askingPrice}
+                  onChange={(e) => setAskingPrice(e.target.value)}
+                  placeholder="Indtast asking pris"
+                  min={minimumPrice}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Minimum pris: {minimumPrice.toLocaleString()} kr
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setTransferModalOpen(false)}
+              disabled={isListingTransfer}
+            >
+              Annuller
+            </Button>
+            <Button
+              onClick={handleListForTransfer}
+              disabled={!askingPrice || parseInt(askingPrice) < minimumPrice || isListingTransfer}
+            >
+              {isListingTransfer ? 'Sætter på transfer...' : 'Sæt på transfer'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

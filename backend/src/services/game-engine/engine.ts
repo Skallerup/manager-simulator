@@ -31,20 +31,26 @@ export class GameEngine {
     
     // Simulate match minute by minute
     for (let minute = 1; minute <= this.config.matchLength; minute++) {
-      const minuteEvents = this.simulateMinute(homeTeam, awayTeam, homeStrength, awayStrength, minute);
-      events.push(...minuteEvents);
+      // For very strong teams, simulate multiple events per minute
+      const strengthDifference = Math.abs(homeStrength - awayStrength);
+      const eventsPerMinute = strengthDifference > 30 ? 3 : (strengthDifference > 15 ? 2 : 1); // Up to 3 events per minute for very strong teams
       
-      // Generate highlights for important events
-      const minuteHighlights = this.generateHighlights(minuteEvents, minute);
-      highlights.push(...minuteHighlights);
-      
-      // Count goals
-      minuteEvents.forEach(event => {
-        if (event.type === 'goal') {
-          if (event.team === 'home') homeScore++;
-          else awayScore++;
-        }
-      });
+      for (let i = 0; i < eventsPerMinute; i++) {
+        const minuteEvents = this.simulateMinute(homeTeam, awayTeam, homeStrength, awayStrength, minute);
+        events.push(...minuteEvents);
+        
+        // Generate highlights for important events
+        const minuteHighlights = this.generateHighlights(minuteEvents, minute);
+        highlights.push(...minuteHighlights);
+        
+        // Count goals
+        minuteEvents.forEach(event => {
+          if (event.type === 'goal') {
+            if (event.team === 'home') homeScore++;
+            else awayScore++;
+          }
+        });
+      }
     }
     
     // Calculate match statistics
@@ -73,30 +79,56 @@ export class GameEngine {
 
   /**
    * Calculate overall team strength based on players
-   * Uses the same logic as TeamService.calculateTeamRating
+   * More realistic calculation that considers position-specific skills
    */
   private calculateTeamStrength(team: Team): number {
     const starters = team.players.filter(p => p.isStarter);
-    if (starters.length === 0) return 50; // Default if no starters
+    if (starters.length === 0) return 20; // Very low if no starters
     
-    const totalStats = starters.reduce((sum, player) => {
-      let playerStats = player.speed + player.shooting + player.passing + 
-                       player.defending + player.stamina + player.reflexes;
+    let totalStrength = 0;
+    
+    starters.forEach(player => {
+      let playerStrength = 0;
       
-      // Captain bonus: +5 to all stats for the captain
-      if (player.isCaptain) {
-        playerStats += 30; // 5 points per stat * 6 stats
+      // Position-specific skill weighting
+      switch (player.position) {
+        case 'GOALKEEPER':
+          playerStrength = (player.reflexes * 0.4) + (player.overall * 0.3) + 
+                          (player.defending * 0.2) + (player.speed * 0.1);
+          break;
+        case 'DEFENDER':
+          playerStrength = (player.defending * 0.4) + (player.overall * 0.25) + 
+                          (player.speed * 0.15) + (player.passing * 0.1) + 
+                          (player.stamina * 0.1);
+          break;
+        case 'MIDFIELDER':
+          playerStrength = (player.passing * 0.3) + (player.overall * 0.25) + 
+                          (player.stamina * 0.2) + (player.speed * 0.15) + 
+                          (player.defending * 0.1);
+          break;
+        case 'ATTACKER':
+          playerStrength = (player.shooting * 0.4) + (player.speed * 0.25) + 
+                          (player.overall * 0.2) + (player.passing * 0.15);
+          break;
+        default:
+          playerStrength = (player.speed + player.shooting + player.passing + 
+                           player.defending + player.stamina + player.reflexes) / 6;
       }
       
-      return sum + playerStats;
-    }, 0);
+      // Captain bonus: +10% to all stats
+      if (player.isCaptain) {
+        playerStrength *= 1.1;
+      }
+      
+      totalStrength += playerStrength;
+    });
 
-    const averageStats = totalStats / (starters.length * 6); // 6 stats per player
+    const averageStrength = totalStrength / starters.length;
     
-    // Penalty for incomplete teams (less than 16 players)
-    if (starters.length < 16) {
-      const penalty = (16 - starters.length) * 5; // 5 points penalty per missing player (reduced from 15)
-      return Math.max(0, Math.round(averageStats - penalty));
+    // Penalty for incomplete teams (less than 11 players)
+    if (starters.length < 11) {
+      const penalty = (11 - starters.length) * 8; // 8 points penalty per missing player
+      return Math.max(0, Math.round(averageStrength - penalty));
     }
     
     // Minimum team strength requirement
@@ -104,7 +136,7 @@ export class GameEngine {
       return 0; // Teams with less than 5 players have 0 strength
     }
     
-    return Math.round(averageStats);
+    return Math.round(averageStrength);
   }
 
   /**
@@ -119,22 +151,35 @@ export class GameEngine {
   ): MatchEvent[] {
     const events: MatchEvent[] = [];
     
-    // Determine which team has the ball (based on possession)
-    const homePossession = homeStrength / (homeStrength + awayStrength);
-    const ballWithHome = Math.random() < homePossession;
+    // Calculate possession more realistically - BALANCED
+    const strengthDifference = homeStrength - awayStrength;
+    const homePossession = 0.5 + (strengthDifference / 150); // More balanced possession changes
+    const ballWithHome = Math.random() < Math.max(0.2, Math.min(0.8, homePossession)); // More balanced
     
     const attackingTeam = ballWithHome ? homeTeam : awayTeam;
     const defendingTeam = ballWithHome ? awayTeam : homeTeam;
     const teamSide = ballWithHome ? 'home' : 'away';
     const defendingSide = ballWithHome ? 'away' : 'home';
     
-    // Chance of an event happening this minute
-    const eventChance = Math.random();
+    // Calculate attacking team's offensive strength
+    const attackingStrength = teamSide === 'home' ? homeStrength : awayStrength;
+    const defendingStrength = teamSide === 'home' ? awayStrength : homeStrength;
+    
+    // Base event chance increases with team strength difference - BALANCED
+    const strengthRatio = attackingStrength / Math.max(defendingStrength, 1);
+    const baseEventChance = Math.min(0.6, 0.2 + (strengthRatio - 1) * 0.15); // More balanced event chance
     
     // Check if attacking team has any attackers
     const hasAttackers = attackingTeam.players.some(p => p.isStarter && p.position === 'ATTACKER');
     
-    if (eventChance < 0.05) { // 5% chance of goal attempt (reduced from 15%)
+    // Calculate goal chance based on team strength difference
+    const goalChance = this.calculateGoalChance(attackingTeam, defendingTeam, attackingStrength, defendingStrength);
+    const shotChance = this.calculateShotChance(attackingTeam, defendingTeam, attackingStrength, defendingStrength);
+    
+    const eventChance = Math.random();
+    
+    
+    if (eventChance < goalChance) { // Dynamic goal chance based on strength
       if (hasAttackers) {
         const goalEvent = this.simulateGoal(attackingTeam, teamSide, minute, homeStrength, awayStrength);
         if (goalEvent) events.push(goalEvent);
@@ -143,7 +188,7 @@ export class GameEngine {
         const saveEvent = this.simulateSave(defendingTeam, defendingSide, minute);
         if (saveEvent) events.push(saveEvent);
       }
-    } else if (eventChance < 0.10) { // 5% chance of shot (reduced from 10%)
+    } else if (eventChance < goalChance + shotChance) { // Dynamic shot chance
       if (hasAttackers) {
         const shotEvent = this.simulateShot(attackingTeam, teamSide, minute);
         if (shotEvent) events.push(shotEvent);
@@ -152,15 +197,72 @@ export class GameEngine {
         const saveEvent = this.simulateSave(defendingTeam, defendingSide, minute);
         if (saveEvent) events.push(saveEvent);
       }
-    } else if (eventChance < 0.12) { // 2% chance of card (reduced from 3%)
+    } else if (eventChance < baseEventChance + 0.02) { // 2% chance of card
       const cardEvent = this.simulateCard(attackingTeam, teamSide, minute);
       if (cardEvent) events.push(cardEvent);
-    } else if (eventChance < 0.13) { // 1% chance of substitution (reduced from 2%)
+    } else if (eventChance < baseEventChance + 0.03) { // 1% chance of substitution
       const subEvent = this.simulateSubstitution(attackingTeam, teamSide, minute);
       if (subEvent) events.push(subEvent);
     }
     
     return events;
+  }
+
+  /**
+   * Calculate goal chance based on team strength and individual player skills
+   */
+  private calculateGoalChance(attackingTeam: Team, defendingTeam: Team, attackingStrength: number, defendingStrength: number): number {
+    // Get attacking team's best attackers
+    const attackers = attackingTeam.players.filter(p => p.isStarter && p.position === 'ATTACKER');
+    if (attackers.length === 0) return 0.01; // Very low chance if no attackers
+    
+    // Get defending team's goalkeeper
+    const goalkeepers = defendingTeam.players.filter(p => p.isStarter && p.position === 'GOALKEEPER');
+    const goalkeeper = goalkeepers[0];
+    
+    // Calculate average attacking skill
+    const avgAttackingSkill = attackers.reduce((sum, p) => sum + (p.shooting + p.speed + p.overall) / 3, 0) / attackers.length;
+    
+    // Calculate goalkeeper skill
+    const goalkeeperSkill = goalkeeper ? (goalkeeper.reflexes + goalkeeper.overall) / 2 : 50;
+    
+    // Base goal chance from skill difference
+    const skillDifference = (avgAttackingSkill - goalkeeperSkill) / 100;
+    
+    // Team strength difference impact - BALANCED
+    const strengthDifference = (attackingStrength - defendingStrength) / 50; // More balanced
+    
+    // Calculate final goal chance - BALANCED
+    const baseChance = 0.08 + skillDifference * 0.2 + strengthDifference * 0.3; // More balanced
+    
+    // Cap the chance between 2% and 40% - More realistic
+    const finalChance = Math.max(0.02, Math.min(0.40, baseChance));
+    
+    return finalChance;
+  }
+
+  /**
+   * Calculate shot chance based on team strength and individual player skills
+   */
+  private calculateShotChance(attackingTeam: Team, defendingTeam: Team, attackingStrength: number, defendingStrength: number): number {
+    // Get attacking team's offensive players
+    const offensivePlayers = attackingTeam.players.filter(p => p.isStarter && 
+      (p.position === 'ATTACKER' || p.position === 'MIDFIELDER'));
+    
+    if (offensivePlayers.length === 0) return 0.01;
+    
+    // Calculate average offensive skill
+    const avgOffensiveSkill = offensivePlayers.reduce((sum, p) => 
+      sum + (p.shooting + p.speed + p.passing + p.overall) / 4, 0) / offensivePlayers.length;
+    
+    // Team strength difference impact - BALANCED
+    const strengthDifference = (attackingStrength - defendingStrength) / 60; // More balanced
+    
+    // Calculate shot chance - BALANCED
+    const baseChance = 0.15 + (avgOffensiveSkill - 50) / 100 + strengthDifference * 0.25; // More balanced
+    
+    // Cap the chance between 5% and 50% - More realistic
+    return Math.max(0.05, Math.min(0.50, baseChance));
   }
 
   /**
@@ -170,18 +272,35 @@ export class GameEngine {
     const attackers = team.players.filter(p => p.isStarter && p.position === 'ATTACKER');
     if (attackers.length === 0) return null;
     
-    const attacker = attackers[Math.floor(Math.random() * attackers.length)];
+    // Choose the best attacker (highest shooting + overall)
+    const attacker = attackers.reduce((best, current) => {
+      const bestScore = best.shooting + best.overall;
+      const currentScore = current.shooting + current.overall;
+      return currentScore > bestScore ? current : best;
+    });
     
     // Calculate goal chance based on team strength difference
     const attackingStrength = teamSide === 'home' ? homeStrength : awayStrength;
     const defendingStrength = teamSide === 'home' ? awayStrength : homeStrength;
     
-    // Base goal chance from player stats (much lower)
-    const playerGoalChance = (attacker.shooting + attacker.overall) / 400; // Reduced from 200 to 400
+    // Individual player skill impact (much higher)
+    const playerSkill = (attacker.shooting + attacker.speed + attacker.overall) / 3;
+    const playerGoalChance = playerSkill / 100; // MUCH higher than before (was 200)
     
-    // Modify by team strength difference
-    const strengthDifference = (attackingStrength - defendingStrength) / 100;
-    const goalChance = Math.max(0.01, Math.min(0.3, playerGoalChance + strengthDifference * 0.1)); // Much lower max chance
+    // Team strength difference impact (MUCH more dramatic)
+    const strengthDifference = (attackingStrength - defendingStrength) / 20; // MUCH more dramatic impact (was 50)
+    const strengthBonus = Math.max(0, strengthDifference * 0.6); // Up to 60% bonus for strong teams (was 30%)
+    
+    // Position-specific bonuses
+    const positionBonus = attacker.position === 'ATTACKER' ? 0.2 : 0.1; // Higher bonuses
+    
+    // Captain bonus
+    const captainBonus = attacker.isCaptain ? 0.1 : 0; // Higher captain bonus
+    
+    // Calculate final goal chance - MUCH higher
+    const goalChance = Math.max(0.02, Math.min(0.9, 
+      playerGoalChance + strengthBonus + positionBonus + captainBonus
+    ));
     
     if (Math.random() < goalChance) {
       return {
@@ -200,10 +319,16 @@ export class GameEngine {
    * Simulate a shot attempt
    */
   private simulateShot(team: Team, teamSide: 'home' | 'away', minute: number): MatchEvent | null {
-    const attackers = team.players.filter(p => p.isStarter && (p.position === 'ATTACKER' || p.position === 'MIDFIELDER'));
-    if (attackers.length === 0) return null;
+    const offensivePlayers = team.players.filter(p => p.isStarter && 
+      (p.position === 'ATTACKER' || p.position === 'MIDFIELDER'));
+    if (offensivePlayers.length === 0) return null;
     
-    const attacker = attackers[Math.floor(Math.random() * attackers.length)];
+    // Choose player based on their offensive skills
+    const attacker = offensivePlayers.reduce((best, current) => {
+      const bestScore = best.shooting + best.speed + best.passing;
+      const currentScore = current.shooting + current.speed + current.passing;
+      return currentScore > bestScore ? current : best;
+    });
     
     return {
       minute,
@@ -221,7 +346,12 @@ export class GameEngine {
     const goalkeepers = team.players.filter(p => p.isStarter && p.position === 'GOALKEEPER');
     if (goalkeepers.length === 0) return null;
     
-    const goalkeeper = goalkeepers[Math.floor(Math.random() * goalkeepers.length)];
+    // Choose the best goalkeeper (highest reflexes + overall)
+    const goalkeeper = goalkeepers.reduce((best, current) => {
+      const bestScore = best.reflexes + best.overall;
+      const currentScore = current.reflexes + current.overall;
+      return currentScore > bestScore ? current : best;
+    });
     
     return {
       minute,
