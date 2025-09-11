@@ -485,9 +485,12 @@ export default function MyTeamPage() {
       });
       
       if (response) {
-        // Update local team data
+        const updatedTeam = await response.json();
+        
+        // Update local team data with new overallRating from backend
         setTeamData(prev => prev ? {
           ...prev,
+          overallRating: updatedTeam.overallRating,
           players: prev.players.map(p => ({
             ...p,
             isCaptain: p.id === player.id
