@@ -117,6 +117,7 @@ export default function MyTeamPage() {
   const [minimumPrice, setMinimumPrice] = useState(0);
   const [isListingTransfer, setIsListingTransfer] = useState(false);
   const [isSettingCaptain, setIsSettingCaptain] = useState(false);
+  const [currentTeamRating, setCurrentTeamRating] = useState(0);
 
   // Load team data
   useEffect(() => {
@@ -127,6 +128,7 @@ export default function MyTeamPage() {
         if (data) {
           setTeamData(data as TeamData);
           setSelectedFormation((data as TeamData).formation || "5-3-2");
+          setCurrentTeamRating((data as TeamData).overallRating || 0);
         }
       } catch (err) {
         console.error("Error loading team data:", err);
@@ -215,6 +217,13 @@ export default function MyTeamPage() {
       }
     }
   }, [teamData, selectedFormation]);
+
+  // Recalculate team rating when formation players change
+  useEffect(() => {
+    const newRating = calculateDynamicTeamRating();
+    setCurrentTeamRating(newRating);
+    console.log(`Team rating updated to: ${newRating}`);
+  }, [formationPlayers]);
 
   // Get formation positions for current formation
   const getFormationPositions = () => {
@@ -385,7 +394,7 @@ export default function MyTeamPage() {
     );
   }
 
-  const currentTeamRating = calculateDynamicTeamRating();
+  // currentTeamRating is now managed by useEffect
 
   // Transfer functions
   const handleTransferClick = async (player: Player) => {
