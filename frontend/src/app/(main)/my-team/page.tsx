@@ -118,6 +118,7 @@ export default function MyTeamPage() {
   const [isListingTransfer, setIsListingTransfer] = useState(false);
   const [isSettingCaptain, setIsSettingCaptain] = useState(false);
   const [currentTeamRating, setCurrentTeamRating] = useState(0);
+  const [hasRatingChanged, setHasRatingChanged] = useState(false);
 
   // Load team data
   useEffect(() => {
@@ -222,7 +223,17 @@ export default function MyTeamPage() {
   useEffect(() => {
     console.log("Formation players changed, recalculating rating...");
     const newRating = calculateDynamicTeamRating();
+    const previousRating = currentTeamRating;
     setCurrentTeamRating(newRating);
+    
+    // Only mark as changed if rating actually changed and it's not the initial load
+    if (previousRating > 0 && newRating !== previousRating) {
+      setHasRatingChanged(true);
+      console.log(`Team rating changed from ${previousRating} to ${newRating}`);
+    } else {
+      setHasRatingChanged(false);
+    }
+    
     console.log(`Team rating updated to: ${newRating}`);
   }, [formationPlayers]);
 
@@ -498,6 +509,7 @@ export default function MyTeamPage() {
         });
         
         console.log(`Captain changed to: ${player.name} (${player.rating})`);
+        setHasRatingChanged(true); // Mark as changed when captain is manually changed
         alert(`${player.name} er nu kaptajn!`);
       }
     } catch (error: any) {
@@ -517,7 +529,7 @@ export default function MyTeamPage() {
             <h1 className="text-3xl font-bold">Mit Hold</h1>
             <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
               Rating: {currentTeamRating}
-              {currentTeamRating !== (teamData.overallRating || 0) && (
+              {hasRatingChanged && (
                 <span className="ml-2 text-orange-600">(ændret)</span>
               )}
             </div>
