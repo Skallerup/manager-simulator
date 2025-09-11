@@ -504,28 +504,59 @@ export default function MyTeamPage() {
             </div>
           </div>
           
-          {/* Formation Selector */}
-          <div className="flex items-center space-x-2">
-            <span className="text-lg font-semibold text-muted-foreground">Formation:</span>
-            <Select value={selectedFormation} onValueChange={(newFormation) => {
-              setSelectedFormation(newFormation);
-              // Clear formation and auto-fill with existing players when formation changes
-              setFormationPlayers({});
-              setTimeout(() => {
-                autoFillFormation();
-              }, 100);
-            }}>
-              <SelectTrigger className="w-24">
-                <SelectValue placeholder="Vælg formation" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.keys(formationDefinitions).map((formation) => (
-                  <SelectItem key={formation} value={formation}>
-                    {formation}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Formation and Captain Selectors */}
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <span className="text-lg font-semibold text-muted-foreground">Formation:</span>
+              <Select value={selectedFormation} onValueChange={(newFormation) => {
+                setSelectedFormation(newFormation);
+                // Clear formation and auto-fill with existing players when formation changes
+                setFormationPlayers({});
+                setTimeout(() => {
+                  autoFillFormation();
+                }, 100);
+              }}>
+                <SelectTrigger className="w-24">
+                  <SelectValue placeholder="Vælg formation" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(formationDefinitions).map((formation) => (
+                    <SelectItem key={formation} value={formation}>
+                      {formation}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <span className="text-lg font-semibold text-muted-foreground">Kaptajn:</span>
+              <Select 
+                value={teamData?.players.find(p => p.isCaptain)?.id || ""} 
+                onValueChange={(playerId) => {
+                  const player = teamData?.players.find(p => p.id === playerId);
+                  if (player) {
+                    handleSetCaptain(player);
+                  }
+                }}
+                disabled={isSettingCaptain}
+              >
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Vælg kaptajn" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teamData?.players.map((player) => (
+                    <SelectItem key={player.id} value={player.id}>
+                      <div className="flex items-center space-x-2">
+                        {player.isCaptain && <Crown className="w-4 h-4 text-yellow-600" />}
+                        <span>{player.name}</span>
+                        <span className="text-sm text-muted-foreground">({getPositionName(player.position)})</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
         <div className="flex space-x-2">
@@ -629,23 +660,9 @@ export default function MyTeamPage() {
                   />
                   <span className="text-sm font-bold mt-2 text-center text-black bg-white px-2 py-1 rounded border border-gray-300">{player.name}</span>
                   <span className="text-xs font-bold text-white bg-blue-700 px-2 py-1 rounded mt-1 border border-blue-800">{pos.name}</span>
-                  <div className="flex items-center space-x-1 mt-1">
-                    {player.isCaptain && (
-                      <Crown className="w-4 h-4 text-yellow-700" />
-                    )}
-                    <Button
-                      size="sm"
-                      variant={player.isCaptain ? "default" : "outline"}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSetCaptain(player);
-                      }}
-                      disabled={isSettingCaptain}
-                      className={`text-xs px-1 py-0 h-5 ${player.isCaptain ? 'bg-yellow-600 hover:bg-yellow-700 text-white' : 'bg-white text-black hover:bg-gray-100'}`}
-                    >
-                      <Crown className="w-3 h-3" />
-                    </Button>
-                  </div>
+                  {player.isCaptain && (
+                    <Crown className="w-4 h-4 text-yellow-700 mt-1" />
+                  )}
                 </div>
               ) : (
                 <div 
@@ -745,19 +762,6 @@ export default function MyTeamPage() {
                       >
                         <TrendingUp className="w-3 h-3 mr-1" />
                         Transfer
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={player.isCaptain ? "default" : "outline"}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSetCaptain(player);
-                        }}
-                        disabled={isSettingCaptain}
-                        className={`text-xs px-2 py-1 h-7 ${player.isCaptain ? 'bg-yellow-600 hover:bg-yellow-700 text-white' : ''}`}
-                      >
-                        <Crown className="w-3 h-3 mr-1" />
-                        {player.isCaptain ? 'Kaptajn' : 'Gør til kaptajn'}
                       </Button>
                       <div className="w-8 h-8 rounded-full shadow-lg font-bold flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground">
                         <Plus className="w-4 h-4" />
