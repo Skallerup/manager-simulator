@@ -116,6 +116,7 @@ export default function MyTeamPage() {
   const [askingPrice, setAskingPrice] = useState("");
   const [minimumPrice, setMinimumPrice] = useState(0);
   const [isListingTransfer, setIsListingTransfer] = useState(false);
+  const [isSettingCaptain, setIsSettingCaptain] = useState(false);
 
   // Load team data
   useEffect(() => {
@@ -436,6 +437,52 @@ export default function MyTeamPage() {
     }
   };
 
+  // Captain functions
+  const handleSetCaptain = async (player: Player) => {
+    if (!teamData) return;
+    
+    try {
+      setIsSettingCaptain(true);
+      const response = await authApiFetch(`/api/teams/${teamData.id}/captain/${player.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (response) {
+        // Update local team data
+        setTeamData(prev => prev ? {
+          ...prev,
+          players: prev.players.map(p => ({
+            ...p,
+            isCaptain: p.id === player.id
+          }))
+        } : null);
+        
+        // Update formation players if the captain is in formation
+        setFormationPlayers(prev => {
+          const updated = { ...prev };
+          Object.keys(updated).forEach(key => {
+            if (updated[key].id === player.id) {
+              updated[key] = { ...updated[key], isCaptain: true };
+            } else {
+              updated[key] = { ...updated[key], isCaptain: false };
+            }
+          });
+          return updated;
+        });
+        
+        alert(`${player.name} er nu kaptajn!`);
+      }
+    } catch (error: any) {
+      console.error("Error setting captain:", error);
+      setError(error.message || "Kunne ikke sætte kaptajn");
+    } finally {
+      setIsSettingCaptain(false);
+    }
+  };
+
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
@@ -582,9 +629,23 @@ export default function MyTeamPage() {
                   />
                   <span className="text-sm font-bold mt-2 text-center text-black bg-white px-2 py-1 rounded border border-gray-300">{player.name}</span>
                   <span className="text-xs font-bold text-white bg-blue-700 px-2 py-1 rounded mt-1 border border-blue-800">{pos.name}</span>
-                  {player.isCaptain && (
-                    <Crown className="w-4 h-4 text-yellow-700 mt-1" />
-                  )}
+                  <div className="flex items-center space-x-1 mt-1">
+                    {player.isCaptain && (
+                      <Crown className="w-4 h-4 text-yellow-700" />
+                    )}
+                    <Button
+                      size="sm"
+                      variant={player.isCaptain ? "default" : "outline"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSetCaptain(player);
+                      }}
+                      disabled={isSettingCaptain}
+                      className={`text-xs px-1 py-0 h-5 ${player.isCaptain ? 'bg-yellow-600 hover:bg-yellow-700 text-white' : 'bg-white text-black hover:bg-gray-100'}`}
+                    >
+                      <Crown className="w-3 h-3" />
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div 
@@ -684,6 +745,19 @@ export default function MyTeamPage() {
                       >
                         <TrendingUp className="w-3 h-3 mr-1" />
                         Transfer
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={player.isCaptain ? "default" : "outline"}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSetCaptain(player);
+                        }}
+                        disabled={isSettingCaptain}
+                        className={`text-xs px-2 py-1 h-7 ${player.isCaptain ? 'bg-yellow-600 hover:bg-yellow-700 text-white' : ''}`}
+                      >
+                        <Crown className="w-3 h-3 mr-1" />
+                        {player.isCaptain ? 'Kaptajn' : 'Gør til kaptajn'}
                       </Button>
                       <div className="w-8 h-8 rounded-full shadow-lg font-bold flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground">
                         <Plus className="w-4 h-4" />

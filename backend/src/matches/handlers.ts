@@ -571,6 +571,8 @@ async function saveHighlightsToDatabase(matchId: string, highlights: any[]) {
     await prisma.matchHighlight.createMany({
       data: highlightData
     });
+    
+    console.log('Highlights saved for match', matchId, ':', highlights.length, 'clips');
   } catch (error) {
     console.error('Error saving highlights to database:', error);
   }
