@@ -119,7 +119,6 @@ export default function MyTeamPage() {
   const [isSettingCaptain, setIsSettingCaptain] = useState(false);
   const [currentTeamRating, setCurrentTeamRating] = useState(0);
   const [hasRatingChanged, setHasRatingChanged] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Load team data
   useEffect(() => {
@@ -217,11 +216,6 @@ export default function MyTeamPage() {
           setFormationPlayers(updatedFormation);
         }
       }
-      
-      // Mark initial load as complete when teamData is loaded
-      if (isInitialLoad) {
-        setIsInitialLoad(false);
-      }
     }
   }, [teamData, selectedFormation]);
 
@@ -229,24 +223,20 @@ export default function MyTeamPage() {
   useEffect(() => {
     console.log("Formation players changed, recalculating rating...");
     const newRating = calculateDynamicTeamRating();
-    const previousRating = currentTeamRating;
+    const originalRating = teamData?.overallRating || 0;
     setCurrentTeamRating(newRating);
     
-    // Only mark as changed if rating actually changed and it's not the initial load
-    if (isInitialLoad) {
-      // First load - don't mark as changed
-      setHasRatingChanged(false);
-      console.log(`Initial team rating set to: ${newRating}`);
-    } else if (previousRating > 0 && newRating !== previousRating) {
-      // Subsequent changes - mark as changed
+    // Only mark as changed if rating differs from original team rating
+    if (originalRating > 0 && newRating !== originalRating) {
       setHasRatingChanged(true);
-      console.log(`Team rating changed from ${previousRating} to ${newRating}`);
+      console.log(`Team rating changed from original ${originalRating} to ${newRating}`);
     } else {
       setHasRatingChanged(false);
+      console.log(`Team rating matches original: ${newRating}`);
     }
     
     console.log(`Team rating updated to: ${newRating}`);
-  }, [formationPlayers]);
+  }, [formationPlayers, teamData?.overallRating]);
 
   // Get formation positions for current formation
   const getFormationPositions = () => {
