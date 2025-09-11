@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, Trophy, Target, Calendar, Star, Crown, Settings, Search, Plus, Filter } from "lucide-react";
-import { useTranslation } from 'react-i18next';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Search, Plus, Star, Crown, Zap, Swords, ArrowRightLeft, Shield, DollarSign, TrendingUp } from "lucide-react";
 import { authApiFetch } from "@/lib/api";
 import { PlayerAvatar } from "@/components/player-avatar";
 
@@ -19,201 +20,236 @@ interface Player {
   formationPosition?: string;
   age: number;
   rating: number;
-  isCaptain: boolean;
   isStarter: boolean;
+  isCaptain: boolean;
+  speed?: number;
+  shooting?: number;
+  passing?: number;
+  defending?: number;
+  stamina?: number;
+  reflexes?: number;
 }
 
 interface TeamData {
   id: string;
   name: string;
-  formation: string;
-  colors: { primary: string; secondary: string } | null;
-  logo: string | null;
-  budget: number;
   overallRating: number;
+  formation: string;
   players: Player[];
-  createdAt: string;
-  updatedAt: string;
 }
+
+// Formation definitions
+const formationDefinitions = {
+  "4-3-3": {
+    positions: [
+      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 90 },
+      { id: "lb", name: "VB", position: "DEFENDER", x: 20, y: 70 },
+      { id: "cb1", name: "CB", position: "DEFENDER", x: 40, y: 70 },
+      { id: "cb2", name: "CB", position: "DEFENDER", x: 60, y: 70 },
+      { id: "rb", name: "HB", position: "DEFENDER", x: 80, y: 70 },
+      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 30, y: 50 },
+      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 50, y: 50 },
+      { id: "cm3", name: "CM", position: "MIDFIELDER", x: 70, y: 50 },
+      { id: "lw", name: "VK", position: "ATTACKER", x: 20, y: 30 },
+      { id: "st", name: "AN", position: "ATTACKER", x: 50, y: 30 },
+      { id: "rw", name: "HK", position: "ATTACKER", x: 80, y: 30 }
+    ]
+  },
+  "4-4-2": {
+    positions: [
+      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 90 },
+      { id: "lb", name: "VB", position: "DEFENDER", x: 20, y: 70 },
+      { id: "cb1", name: "CB", position: "DEFENDER", x: 40, y: 70 },
+      { id: "cb2", name: "CB", position: "DEFENDER", x: 60, y: 70 },
+      { id: "rb", name: "HB", position: "DEFENDER", x: 80, y: 70 },
+      { id: "lm", name: "VM", position: "MIDFIELDER", x: 20, y: 50 },
+      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 40, y: 50 },
+      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 60, y: 50 },
+      { id: "rm", name: "HM", position: "MIDFIELDER", x: 80, y: 50 },
+      { id: "st1", name: "AN", position: "ATTACKER", x: 40, y: 30 },
+      { id: "st2", name: "AN", position: "ATTACKER", x: 60, y: 30 }
+    ]
+  },
+  "3-5-2": {
+    positions: [
+      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 90 },
+      { id: "cb1", name: "CB", position: "DEFENDER", x: 30, y: 70 },
+      { id: "cb2", name: "CB", position: "DEFENDER", x: 50, y: 70 },
+      { id: "cb3", name: "CB", position: "DEFENDER", x: 70, y: 70 },
+      { id: "lm", name: "VM", position: "MIDFIELDER", x: 20, y: 50 },
+      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 40, y: 50 },
+      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 50, y: 50 },
+      { id: "cm3", name: "CM", position: "MIDFIELDER", x: 60, y: 50 },
+      { id: "rm", name: "HM", position: "MIDFIELDER", x: 80, y: 50 },
+      { id: "st1", name: "AN", position: "ATTACKER", x: 40, y: 30 },
+      { id: "st2", name: "AN", position: "ATTACKER", x: 60, y: 30 }
+    ]
+  },
+  "5-3-2": {
+    positions: [
+      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 90 },
+      { id: "lwb", name: "VB", position: "DEFENDER", x: 15, y: 70 },
+      { id: "cb1", name: "CB", position: "DEFENDER", x: 35, y: 70 },
+      { id: "cb2", name: "CB", position: "DEFENDER", x: 50, y: 70 },
+      { id: "cb3", name: "CB", position: "DEFENDER", x: 65, y: 70 },
+      { id: "rwb", name: "HB", position: "DEFENDER", x: 85, y: 70 },
+      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 35, y: 50 },
+      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 50, y: 50 },
+      { id: "cm3", name: "CM", position: "MIDFIELDER", x: 65, y: 50 },
+      { id: "st1", name: "AN", position: "ATTACKER", x: 40, y: 30 },
+      { id: "st2", name: "AN", position: "ATTACKER", x: 60, y: 30 }
+    ]
+  }
+};
 
 export default function MyTeamPage() {
   const { user } = useAuth();
-  const { t } = useTranslation('team');
+  
   const [teamData, setTeamData] = useState<TeamData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isUpdatingFormation, setIsUpdatingFormation] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedPosition, setSelectedPosition] = useState("all");
-  const [sortBy, setSortBy] = useState("rating");
+  const [selectedFormation, setSelectedFormation] = useState("5-3-2");
   const [formationPlayers, setFormationPlayers] = useState<{[key: string]: Player}>({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [transferModalOpen, setTransferModalOpen] = useState(false);
+  const [selectedPlayerForTransfer, setSelectedPlayerForTransfer] = useState<Player | null>(null);
+  const [askingPrice, setAskingPrice] = useState("");
+  const [minimumPrice, setMinimumPrice] = useState(0);
+  const [isListingTransfer, setIsListingTransfer] = useState(false);
 
-  // Calculate team overall rating based on current formation
-  const calculateTeamRating = () => {
-    if (!teamData) return 0;
-    
-    // Use starters from teamData instead of formationPlayers
-    const starters = teamData.players.filter(player => player.isStarter);
-    if (starters.length === 0) return teamData.overallRating || 0;
-    
-    const totalRating = starters.reduce((sum, player) => sum + player.rating, 0);
-    return Math.round(totalRating / starters.length);
-  };
-
-  const currentTeamRating = calculateTeamRating();
-
+  // Load team data
   useEffect(() => {
-    const fetchTeamData = async () => {
+    const loadTeamData = async () => {
       try {
         setLoading(true);
         const data = await authApiFetch('/api/teams/my-team');
         if (data) {
           setTeamData(data as TeamData);
-        } else {
-          setError('Failed to load team data');
+          setSelectedFormation((data as TeamData).formation || "5-3-2");
         }
       } catch (err) {
-        setError('Failed to load team data');
+        console.error("Error loading team data:", err);
+        setError("Kunne ikke indlæse holddata");
       } finally {
         setLoading(false);
       }
     };
 
     if (user) {
-      fetchTeamData();
+      loadTeamData();
     }
   }, [user]);
-
-  const setCaptain = async (playerId: string) => {
-    if (!teamData) return;
-    
-    try {
-      const updatedTeam = await authApiFetch(`/api/teams/${teamData.id}/captain/${playerId}`, {
-        method: 'PUT'
-      });
-      
-      if (updatedTeam) {
-        setTeamData(updatedTeam as TeamData);
-      } else {
-        setError('Failed to set captain');
-      }
-    } catch (err) {
-      setError('Failed to set captain');
-    }
-  };
-
-  const updateFormation = async (formation: string) => {
-    if (!teamData) return;
-    
-    try {
-      setIsUpdatingFormation(true);
-      const response = await authApiFetch(`/api/teams/${teamData.id}/formation`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ formation })
-      });
-      
-      if (response) {
-        // Refresh team data
-        const updatedTeam = await authApiFetch('/api/teams/my-team');
-        if (updatedTeam) {
-          setTeamData(updatedTeam as TeamData);
-        }
-      } else {
-        setError('Failed to update formation');
-      }
-    } catch (err) {
-      setError('Failed to update formation');
-    } finally {
-      setIsUpdatingFormation(false);
-    }
-  };
-
-  const swapPlayers = async (fromPlayerId: string, toPlayerId: string) => {
-    if (!teamData) return;
-    
-    try {
-      const response = await authApiFetch(`/api/teams/${teamData.id}/swap-players`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fromPlayerId, toPlayerId })
-      });
-      
-      if (response) {
-        // Refresh team data
-        const updatedTeam = await authApiFetch('/api/teams/my-team');
-        if (updatedTeam) {
-          setTeamData(updatedTeam as TeamData);
-        }
-      } else {
-        setError('Failed to swap players');
-      }
-    } catch (err) {
-      setError('Failed to swap players');
-    }
-  };
-
-  // Formation positions for 4-3-3
-  const getFormationPositions = () => {
-    const positions = [
-      // Goalkeeper - bottom center
-      { id: 'gk', name: 'Målmand', x: 50, y: 90, position: 'GOALKEEPER' },
-      
-      // Defenders (4) - back line
-      { id: 'lb', name: 'Forsvar', x: 20, y: 70, position: 'DEFENDER' },
-      { id: 'cb1', name: 'Forsvar', x: 40, y: 70, position: 'DEFENDER' },
-      { id: 'cb2', name: 'Forsvar', x: 60, y: 70, position: 'DEFENDER' },
-      { id: 'rb', name: 'Forsvar', x: 80, y: 70, position: 'DEFENDER' },
-      
-      // Midfielders (3) - middle line
-      { id: 'cm1', name: 'Midtbane', x: 30, y: 45, position: 'MIDFIELDER' },
-      { id: 'cm2', name: 'Midtbane', x: 50, y: 45, position: 'MIDFIELDER' },
-      { id: 'cm3', name: 'Midtbane', x: 70, y: 45, position: 'MIDFIELDER' },
-      
-      // Forwards (3) - front line
-      { id: 'lw', name: 'Angreb', x: 25, y: 20, position: 'ATTACKER' },
-      { id: 'st', name: 'Angreb', x: 50, y: 15, position: 'ATTACKER' },
-      { id: 'rw', name: 'Angreb', x: 75, y: 20, position: 'ATTACKER' },
-    ];
-    return positions;
-  };
 
   // Initialize formation players when team data loads
   useEffect(() => {
     if (teamData) {
-      // Only initialize if formationPlayers is empty (first load)
-      if (Object.keys(formationPlayers).length === 0) {
-        const initialFormation: {[key: string]: Player} = {};
-        const starters = teamData.players.filter(player => player.isStarter);
-        const positions = getFormationPositions();
-        
-        // Map starters to formation positions using saved formationPosition or default order
-        starters.forEach((player, index) => {
-          let targetPositionId;
-          
-          // Use saved formationPosition if available, otherwise use default order
-          if (player.formationPosition) {
-            targetPositionId = player.formationPosition;
-          } else {
-            targetPositionId = positions[index]?.id;
-          }
-          
-          if (targetPositionId) {
-            // Create a deep copy of the player object
-            initialFormation[targetPositionId] = { ...player };
+      const initialFormation: {[key: string]: Player} = {};
+      const usedPlayerIds = new Set<string>();
+      
+      teamData.players.forEach(player => {
+        if (player.isStarter && player.formationPosition && !usedPlayerIds.has(player.id)) {
+          initialFormation[player.formationPosition] = player;
+          usedPlayerIds.add(player.id);
+        }
+      });
+      
+      // Ensure we don't exceed 11 players
+      const players = Object.values(initialFormation);
+      if (players.length > 11) {
+        const limitedPlayers = players.slice(0, 11);
+        const limitedFormation: {[key: string]: Player} = {};
+        limitedPlayers.forEach((p, index) => {
+          const positionId = Object.keys(initialFormation)[index];
+          if (positionId) {
+            limitedFormation[positionId] = p;
           }
         });
-        
+        setFormationPlayers(limitedFormation);
+      } else {
         setFormationPlayers(initialFormation);
       }
     }
   }, [teamData]);
 
+  // Update formation players when team data changes (after save)
+  useEffect(() => {
+    if (teamData) {
+      const currentFormation = Object.values(formationPlayers);
+      const teamStarters = teamData.players.filter(p => p.isStarter);
+      
+      // Only update if we have starters and they're different from current formation
+      if (teamStarters.length > 0) {
+        const currentPlayerIds = currentFormation.map(p => p.id).sort();
+        const teamStarterIds = teamStarters.map(p => p.id).sort();
+        
+        // Check if the starter lists are different
+        const needsUpdate = currentPlayerIds.length !== teamStarterIds.length ||
+          currentPlayerIds.some((id, index) => id !== teamStarterIds[index]);
+        
+        if (needsUpdate) {
+          const updatedFormation: {[key: string]: Player} = {};
+          const positions = getFormationPositions();
+          const usedPlayerIds = new Set<string>();
+          
+          // Place starters in their positions based on formationPosition
+          teamStarters.forEach(player => {
+            if (player.formationPosition) {
+              // Use the saved formation position
+              updatedFormation[player.formationPosition] = player;
+              usedPlayerIds.add(player.id);
+            } else {
+              // Find a suitable position if no formation position is saved
+              const position = positions.find(pos => 
+                pos.position === player.position && !usedPlayerIds.has(player.id)
+              );
+              if (position) {
+                updatedFormation[position.id] = player;
+                usedPlayerIds.add(player.id);
+              }
+            }
+          });
+          
+          setFormationPlayers(updatedFormation);
+        }
+      }
+    }
+  }, [teamData, selectedFormation]);
+
+  // Get formation positions for current formation
+  const getFormationPositions = () => {
+    return formationDefinitions[selectedFormation as keyof typeof formationDefinitions]?.positions || [];
+  };
+
   const addPlayerToFormation = (player: Player, positionId: string) => {
-    setFormationPlayers(prev => ({
-      ...prev,
-      [positionId]: player
-    }));
+    setFormationPlayers(prev => {
+      // Remove player from any existing position first
+      const cleaned = Object.fromEntries(
+        Object.entries(prev).filter(([_, p]) => p.id !== player.id)
+      );
+      
+      // Add player to new position
+      const updated = {
+        ...cleaned,
+        [positionId]: player
+      };
+      
+      // Ensure we don't exceed 11 players
+      const players = Object.values(updated);
+      if (players.length > 11) {
+        // Keep only the first 11 players
+        const limitedPlayers = players.slice(0, 11);
+        const limitedFormation: {[key: string]: Player} = {};
+        limitedPlayers.forEach((p, index) => {
+          const positionId = Object.keys(updated)[index];
+          if (positionId) {
+            limitedFormation[positionId] = p;
+          }
+        });
+        return limitedFormation;
+      }
+      
+      return updated;
+    });
   };
 
   const removePlayerFromFormation = (positionId: string) => {
@@ -224,87 +260,41 @@ export default function MyTeamPage() {
     });
   };
 
-  const handleSaveFormation = async () => {
-    try {
-      setIsUpdatingFormation(true);
-      
-      if (!teamData) {
-        throw new Error("No team data available");
+  // Auto-fill empty positions with suitable players
+  const autoFillFormation = () => {
+    if (!teamData) return;
+    
+    const positions = getFormationPositions();
+    const newFormation: {[key: string]: Player} = {};
+    const usedPlayerIds = new Set<string>();
+    
+    // First, try to place existing players in their preferred positions
+    positions.forEach(pos => {
+      const existingPlayer = Object.values(formationPlayers).find(p => 
+        p.position === pos.position && !usedPlayerIds.has(p.id)
+      );
+      if (existingPlayer) {
+        newFormation[pos.id] = existingPlayer;
+        usedPlayerIds.add(existingPlayer.id);
       }
-
-      // Get the current starters from teamData (not formationPlayers)
-      const starters = teamData.players.filter(player => player.isStarter).map(player => player.id);
-      
-      // Create formation positions mapping
-      const formationPositions: {[key: string]: string} = {};
-      teamData.players.forEach(player => {
-        if (player.isStarter && player.formationPosition) {
-          formationPositions[player.id] = player.formationPosition;
-        }
-      });
-      
-      // Save to backend
-      const response = await authApiFetch(`/api/teams/${teamData.id}/starters`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ starters, formationPositions }),
-      });
-
-      if (response) {
-        // Show success message
-        alert("Holdopstilling gemt! Din nye holdopstilling er blevet gemt succesfuldt.");
-        
-        // Update team data with new rating
-        if (teamData) {
-          setTeamData({
-            ...teamData,
-            overallRating: (response as any).overallRating || currentTeamRating
-          });
-        }
-        
-        // Refresh team data to get updated state
-        const updatedData = await authApiFetch('/api/teams/my-team');
-        if (updatedData) {
-          setTeamData(updatedData as TeamData);
+    });
+    
+    // Then fill remaining positions with suitable players from teamData
+    positions.forEach(pos => {
+      if (!newFormation[pos.id]) {
+        const suitablePlayer = teamData.players.find(p => 
+          p.position === pos.position && 
+          !usedPlayerIds.has(p.id)
+        );
+        if (suitablePlayer) {
+          newFormation[pos.id] = suitablePlayer;
+          usedPlayerIds.add(suitablePlayer.id);
         }
       }
-      
-    } catch (err) {
-      console.error("Error saving formation:", err);
-      alert("Fejl: Kunne ikke gemme holdopstillingen. Prøv igen.");
-    } finally {
-      setIsUpdatingFormation(false);
-    }
+    });
+    
+    setFormationPlayers(newFormation);
   };
-
-
-  if (loading) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p>Indlæser holddata...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !teamData) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error || 'Intet hold fundet'}</p>
-          <Button onClick={() => window.location.reload()}>
-            Prøv igen
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const getPositionColor = (position: string) => {
     switch (position) {
@@ -326,270 +316,495 @@ export default function MyTeamPage() {
     }
   };
 
-  const getRatingColor = (rating: number) => {
-    if (rating >= 85) return "text-green-600";
-    if (rating >= 80) return "text-yellow-600";
-    if (rating >= 75) return "text-orange-600";
-    return "text-red-600";
+  // Calculate team rating dynamically based on current formation
+  const calculateDynamicTeamRating = () => {
+    const playersInFormation = Object.values(formationPlayers);
+    
+    // Ensure we don't exceed 11 players (football team limit)
+    const validPlayers = playersInFormation.slice(0, 11);
+    
+    if (validPlayers.length === 0) {
+      return 0;
+    }
+
+    const totalStats = validPlayers.reduce((sum, player) => {
+      let playerStats = (player.speed || 0) + (player.shooting || 0) + (player.passing || 0) + 
+                       (player.defending || 0) + (player.stamina || 0) + (player.reflexes || 0);
+      
+      // Captain bonus: +5 to all stats for the captain
+      if (player.isCaptain) {
+        playerStats += 30; // 5 points per stat * 6 stats
+      }
+      
+      return sum + playerStats;
+    }, 0);
+
+    const averageStats = totalStats / (validPlayers.length * 6); // 6 stats per player
+    
+    // Penalty for incomplete teams (less than 11 players)
+    if (validPlayers.length < 11) {
+      const penalty = (11 - validPlayers.length) * 3; // 3 points penalty per missing player
+      return Math.max(0, Math.round(averageStats - penalty));
+    }
+    
+    // Minimum team strength requirement
+    if (validPlayers.length < 5) {
+      return 0; // Teams with less than 5 players have 0 strength
+    }
+    
+    return Math.round(averageStats);
   };
 
-  const getLogoEmoji = (logo: string | null) => {
-    switch (logo) {
-      case "shield": return "🛡️";
-      case "star": return "⭐";
-      case "crown": return "👑";
-      case "fire": return "🔥";
-      case "lightning": return "⚡";
-      default: return "⚽";
+  if (loading) {
+    return (
+      <div className="space-y-6 p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p>Indlæser holddata...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !teamData) {
+    return (
+      <div className="space-y-6 p-6">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error || 'Intet hold fundet'}</p>
+          <Button onClick={() => window.location.reload()}>
+            Prøv igen
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const currentTeamRating = calculateDynamicTeamRating();
+
+  // Transfer functions
+  const handleTransferClick = async (player: Player) => {
+    try {
+      setSelectedPlayerForTransfer(player);
+      setAskingPrice("");
+      
+      // Get minimum price for the player
+      const response = await authApiFetch(`/api/transfers/minimum-price/${player.id}`) as any;
+      if (response) {
+        setMinimumPrice(response.minimumPrice);
+        setAskingPrice(response.suggestedPrice.toString());
+      }
+      
+      setTransferModalOpen(true);
+    } catch (error) {
+      console.error("Error getting minimum price:", error);
+      setError("Kunne ikke hente minimumspris for spilleren");
     }
   };
 
-  // Filter and sort players
-  const filteredPlayers = teamData.players
-    .filter(player => {
-      const matchesSearch = player.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesPosition = selectedPosition === "all" || player.position === selectedPosition;
-      return matchesSearch && matchesPosition;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "rating":
-          return b.rating - a.rating;
-        case "name":
-          return a.name.localeCompare(b.name);
-        case "age":
-          return a.age - b.age;
-        default:
-          return 0;
+  const handleListForTransfer = async () => {
+    if (!selectedPlayerForTransfer || !askingPrice) return;
+    
+    try {
+      setIsListingTransfer(true);
+      const response = await authApiFetch(`/api/transfers/list/${selectedPlayerForTransfer.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          askingPrice: parseInt(askingPrice)
+        })
+      });
+      
+      if (response) {
+        setTransferModalOpen(false);
+        setSelectedPlayerForTransfer(null);
+        setAskingPrice("");
+        // Reload team data to reflect changes
+        const data = await authApiFetch('/api/teams/my-team');
+        if (data) {
+          setTeamData(data as TeamData);
+        }
       }
-    });
-
-  const starters = filteredPlayers.filter(player => player.isStarter);
-  const substitutes = filteredPlayers.filter(player => !player.isStarter);
+    } catch (error: any) {
+      console.error("Error listing player for transfer:", error);
+      setError(error.message || "Kunne ikke sætte spiller på transfer");
+    } finally {
+      setIsListingTransfer(false);
+    }
+  };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Left Side - Formation */}
-      <div className="flex-1 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold text-black">Nyt hold</h1>
-              <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
-                Rating: {currentTeamRating}
-              </div>
+    <div className="space-y-6 p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <h1 className="text-3xl font-bold">Mit Hold</h1>
+            <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+              Rating: {currentTeamRating}
+              {currentTeamRating !== (teamData.overallRating || 0) && (
+                <span className="ml-2 text-orange-600">(ændret)</span>
+              )}
             </div>
-            <div className="flex items-center space-x-4 mt-2">
-              <span className="text-xl font-bold text-green-700 bg-green-100 px-3 py-1 rounded border border-green-600">50.000.000</span>
-              <span className="text-lg font-semibold text-gray-800">Bank</span>
+            <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+              Formation: {Math.min(Object.values(formationPlayers).length, 11)}/11
+            </div>
+            <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-semibold">
+              Total: {teamData?.players.length || 0} spillere
             </div>
           </div>
-          <div className="flex space-x-2">
-            <Button variant="outline" className="text-gray-800 border-gray-600 hover:bg-gray-100">
-              Annullér
-            </Button>
-            <Button 
-              className="bg-blue-700 hover:bg-blue-800 text-white font-bold"
-              onClick={handleSaveFormation}
-              disabled={isUpdatingFormation}
-            >
-              {isUpdatingFormation ? "Gemmer..." : "Gem"}
+          
+          {/* Formation Selector */}
+          <div className="flex items-center space-x-2">
+            <span className="text-lg font-semibold text-muted-foreground">Formation:</span>
+            <Select value={selectedFormation} onValueChange={(newFormation) => {
+              setSelectedFormation(newFormation);
+              // Clear formation and auto-fill with existing players when formation changes
+              setFormationPlayers({});
+              setTimeout(() => {
+                autoFillFormation();
+              }, 100);
+            }}>
+              <SelectTrigger className="w-24">
+                <SelectValue placeholder="Vælg formation" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.keys(formationDefinitions).map((formation) => (
+                  <SelectItem key={formation} value={formation}>
+                    {formation}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="flex space-x-2">
+          <Button variant="outline" onClick={() => window.location.reload()}>
+            Annullér
+          </Button>
+          <Button variant="outline" onClick={autoFillFormation}>
+            Auto-fyld
+          </Button>
+          <Button onClick={async () => {
+            try {
+              const starters = Object.values(formationPlayers).map(player => player.id);
+              const formationPositions: {[key: string]: string} = {};
+              Object.entries(formationPlayers).forEach(([positionId, player]) => {
+                formationPositions[player.id] = positionId;
+              });
+              
+              
+              const response = await authApiFetch(`/api/teams/${teamData.id}/starters`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ starters, formationPositions, formation: selectedFormation }),
+              });
+
+              if (response) {
+                // Update local team data with new rating and formation
+                setTeamData(prev => prev ? {
+                  ...prev,
+                  overallRating: currentTeamRating,
+                  formation: selectedFormation,
+                  players: prev.players.map(player => {
+                    const isStarter = Object.values(formationPlayers).some(fp => fp.id === player.id);
+                    const formationPosition = isStarter ? 
+                      Object.entries(formationPlayers).find(([_, p]) => p.id === player.id)?.[0] : undefined;
+                    
+                    return {
+                      ...player,
+                      isStarter,
+                      formationPosition: formationPosition || undefined
+                    };
+                  })
+                } : null);
+                alert("Holdopstilling gemt!");
+              }
+            } catch (err) {
+              console.error("Error saving formation:", err);
+              alert("Fejl: Kunne ikke gemme holdopstillingen. Prøv igen.");
+            }
+          }}>
+            Gem
           </Button>
         </div>
       </div>
 
-        {/* Football Field */}
-        <div className="relative bg-gradient-to-b from-green-500 to-green-700 rounded-lg h-[500px] border-4 border-white overflow-hidden shadow-lg">
-          {/* Field lines */}
-          <div className="absolute top-1/2 left-0 right-0 h-1 bg-white"></div>
-          
-          {/* Goal areas */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-40 h-20 border-2 border-white"></div>
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-40 h-20 border-2 border-white"></div>
-          
-          {/* Penalty areas */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-60 h-30 border-2 border-white"></div>
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-60 h-30 border-2 border-white"></div>
-          
-          {/* Center circle */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-2 border-white rounded-full"></div>
-          
-          {/* Field pattern */}
-          <div className="absolute inset-0 opacity-20">
-            <div className="w-full h-full" style={{
-              backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(255,255,255,0.3) 1px, transparent 1px)',
-              backgroundSize: '30px 30px'
-            }}></div>
-          </div>
-          
-          {/* Formation positions */}
-          {getFormationPositions().map((pos, index) => {
-            const player = formationPlayers[pos.id];
-            return (
-              <div
-                key={pos.id}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200"
-                style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+      {/* Football Field */}
+      <div className="relative bg-gradient-to-b from-green-500 to-green-700 rounded-lg h-[400px] border-4 border-white overflow-hidden shadow-lg max-w-4xl mx-auto">
+        {/* Field lines */}
+        <div className="absolute top-1/2 left-0 right-0 h-1 bg-white"></div>
+        
+        {/* Goal areas */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-40 h-20 border-2 border-white"></div>
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-40 h-20 border-2 border-white"></div>
+        
+        {/* Penalty areas */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-60 h-30 border-2 border-white"></div>
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-60 h-30 border-2 border-white"></div>
+        
+        {/* Center circle */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-2 border-white rounded-full"></div>
+        
+        {/* Field pattern */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="w-full h-full" style={{
+            backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(255,255,255,0.3) 1px, transparent 1px)',
+            backgroundSize: '30px 30px'
+          }}></div>
+        </div>
+        
+        {/* Formation positions */}
+        {getFormationPositions().map((pos) => {
+          const player = formationPlayers[pos.id];
+          return (
+            <div
+              key={pos.id}
+              className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200"
+              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+            >
+              {player ? (
+                <div 
+                  className="flex flex-col items-center p-3 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-all cursor-pointer min-w-[90px] border-2 border-gray-600 hover:border-red-500"
+                  onClick={() => removePlayerFromFormation(pos.id)}
+                  title="Klik for at fjerne spiller"
+                >
+                  <PlayerAvatar 
+                    playerName={player.name}
+                    position={player.position}
+                    size={36}
+                    className="rounded-full"
+                  />
+                  <span className="text-sm font-bold mt-2 text-center text-black bg-white px-2 py-1 rounded border border-gray-300">{player.name}</span>
+                  <span className="text-xs font-bold text-white bg-blue-700 px-2 py-1 rounded mt-1 border border-blue-800">{pos.name}</span>
+                  {player.isCaptain && (
+                    <Crown className="w-4 h-4 text-yellow-700 mt-1" />
+                  )}
+                </div>
+              ) : (
+                <div 
+                  className="flex flex-col items-center p-3 bg-yellow-200 rounded-lg border-2 border-dashed border-yellow-700 min-w-[90px] hover:bg-yellow-300 transition-colors cursor-pointer"
+                  onClick={() => {
+                    // Find a suitable player for this position
+                    const suitablePlayer = teamData.players.find(p => 
+                      p.position === pos.position && 
+                      !Object.values(formationPlayers).some(fp => fp.id === p.id)
+                    );
+                    if (suitablePlayer) {
+                      addPlayerToFormation(suitablePlayer, pos.id);
+                    }
+                  }}
+                  title="Klik for at tilføje spiller"
+                >
+                  <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-lg">+</span>
+                  </div>
+                  <span className="text-xs font-bold mt-2 text-center text-yellow-900 bg-yellow-100 px-2 py-1 rounded border border-yellow-400">{pos.name}</span>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Player List */}
+      <div>
+        <h2 className="text-2xl font-bold mb-4">Spillere</h2>
+        
+        {/* Search */}
+        <div className="flex items-center space-x-2 mb-6">
+          <Search className="w-5 h-5 text-muted-foreground" />
+          <Input
+            placeholder="Søg efter spiller..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1"
+          />
+        </div>
+
+        {/* Player Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {teamData.players
+            .filter(player => player.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            .map((player) => {
+              const isInFormation = Object.values(formationPlayers).some(p => p.id === player.id);
+              const positions = getFormationPositions();
+              const suitablePosition = positions.find(pos => 
+                pos.position === player.position && !formationPlayers[pos.id]
+              );
+              const canAdd = !isInFormation && suitablePosition;
+              
+              
+              return (
+              <Card 
+                key={player.id} 
+                className={`hover:shadow-lg transition-all cursor-pointer ${canAdd ? 'hover:bg-green-50' : 'opacity-50 cursor-not-allowed'}`}
                 onClick={() => {
-                  if (player) {
-                    removePlayerFromFormation(pos.id);
+                  if (canAdd) {
+                    addPlayerToFormation(player, suitablePosition.id);
                   }
                 }}
               >
-                {player ? (
-                  <div className="flex flex-col items-center p-3 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-all cursor-pointer min-w-[90px] border-2 border-gray-600">
-                    <PlayerAvatar 
-                      playerName={player.name}
-                      position={player.position}
-                      size={36}
-                      className="rounded-full"
-                    />
-                    <span className="text-sm font-bold mt-2 text-center text-black bg-white px-2 py-1 rounded border border-gray-300">{player.name}</span>
-                    <span className="text-xs font-bold text-white bg-blue-700 px-2 py-1 rounded mt-1 border border-blue-800">{pos.name}</span>
-                    {player.isCaptain && (
-                      <Crown className="w-4 h-4 text-yellow-700 mt-1" />
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center p-3 bg-yellow-200 rounded-lg border-2 border-dashed border-yellow-700 min-w-[90px] hover:bg-yellow-300 transition-colors">
-                    <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center shadow-md">
-                      <span className="text-white font-bold text-lg">+</span>
-                    </div>
-                    <span className="text-xs font-bold mt-2 text-center text-yellow-900 bg-yellow-100 px-2 py-1 rounded border border-yellow-400">{pos.name}</span>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Right Side - Player List */}
-      <div className="w-96 bg-white border-l border-gray-200 p-4">
-        {/* Search and Filter Header */}
-        <div className="space-y-4 mb-6">
-          <div className="flex items-center space-x-2">
-            <Search className="w-5 h-5 text-gray-700" />
-            <Input
-              placeholder="Søg efter spiller..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 border-2 border-gray-400 text-gray-900 font-semibold"
-            />
-            </div>
-
-          <div className="flex items-center space-x-2">
-            <Select value={selectedPosition} onValueChange={setSelectedPosition}>
-              <SelectTrigger className="w-32 border-2 border-gray-400 text-gray-900 font-semibold">
-                <SelectValue placeholder="Position" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle</SelectItem>
-                <SelectItem value="GOALKEEPER">Målmand</SelectItem>
-                <SelectItem value="DEFENDER">Forsvar</SelectItem>
-                <SelectItem value="MIDFIELDER">Midtbane</SelectItem>
-                <SelectItem value="ATTACKER">Angreb</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-32 border-2 border-gray-400 text-gray-900 font-semibold">
-                <SelectValue placeholder="Sorter" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="rating">Rating</SelectItem>
-                <SelectItem value="name">Navn</SelectItem>
-                <SelectItem value="age">Alder</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Button variant="outline" size="sm" className="border-2 border-gray-400 text-gray-700">
-              <Filter className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Player List */}
-        <div className="space-y-2 max-h-[600px] overflow-y-auto">
-          {filteredPlayers.map((player) => {
-            const isInFormation = Object.values(formationPlayers).some(p => p.id === player.id);
-            
-            // Check if there's an available position for this player's position type
-            const positions = getFormationPositions();
-            const availablePosition = positions.find(pos => 
-              pos.position === player.position && !formationPlayers[pos.id]
-            );
-            const hasAvailablePosition = !!availablePosition;
-            
-            const isDisabled = isInFormation || !hasAvailablePosition;
-            return (
-                  <div
-                    key={player.id}
-                className={`flex items-center justify-between p-4 border-2 rounded-lg transition-all bg-white shadow-lg ${
-                  isDisabled ? 'opacity-50 bg-gray-200 cursor-not-allowed border-gray-500' : 'hover:shadow-xl hover:border-blue-500 cursor-pointer border-gray-400'
-                }`}
-              >
-                <div className="flex items-center space-x-4 flex-1">
-                  <div 
-                    className={`w-10 h-10 rounded-full shadow-lg font-bold flex items-center justify-center ${
-                      isDisabled 
-                        ? 'bg-gray-400 text-gray-600 border-2 border-gray-500' 
-                        : 'bg-blue-700 hover:bg-blue-800 text-white border-2 border-blue-800 cursor-pointer'
-                    }`}
-                    onClick={() => {
-                      if (isDisabled) return;
-                      
-                      if (availablePosition) {
-                        addPlayerToFormation(player, availablePosition.id);
-                      }
-                    }}
-                  >
-                    <Plus className="w-5 h-5" />
-                  </div>
-                  
-                  <div className="flex items-center space-x-4 flex-1">
-                    <PlayerAvatar 
-                      playerName={player.name}
-                      position={player.position}
-                      size={48}
-                      className="rounded-full"
-                    />
-                    
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3">
-                        <p className="font-bold text-xl text-black">{player.name}</p>
-                    {player.isCaptain && (
-                          <Crown className="w-5 h-5 text-yellow-700" />
-                    )}
-                  </div>
-                      <div className="flex items-center space-x-3 mt-1">
-                        <Badge className={`${getPositionColor(player.position)} font-bold text-sm px-3 py-1 border-2`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <PlayerAvatar 
+                        playerName={player.name}
+                        position={player.position}
+                        size={40}
+                        className="rounded-full"
+                      />
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <p className="font-bold text-lg">{player.name}</p>
+                          {player.isCaptain && (
+                            <Crown className="w-4 h-4 text-yellow-700" />
+                          )}
+                        </div>
+                        <Badge className={`${getPositionColor(player.position)} font-bold text-xs px-2 py-1`}>
                           {getPositionName(player.position)}
                         </Badge>
+                      </div>
                     </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTransferClick(player);
+                        }}
+                        className="text-xs px-2 py-1 h-7"
+                      >
+                        <TrendingUp className="w-3 h-3 mr-1" />
+                        Transfer
+                      </Button>
+                      <div className="w-8 h-8 rounded-full shadow-lg font-bold flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground">
+                        <Plus className="w-4 h-4" />
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center bg-yellow-200 px-4 py-2 rounded-lg border-2 border-yellow-600">
-                    <Star className="w-5 h-5 mr-2 text-yellow-800" />
-                    <span className={`font-bold text-2xl text-black`}>
+                  
+                  {/* Rating */}
+                  <div className="flex items-center justify-center bg-yellow-200 px-2 py-1 rounded-md border-2 border-yellow-400 mb-3">
+                    <Star className="w-3 h-3 mr-1 text-yellow-800" />
+                    <span className="font-bold text-sm text-yellow-900">
                       {player.rating}
                     </span>
                   </div>
-                  <div className="text-right">
-                    <span className="text-lg font-bold text-green-800 bg-green-100 px-3 py-1 rounded border border-green-600">
-                      {(player.rating * 1000).toLocaleString()}
-                    </span>
+                  
+                  {/* Player Stats */}
+                  <div className="space-y-2">
+                    <div className="text-xs text-muted-foreground font-semibold text-center">Evner:</div>
+                    <div className="flex justify-center space-x-3">
+                      {/* Speed */}
+                      <div className="flex flex-col items-center">
+                        <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center border border-blue-300">
+                          <Zap className="w-3 h-3 text-blue-800" />
+                        </div>
+                        <div className="text-xs font-bold mt-1">{player.speed || 'N/A'}</div>
+                      </div>
+                      
+                      {/* Shooting */}
+                      <div className="flex flex-col items-center">
+                        <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center border border-red-300">
+                          <Swords className="w-3 h-3 text-red-800" />
+                        </div>
+                        <div className="text-xs font-bold mt-1">{player.shooting || 'N/A'}</div>
+                      </div>
+                      
+                      {/* Passing */}
+                      <div className="flex flex-col items-center">
+                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center border border-green-300">
+                          <ArrowRightLeft className="w-3 h-3 text-green-800" />
+                        </div>
+                        <div className="text-xs font-bold mt-1">{player.passing || 'N/A'}</div>
+                      </div>
+                      
+                      {/* Defense */}
+                      <div className="flex flex-col items-center">
+                        <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center border border-purple-300">
+                          <Shield className="w-3 h-3 text-purple-800" />
+                        </div>
+                        <div className="text-xs font-bold mt-1">{player.defending || 'N/A'}</div>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </CardContent>
+              </Card>
+              );
+            })}
+        </div>
+      </div>
+
+      {/* Transfer Modal */}
+      <Dialog open={transferModalOpen} onOpenChange={setTransferModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sæt spiller på transfer</DialogTitle>
+            <DialogDescription>
+              Sæt {selectedPlayerForTransfer?.name} på transfermarkedet
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <PlayerAvatar 
+                playerName={selectedPlayerForTransfer?.name || ''}
+                position={selectedPlayerForTransfer?.position || ''}
+                size={40}
+                className="rounded-full"
+              />
+              <div>
+                <p className="font-semibold text-black">{selectedPlayerForTransfer?.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {getPositionName(selectedPlayerForTransfer?.position || '')} • Rating: {selectedPlayerForTransfer?.rating}
+                </p>
               </div>
-            );
-          })}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="askingPrice">Asking pris</Label>
+              <div className="flex items-center space-x-2">
+                <DollarSign className="w-4 h-4 text-muted-foreground" />
+                <Input
+                  id="askingPrice"
+                  type="number"
+                  value={askingPrice}
+                  onChange={(e) => setAskingPrice(e.target.value)}
+                  placeholder="Indtast asking pris"
+                  min={minimumPrice}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Minimum pris: {minimumPrice.toLocaleString()} kr
+              </p>
             </div>
           </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setTransferModalOpen(false)}
+              disabled={isListingTransfer}
+            >
+              Annuller
+            </Button>
+            <Button
+              onClick={handleListForTransfer}
+              disabled={!askingPrice || parseInt(askingPrice) < minimumPrice || isListingTransfer}
+            >
+              {isListingTransfer ? 'Sætter på transfer...' : 'Sæt på transfer'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

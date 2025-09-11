@@ -25,6 +25,7 @@ export interface MatchResult {
   homeScore: number;
   awayScore: number;
   events: MatchEvent[];
+  highlights: MatchHighlight[];
   possession: {
     home: number;
     away: number;
@@ -45,6 +46,18 @@ export interface MatchEvent {
   team: 'home' | 'away';
   player: string;
   description: string;
+}
+
+export interface MatchHighlight {
+  id: string;
+  eventType: string;
+  minute: number;
+  player: string;
+  description: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  duration: number;
+  isProOnly: boolean;
 }
 
 export interface GameEngineConfig {

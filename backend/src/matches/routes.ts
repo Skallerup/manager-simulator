@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createMatch, getMatches, simulateMatch, getMatchById, createBotMatch, simulateBotMatch, getBotMatches } from './handlers';
+import { createMatch, getMatches, simulateMatch, getMatchById, createBotMatch, simulateBotMatch, getBotMatches, getMatchHighlights } from './handlers';
 
 const router = Router();
 
@@ -7,6 +7,7 @@ const router = Router();
 router.post('/bot', createBotMatch);
 router.get('/bot', getBotMatches);
 router.post('/bot/:id/simulate', simulateBotMatch);
+router.get('/bot/:id/highlights', getMatchHighlights);
 
 // Create a new match
 router.post('/', createMatch);

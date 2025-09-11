@@ -325,7 +325,7 @@ export class TeamService {
 
   /**
    * Calculates team overall rating with captain bonus
-   * More realistic calculation that penalizes incomplete teams
+   * More realistic calculation that penalizes incomplete teams (less than 11 players)
    */
   public static calculateTeamRating(players: any[]): number {
     console.log("=== calculateTeamRating DEBUG START ===");
@@ -362,12 +362,19 @@ export class TeamService {
     
     // Penalty for incomplete teams (less than 11 players)
     if (players.length < 11) {
-      const penalty = (11 - players.length) * 15; // 15 points penalty per missing player
+      const penalty = (11 - players.length) * 3; // 3 points penalty per missing player
       const finalRating = Math.max(0, Math.round(averageStats - penalty));
       console.log("calculateTeamRating - Incomplete team penalty:", penalty, "points");
       console.log("calculateTeamRating - Final rating with penalty:", finalRating);
       console.log("=== calculateTeamRating DEBUG END ===");
       return finalRating;
+    }
+    
+    // Minimum team strength requirement
+    if (players.length < 5) {
+      console.log("calculateTeamRating - Team has less than 5 players, returning 0");
+      console.log("=== calculateTeamRating DEBUG END ===");
+      return 0; // Teams with less than 5 players have 0 strength
     }
     
     const finalRating = Math.round(averageStats);

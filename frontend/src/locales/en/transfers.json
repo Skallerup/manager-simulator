@@ -35,7 +35,7 @@
   "failedToCancel": "Failed to cancel transfer",
   "enterValidPrice": "Please enter a valid asking price",
   "insufficientBudget": "Insufficient budget",
-  "teamFull": "Team is full (max 11 players)",
+  "teamFull": "Team is full (max 16 players)",
   "playerAlreadyOnTeam": "Player is already on a team",
   "cannotBuyOwnPlayer": "Cannot buy your own player",
   "playerAlreadyListed": "Player is already listed for transfer",

@@ -35,7 +35,7 @@
   "failedToCancel": "Kunne ikke annullere transfer",
   "enterValidPrice": "Indtast en gyldig udbudspris",
   "insufficientBudget": "Utilstrækkeligt budget",
-  "teamFull": "Holdet er fuldt (maks 11 spillere)",
+  "teamFull": "Holdet er fuldt (maks 16 spillere)",
   "playerAlreadyOnTeam": "Spilleren er allerede på et hold",
   "cannotBuyOwnPlayer": "Kan ikke købe din egen spiller",
   "playerAlreadyListed": "Spilleren er allerede listet til transfer",

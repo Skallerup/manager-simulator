@@ -314,7 +314,13 @@ export async function getMyTeamHandler(req: Request, res: Response) {
         rating: Math.floor((tp.player.speed + tp.player.shooting + tp.player.passing + 
                            tp.player.defending + tp.player.stamina + tp.player.reflexes) / 6),
         isStarter: tp.isStarter,
-        isCaptain: tp.player.isCaptain
+        isCaptain: tp.player.isCaptain,
+        speed: tp.player.speed,
+        shooting: tp.player.shooting,
+        passing: tp.player.passing,
+        defending: tp.player.defending,
+        stamina: tp.player.stamina,
+        reflexes: tp.player.reflexes
       })),
       createdAt: team.createdAt.toISOString(),
       updatedAt: team.updatedAt.toISOString()
@@ -423,7 +429,7 @@ export async function updateStartersHandler(req: Request, res: Response) {
     console.log("=== updateStartersHandler DEBUG START ===");
     const user = await getUserFromToken(req);
     const { teamId } = req.params;
-    const { starters, formationPositions } = req.body; // Array of player IDs and their positions
+    const { starters, formationPositions, formation } = req.body; // Array of player IDs and their positions
     console.log("updateStartersHandler - Team ID:", teamId);
     console.log("updateStartersHandler - Starters received:", starters);
     console.log("updateStartersHandler - Formation positions:", formationPositions);
@@ -437,6 +443,14 @@ export async function updateStartersHandler(req: Request, res: Response) {
     if (!team) {
       return res.status(404).json({
         error: "Team not found or you don't have permission to update it",
+      });
+    }
+
+    // Update team formation if provided
+    if (formation) {
+      await prisma.team.update({
+        where: { id: teamId },
+        data: { formation }
       });
     }
 

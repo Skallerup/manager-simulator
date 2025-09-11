@@ -243,12 +243,14 @@ model BotMatch {
   botScore      Int?        @default(0)
   status        MatchStatus @default(SCHEDULED)
   events        String?     // JSON string of match events
+  highlights    String?     // JSON string of match highlights
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   
   // Relations
   owner     User @relation(fields: [ownerId], references: [id])
   userTeam  Team @relation(fields: [userTeamId], references: [id])
+  highlightsClips MatchHighlight[] @relation("BotMatchHighlights")
 }
 
 model Transfer {
@@ -318,6 +320,25 @@ enum SeasonStatus {
   ACTIVE
   COMPLETED
   PAUSED
+}
+
+model MatchHighlight {
+  id          String   @id @default(cuid())
+  matchId     String
+  eventType   String   // 'goal', 'save', 'shot', 'card', 'substitution'
+  minute      Int
+  player      String
+  description String
+  videoUrl    String?  // URL to video clip (simulated)
+  thumbnailUrl String? // URL to thumbnail image
+  duration    Int      @default(10) // Duration in seconds
+  isProOnly   Boolean  @default(true) // PRO feature
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  botMatch    BotMatch @relation("BotMatchHighlights", fields: [matchId], references: [id], onDelete: Cascade)
+  
+  @@index([matchId])
 }
 
 
