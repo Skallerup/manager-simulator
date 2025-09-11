@@ -666,7 +666,13 @@ export default function MyTeamPage() {
                     className="rounded-full"
                   />
                   <span className="text-sm font-bold mt-2 text-center text-black bg-white px-2 py-1 rounded border border-gray-300">{player.name}</span>
-                  <span className="text-xs font-bold text-white bg-blue-700 px-2 py-1 rounded mt-1 border border-blue-800">{pos.name}</span>
+                  <div className="flex items-center justify-center space-x-1 mt-1">
+                    <span className="text-xs font-bold text-white bg-blue-700 px-2 py-1 rounded border border-blue-800">{pos.name}</span>
+                    <div className="flex items-center bg-yellow-200 px-2 py-1 rounded border border-yellow-400">
+                      <Star className="w-3 h-3 text-yellow-800 mr-1" />
+                      <span className="text-xs font-bold text-yellow-900">{player.rating}</span>
+                    </div>
+                  </div>
                   {player.isCaptain && (
                     <Crown className="w-6 h-6 text-yellow-700 mt-1 drop-shadow-lg" />
                   )}
