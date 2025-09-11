@@ -42,62 +42,62 @@ interface TeamData {
 const formationDefinitions = {
   "4-3-3": {
     positions: [
-      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 90 },
-      { id: "lb", name: "VB", position: "DEFENDER", x: 20, y: 70 },
-      { id: "cb1", name: "CB", position: "DEFENDER", x: 40, y: 70 },
-      { id: "cb2", name: "CB", position: "DEFENDER", x: 60, y: 70 },
-      { id: "rb", name: "HB", position: "DEFENDER", x: 80, y: 70 },
-      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 30, y: 50 },
-      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 50, y: 50 },
-      { id: "cm3", name: "CM", position: "MIDFIELDER", x: 70, y: 50 },
-      { id: "lw", name: "VK", position: "ATTACKER", x: 20, y: 30 },
-      { id: "st", name: "AN", position: "ATTACKER", x: 50, y: 30 },
-      { id: "rw", name: "HK", position: "ATTACKER", x: 80, y: 30 }
+      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 88 },
+      { id: "lb", name: "VB", position: "DEFENDER", x: 15, y: 72 },
+      { id: "cb1", name: "CB", position: "DEFENDER", x: 35, y: 72 },
+      { id: "cb2", name: "CB", position: "DEFENDER", x: 65, y: 72 },
+      { id: "rb", name: "HB", position: "DEFENDER", x: 85, y: 72 },
+      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 25, y: 52 },
+      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 50, y: 52 },
+      { id: "cm3", name: "CM", position: "MIDFIELDER", x: 75, y: 52 },
+      { id: "lw", name: "VK", position: "ATTACKER", x: 20, y: 32 },
+      { id: "st", name: "AN", position: "ATTACKER", x: 50, y: 32 },
+      { id: "rw", name: "HK", position: "ATTACKER", x: 80, y: 32 }
     ]
   },
   "4-4-2": {
     positions: [
-      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 90 },
-      { id: "lb", name: "VB", position: "DEFENDER", x: 20, y: 70 },
-      { id: "cb1", name: "CB", position: "DEFENDER", x: 40, y: 70 },
-      { id: "cb2", name: "CB", position: "DEFENDER", x: 60, y: 70 },
-      { id: "rb", name: "HB", position: "DEFENDER", x: 80, y: 70 },
-      { id: "lm", name: "VM", position: "MIDFIELDER", x: 20, y: 50 },
-      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 40, y: 50 },
-      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 60, y: 50 },
-      { id: "rm", name: "HM", position: "MIDFIELDER", x: 80, y: 50 },
-      { id: "st1", name: "AN", position: "ATTACKER", x: 40, y: 30 },
-      { id: "st2", name: "AN", position: "ATTACKER", x: 60, y: 30 }
+      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 88 },
+      { id: "lb", name: "VB", position: "DEFENDER", x: 15, y: 72 },
+      { id: "cb1", name: "CB", position: "DEFENDER", x: 35, y: 72 },
+      { id: "cb2", name: "CB", position: "DEFENDER", x: 65, y: 72 },
+      { id: "rb", name: "HB", position: "DEFENDER", x: 85, y: 72 },
+      { id: "lm", name: "VM", position: "MIDFIELDER", x: 20, y: 52 },
+      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 40, y: 52 },
+      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 60, y: 52 },
+      { id: "rm", name: "HM", position: "MIDFIELDER", x: 80, y: 52 },
+      { id: "st1", name: "AN", position: "ATTACKER", x: 35, y: 32 },
+      { id: "st2", name: "AN", position: "ATTACKER", x: 65, y: 32 }
     ]
   },
   "3-5-2": {
     positions: [
-      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 90 },
-      { id: "cb1", name: "CB", position: "DEFENDER", x: 30, y: 70 },
-      { id: "cb2", name: "CB", position: "DEFENDER", x: 50, y: 70 },
-      { id: "cb3", name: "CB", position: "DEFENDER", x: 70, y: 70 },
-      { id: "lm", name: "VM", position: "MIDFIELDER", x: 20, y: 50 },
-      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 40, y: 50 },
-      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 50, y: 50 },
-      { id: "cm3", name: "CM", position: "MIDFIELDER", x: 60, y: 50 },
-      { id: "rm", name: "HM", position: "MIDFIELDER", x: 80, y: 50 },
-      { id: "st1", name: "AN", position: "ATTACKER", x: 40, y: 30 },
-      { id: "st2", name: "AN", position: "ATTACKER", x: 60, y: 30 }
+      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 88 },
+      { id: "cb1", name: "CB", position: "DEFENDER", x: 25, y: 72 },
+      { id: "cb2", name: "CB", position: "DEFENDER", x: 50, y: 72 },
+      { id: "cb3", name: "CB", position: "DEFENDER", x: 75, y: 72 },
+      { id: "lm", name: "VM", position: "MIDFIELDER", x: 15, y: 52 },
+      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 35, y: 52 },
+      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 50, y: 52 },
+      { id: "cm3", name: "CM", position: "MIDFIELDER", x: 65, y: 52 },
+      { id: "rm", name: "HM", position: "MIDFIELDER", x: 85, y: 52 },
+      { id: "st1", name: "AN", position: "ATTACKER", x: 35, y: 32 },
+      { id: "st2", name: "AN", position: "ATTACKER", x: 65, y: 32 }
     ]
   },
   "5-3-2": {
     positions: [
-      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 90 },
-      { id: "lwb", name: "VB", position: "DEFENDER", x: 15, y: 70 },
-      { id: "cb1", name: "CB", position: "DEFENDER", x: 35, y: 70 },
-      { id: "cb2", name: "CB", position: "DEFENDER", x: 50, y: 70 },
-      { id: "cb3", name: "CB", position: "DEFENDER", x: 65, y: 70 },
-      { id: "rwb", name: "HB", position: "DEFENDER", x: 85, y: 70 },
-      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 35, y: 50 },
-      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 50, y: 50 },
-      { id: "cm3", name: "CM", position: "MIDFIELDER", x: 65, y: 50 },
-      { id: "st1", name: "AN", position: "ATTACKER", x: 40, y: 30 },
-      { id: "st2", name: "AN", position: "ATTACKER", x: 60, y: 30 }
+      { id: "gk", name: "MÅ", position: "GOALKEEPER", x: 50, y: 88 },
+      { id: "lwb", name: "VB", position: "DEFENDER", x: 10, y: 72 },
+      { id: "cb1", name: "CB", position: "DEFENDER", x: 30, y: 72 },
+      { id: "cb2", name: "CB", position: "DEFENDER", x: 50, y: 72 },
+      { id: "cb3", name: "CB", position: "DEFENDER", x: 70, y: 72 },
+      { id: "rwb", name: "HB", position: "DEFENDER", x: 90, y: 72 },
+      { id: "cm1", name: "CM", position: "MIDFIELDER", x: 35, y: 52 },
+      { id: "cm2", name: "CM", position: "MIDFIELDER", x: 50, y: 52 },
+      { id: "cm3", name: "CM", position: "MIDFIELDER", x: 65, y: 52 },
+      { id: "st1", name: "AN", position: "ATTACKER", x: 35, y: 32 },
+      { id: "st2", name: "AN", position: "ATTACKER", x: 65, y: 32 }
     ]
   }
 };
