@@ -119,6 +119,7 @@ export default function MyTeamPage() {
   const [isSettingCaptain, setIsSettingCaptain] = useState(false);
   const [currentTeamRating, setCurrentTeamRating] = useState(0);
   const [hasRatingChanged, setHasRatingChanged] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Load team data
   useEffect(() => {
@@ -227,7 +228,13 @@ export default function MyTeamPage() {
     setCurrentTeamRating(newRating);
     
     // Only mark as changed if rating actually changed and it's not the initial load
-    if (previousRating > 0 && newRating !== previousRating) {
+    if (isInitialLoad) {
+      // First load - don't mark as changed
+      setHasRatingChanged(false);
+      setIsInitialLoad(false);
+      console.log(`Initial team rating set to: ${newRating}`);
+    } else if (previousRating > 0 && newRating !== previousRating) {
+      // Subsequent changes - mark as changed
       setHasRatingChanged(true);
       console.log(`Team rating changed from ${previousRating} to ${newRating}`);
     } else {
@@ -509,7 +516,7 @@ export default function MyTeamPage() {
         });
         
         console.log(`Captain changed to: ${player.name} (${player.rating})`);
-        setHasRatingChanged(true); // Mark as changed when captain is manually changed
+        // The useEffect will handle marking as changed when formationPlayers updates
         alert(`${player.name} er nu kaptajn!`);
       }
     } catch (error: any) {
