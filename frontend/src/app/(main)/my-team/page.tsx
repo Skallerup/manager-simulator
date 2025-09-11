@@ -342,10 +342,12 @@ export default function MyTeamPage() {
       let playerStats = (player.speed || 0) + (player.shooting || 0) + (player.passing || 0) + 
                        (player.defending || 0) + (player.stamina || 0) + (player.reflexes || 0);
       
-      // Captain bonus: +5 to all stats for the captain
+      // Captain bonus: +10% to all stats (same as backend game engine)
       if (player.isCaptain) {
-        playerStats += 30; // 5 points per stat * 6 stats
-        console.log(`Captain bonus applied to ${player.name}: +30 points (base: ${playerStats - 30})`);
+        const baseStats = playerStats;
+        playerStats *= 1.1; // 10% bonus
+        const bonus = playerStats - baseStats;
+        console.log(`Captain bonus applied to ${player.name}: +${bonus.toFixed(1)} points (base: ${baseStats}, new: ${playerStats.toFixed(1)})`);
       }
       
       return sum + playerStats;
