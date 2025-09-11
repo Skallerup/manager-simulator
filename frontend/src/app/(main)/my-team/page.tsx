@@ -485,7 +485,8 @@ export default function MyTeamPage() {
       });
       
       if (response) {
-        const updatedTeam = await response.json();
+        // response is already the parsed data from authApiFetch
+        const updatedTeam = response;
         
         // Update local team data with new overallRating from backend
         setTeamData(prev => prev ? {
