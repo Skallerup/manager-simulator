@@ -621,7 +621,7 @@ export default function MyTeamPage() {
       </div>
 
       {/* Football Field */}
-      <div className="relative bg-gradient-to-b from-green-500 to-green-700 rounded-lg h-[400px] border-4 border-white overflow-hidden shadow-lg max-w-4xl mx-auto">
+      <div className="relative bg-gradient-to-b from-green-500 to-green-700 rounded-lg h-[600px] border-4 border-white overflow-hidden shadow-lg max-w-6xl mx-auto">
         {/* Field lines */}
         <div className="absolute top-1/2 left-0 right-0 h-1 bg-white"></div>
         
@@ -655,7 +655,7 @@ export default function MyTeamPage() {
             >
               {player ? (
                 <div 
-                  className="flex flex-col items-center p-3 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-all cursor-pointer min-w-[90px] border-2 border-gray-600 hover:border-red-500"
+                  className="flex flex-col items-center p-4 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-all cursor-pointer min-w-[110px] border-2 border-gray-600 hover:border-red-500"
                   onClick={() => removePlayerFromFormation(pos.id)}
                   title="Klik for at fjerne spiller"
                 >
@@ -668,12 +668,12 @@ export default function MyTeamPage() {
                   <span className="text-sm font-bold mt-2 text-center text-black bg-white px-2 py-1 rounded border border-gray-300">{player.name}</span>
                   <span className="text-xs font-bold text-white bg-blue-700 px-2 py-1 rounded mt-1 border border-blue-800">{pos.name}</span>
                   {player.isCaptain && (
-                    <Crown className="w-4 h-4 text-yellow-700 mt-1" />
+                    <Crown className="w-6 h-6 text-yellow-700 mt-1 drop-shadow-lg" />
                   )}
                 </div>
               ) : (
                 <div 
-                  className="flex flex-col items-center p-3 bg-yellow-200 rounded-lg border-2 border-dashed border-yellow-700 min-w-[90px] hover:bg-yellow-300 transition-colors cursor-pointer"
+                  className="flex flex-col items-center p-4 bg-yellow-200 rounded-lg border-2 border-dashed border-yellow-700 min-w-[110px] hover:bg-yellow-300 transition-colors cursor-pointer"
                   onClick={() => {
                     // Find a suitable player for this position
                     const suitablePlayer = teamData.players.find(p => 
@@ -686,8 +686,8 @@ export default function MyTeamPage() {
                   }}
                   title="Klik for at tilføje spiller"
                 >
-                  <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center shadow-md">
-                    <span className="text-white font-bold text-lg">+</span>
+                  <div className="w-12 h-12 bg-yellow-600 rounded-full flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-xl">+</span>
                   </div>
                   <span className="text-xs font-bold mt-2 text-center text-yellow-900 bg-yellow-100 px-2 py-1 rounded border border-yellow-400">{pos.name}</span>
                 </div>
