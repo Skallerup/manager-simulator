@@ -441,6 +441,13 @@ export default function MyTeamPage() {
   const handleSetCaptain = async (player: Player) => {
     if (!teamData) return;
     
+    // Check if player is in formation
+    const isInFormation = Object.values(formationPlayers).some(p => p.id === player.id);
+    if (!isInFormation) {
+      alert("Kaptajnen skal være i formationen!");
+      return;
+    }
+    
     try {
       setIsSettingCaptain(true);
       const response = await authApiFetch(`/api/teams/${teamData.id}/captain/${player.id}`, {
@@ -532,20 +539,20 @@ export default function MyTeamPage() {
             <div className="flex items-center space-x-2">
               <span className="text-lg font-semibold text-muted-foreground">Kaptajn:</span>
               <Select 
-                value={teamData?.players.find(p => p.isCaptain)?.id || ""} 
+                value={Object.values(formationPlayers).find(p => p.isCaptain)?.id || ""} 
                 onValueChange={(playerId) => {
-                  const player = teamData?.players.find(p => p.id === playerId);
+                  const player = Object.values(formationPlayers).find(p => p.id === playerId);
                   if (player) {
                     handleSetCaptain(player);
                   }
                 }}
-                disabled={isSettingCaptain}
+                disabled={isSettingCaptain || Object.values(formationPlayers).length === 0}
               >
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Vælg kaptajn" />
+                  <SelectValue placeholder={Object.values(formationPlayers).length === 0 ? "Ingen spillere i formation" : "Vælg kaptajn"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {teamData?.players.map((player) => (
+                  {Object.values(formationPlayers).map((player) => (
                     <SelectItem key={player.id} value={player.id}>
                       <div className="flex items-center space-x-2">
                         {player.isCaptain && <Crown className="w-4 h-4 text-yellow-600" />}
