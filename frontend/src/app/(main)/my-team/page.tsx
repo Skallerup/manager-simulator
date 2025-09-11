@@ -226,6 +226,8 @@ export default function MyTeamPage() {
     const originalRating = teamData?.overallRating || 0;
     setCurrentTeamRating(newRating);
     
+    console.log(`DEBUG: newRating=${newRating}, originalRating=${originalRating}, teamData=`, teamData);
+    
     // Only mark as changed if rating differs from original team rating
     if (originalRating > 0 && newRating !== originalRating) {
       setHasRatingChanged(true);
@@ -235,7 +237,7 @@ export default function MyTeamPage() {
       console.log(`Team rating matches original: ${newRating}`);
     }
     
-    console.log(`Team rating updated to: ${newRating}`);
+    console.log(`Team rating updated to: ${newRating}, hasRatingChanged: ${hasRatingChanged}`);
   }, [formationPlayers, teamData?.overallRating]);
 
   // Get formation positions for current formation
@@ -354,12 +356,10 @@ export default function MyTeamPage() {
       let playerStats = (player.speed || 0) + (player.shooting || 0) + (player.passing || 0) + 
                        (player.defending || 0) + (player.stamina || 0) + (player.reflexes || 0);
       
-      // Captain bonus: +50% to all stats (very meaningful impact)
+      // Captain bonus: +30 points (same as backend)
       if (player.isCaptain) {
-        const baseStats = playerStats;
-        playerStats *= 1.5; // 50% bonus
-        const bonus = playerStats - baseStats;
-        console.log(`Captain bonus applied to ${player.name}: +${bonus.toFixed(1)} points (base: ${baseStats}, new: ${playerStats.toFixed(1)})`);
+        playerStats += 30; // 5 points per stat * 6 stats (same as backend)
+        console.log(`Captain bonus applied to ${player.name}: +30 points (base: ${playerStats - 30}, new: ${playerStats})`);
       }
       
       return sum + playerStats;
