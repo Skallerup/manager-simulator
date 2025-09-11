@@ -217,6 +217,11 @@ export default function MyTeamPage() {
           setFormationPlayers(updatedFormation);
         }
       }
+      
+      // Mark initial load as complete when teamData is loaded
+      if (isInitialLoad) {
+        setIsInitialLoad(false);
+      }
     }
   }, [teamData, selectedFormation]);
 
@@ -231,7 +236,6 @@ export default function MyTeamPage() {
     if (isInitialLoad) {
       // First load - don't mark as changed
       setHasRatingChanged(false);
-      setIsInitialLoad(false);
       console.log(`Initial team rating set to: ${newRating}`);
     } else if (previousRating > 0 && newRating !== previousRating) {
       // Subsequent changes - mark as changed
