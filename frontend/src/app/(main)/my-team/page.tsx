@@ -220,6 +220,7 @@ export default function MyTeamPage() {
 
   // Recalculate team rating when formation players change
   useEffect(() => {
+    console.log("Formation players changed, recalculating rating...");
     const newRating = calculateDynamicTeamRating();
     setCurrentTeamRating(newRating);
     console.log(`Team rating updated to: ${newRating}`);
@@ -344,7 +345,7 @@ export default function MyTeamPage() {
       // Captain bonus: +5 to all stats for the captain
       if (player.isCaptain) {
         playerStats += 30; // 5 points per stat * 6 stats
-        console.log(`Captain bonus applied to ${player.name}: +30 points`);
+        console.log(`Captain bonus applied to ${player.name}: +30 points (base: ${playerStats - 30})`);
       }
       
       return sum + playerStats;
@@ -485,11 +486,12 @@ export default function MyTeamPage() {
           Object.keys(updated).forEach(key => {
             if (updated[key].id === player.id) {
               updated[key] = { ...updated[key], isCaptain: true };
+              console.log(`Set ${updated[key].name} as captain in formation`);
             } else {
               updated[key] = { ...updated[key], isCaptain: false };
             }
           });
-          console.log("Updated formation players:", updated);
+          console.log("Updated formation players:", Object.values(updated).map(p => ({ name: p.name, isCaptain: p.isCaptain })));
           return updated;
         });
         
