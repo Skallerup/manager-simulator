@@ -335,12 +335,15 @@ export default function MyTeamPage() {
       // Captain bonus: +5 to all stats for the captain
       if (player.isCaptain) {
         playerStats += 30; // 5 points per stat * 6 stats
+        console.log(`Captain bonus applied to ${player.name}: +30 points`);
       }
       
       return sum + playerStats;
     }, 0);
 
     const averageStats = totalStats / (validPlayers.length * 6); // 6 stats per player
+    
+    console.log(`Team rating calculation: ${validPlayers.length} players, total stats: ${totalStats}, average: ${averageStats}`);
     
     // Penalty for incomplete teams (less than 11 players)
     if (validPlayers.length < 11) {
@@ -477,9 +480,11 @@ export default function MyTeamPage() {
               updated[key] = { ...updated[key], isCaptain: false };
             }
           });
+          console.log("Updated formation players:", updated);
           return updated;
         });
         
+        console.log(`Captain changed to: ${player.name} (${player.rating})`);
         alert(`${player.name} er nu kaptajn!`);
       }
     } catch (error: any) {
