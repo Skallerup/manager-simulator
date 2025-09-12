@@ -177,7 +177,8 @@ export const createFacility = async (req: AuthenticatedRequest, res: Response) =
 
     // Check if team has enough budget
     const facilityData = calculateFacilityData(type, level);
-    if (team.budget < facilityData.cost) {
+    const teamBudget = Number(team.budget);
+    if (teamBudget < facilityData.cost) {
       return res.status(400).json({ error: 'Insufficient budget' });
     }
 
@@ -195,10 +196,11 @@ export const createFacility = async (req: AuthenticatedRequest, res: Response) =
     });
 
     // Deduct cost from team budget
+    const newBudget = team.budget - BigInt(facilityData.cost);
     await prisma.team.update({
       where: { id: teamId },
       data: {
-        budget: team.budget - facilityData.cost
+        budget: newBudget
       }
     });
 
