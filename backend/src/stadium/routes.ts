@@ -6,7 +6,8 @@ import {
   createFacility,
   upgradeFacility,
   createUpgrade,
-  startUpgrade
+  startUpgrade,
+  upgradeTier
 } from './handlers';
 
 const router = Router();
@@ -25,5 +26,6 @@ router.put('/facilities/:facilityId/upgrade', upgradeFacility);
 // Upgrade routes
 router.post('/:teamId/upgrades', createUpgrade);
 router.put('/upgrades/:upgradeId/start', startUpgrade);
+router.put('/:teamId/tier', upgradeTier);
 
 export default router;

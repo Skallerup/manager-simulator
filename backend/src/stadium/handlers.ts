@@ -387,6 +387,83 @@ export const startUpgrade = async (req: AuthenticatedRequest, res: Response) => 
   }
 };
 
+// Upgrade stadium tier directly
+export const upgradeTier = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { teamId } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const team = await verifyTeamOwnership(teamId, userId);
+    if (!team) {
+      return res.status(404).json({ error: 'Team not found' });
+    }
+
+    const stadium = await prisma.stadium.findUnique({
+      where: { teamId },
+      include: { facilities: true }
+    });
+
+    if (!stadium) {
+      return res.status(404).json({ error: 'Stadium not found' });
+    }
+
+    // Calculate next tier cost and capacity
+    const tierData = [
+      { tier: 1, capacity: 20000, cost: 0 },
+      { tier: 2, capacity: 35000, cost: 5000000 },
+      { tier: 3, capacity: 50000, cost: 15000000 },
+      { tier: 4, capacity: 75000, cost: 35000000 },
+      { tier: 5, capacity: 100000, cost: 75000000 }
+    ];
+
+    const currentTier = tierData.find(t => t.tier === stadium.tier);
+    const nextTier = tierData.find(t => t.tier === stadium.tier + 1);
+
+    if (!nextTier) {
+      return res.status(400).json({ error: 'Stadium is already at maximum tier' });
+    }
+
+    const teamBudget = Number(team.budget);
+    if (teamBudget < nextTier.cost) {
+      return res.status(400).json({ error: 'Insufficient budget for tier upgrade' });
+    }
+
+    // Update stadium to next tier
+    const newBudget = team.budget - BigInt(nextTier.cost);
+    
+    await prisma.team.update({
+      where: { id: teamId },
+      data: { budget: newBudget }
+    });
+
+    await prisma.stadium.update({
+      where: { id: stadium.id },
+      data: {
+        tier: nextTier.tier,
+        capacity: nextTier.capacity,
+        monthlyRevenue: Math.floor(nextTier.capacity * 25) // 25 øre per seat per month
+      }
+    });
+
+    // Update stadium stats to recalculate everything
+    await updateStadiumStats(stadium.id);
+
+    res.json({ 
+      message: `Stadium upgraded to Tier ${nextTier.tier}`,
+      newTier: nextTier.tier,
+      newCapacity: nextTier.capacity,
+      remainingBudget: Number(newBudget)
+    });
+  } catch (error) {
+    console.error('Error upgrading tier:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 // Helper function to calculate facility data based on type and level
 function calculateFacilityData(type: FacilityType, level: number) {
   const baseMultiplier = Math.pow(1.5, level - 1);
@@ -511,10 +588,19 @@ async function updateStadiumStats(stadiumId: string) {
       return sum + (effect.prestige || 0);
     }, 50); // Base prestige
 
+  // Calculate tier based on capacity
+  let newTier = 1;
+  if (totalCapacity >= 100000) newTier = 5;
+  else if (totalCapacity >= 75000) newTier = 4;
+  else if (totalCapacity >= 50000) newTier = 3;
+  else if (totalCapacity >= 35000) newTier = 2;
+  else newTier = 1;
+
   await prisma.stadium.update({
     where: { id: stadiumId },
     data: {
       capacity: totalCapacity,
+      tier: newTier,
       monthlyRevenue: totalRevenue,
       maintenanceCost: totalCost,
       atmosphere: Math.min(100, atmosphereBonus),
