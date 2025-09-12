@@ -236,6 +236,14 @@ export default function StadiumPage() {
     });
   }, [teamData]);
 
+  const upgradeTier = useCallback(async () => {
+    if (!teamData) return;
+    
+    await authApiFetch(`/api/stadium/${teamData.id}/tier`, {
+      method: 'PUT'
+    });
+  }, [teamData]);
+
   useEffect(() => {
     fetchStadiumData();
   }, [fetchStadiumData]);
@@ -560,13 +568,13 @@ export default function StadiumPage() {
                     </div>
                     <button 
                       onClick={() => handleAction(
-                        () => createUpgrade("Kapacitet Udvidelse", "CAPACITY_EXPANSION", 5000000, 60),
-                        "capacity-upgrade"
+                        () => upgradeTier(),
+                        "tier-upgrade"
                       )}
-                      disabled={teamData.budget < 5000000 || actionLoading === "capacity-upgrade"}
+                      disabled={teamData.budget < 5000000 || actionLoading === "tier-upgrade"}
                       className="w-full mt-4 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      {actionLoading === "capacity-upgrade" ? (
+                      {actionLoading === "tier-upgrade" ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <Plus className="h-4 w-4" />
