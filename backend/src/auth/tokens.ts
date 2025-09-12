@@ -71,3 +71,17 @@ export function verifyAccessToken(token: string) {
     type: "access";
   };
 }
+
+export function authenticateToken(req: any, res: any, next: any) {
+  const accessToken = req.cookies?.access_token as string | undefined;
+  if (!accessToken) {
+    return res.status(401).json({ error: "Unauthenticated" });
+  }
+  try {
+    const payload = verifyAccessToken(accessToken);
+    req.user = { id: payload.sub, email: payload.email };
+    next();
+  } catch {
+    return res.status(401).json({ error: "Unauthenticated" });
+  }
+}

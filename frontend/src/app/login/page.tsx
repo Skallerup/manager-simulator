@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+// import { Label } from "@/components/ui/label";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { FootballSpinner } from "@/components/ui/football-spinner";
 import { useTranslation } from 'react-i18next';
@@ -37,9 +37,9 @@ export default function LoginPage() {
       {/* Login Form */}
       <form onSubmit={onSubmit} className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-foreground">
+          <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground">
             {t('email')}
-          </Label>
+          </label>
           <Input
             id="email"
             type="email"
@@ -53,9 +53,9 @@ export default function LoginPage() {
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password" className="text-foreground">
+            <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground">
               {t('password')}
-            </Label>
+            </label>
             <Link
               href="/forgot-password"
               className="text-sm text-foreground hover:underline"

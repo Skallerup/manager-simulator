@@ -89,6 +89,9 @@ model Team {
   
   // Season related
   seasonStats SeasonStats[]
+  
+  // Stadium related
+  stadium Stadium?
 }
 
 model LeagueMember {
@@ -339,6 +342,96 @@ model MatchHighlight {
   botMatch    BotMatch @relation("BotMatchHighlights", fields: [matchId], references: [id], onDelete: Cascade)
   
   @@index([matchId])
+}
+
+// Stadium Models
+model Stadium {
+  id              String   @id @default(cuid())
+  name            String
+  capacity        Int      @default(20000) // Total capacity
+  tier            Int      @default(1) // Stadium tier (1-5)
+  atmosphere      Int      @default(50) // Atmosphere rating (1-100)
+  maintenanceCost Int      @default(100000) // Monthly maintenance cost in øre
+  monthlyRevenue  Int      @default(500000) // Monthly revenue in øre
+  homeAdvantage   Float    @default(0.05) // Home advantage bonus (0.0-0.2)
+  prestige        Int      @default(50) // Stadium prestige (1-100)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  team            Team     @relation(fields: [teamId], references: [id])
+  teamId          String   @unique
+  facilities      StadiumFacility[]
+  upgrades        StadiumUpgrade[]
+}
+
+model StadiumFacility {
+  id          String   @id @default(cuid())
+  name        String
+  type        FacilityType
+  level       Int      @default(1) // Facility level (1-5)
+  capacity    Int?     // For capacity-related facilities
+  revenue     Int      @default(0) // Monthly revenue in øre
+  cost        Int      @default(0) // Monthly cost in øre
+  effect      String?  // JSON string for facility effects
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  stadium     Stadium  @relation(fields: [stadiumId], references: [id])
+  stadiumId   String
+}
+
+model StadiumUpgrade {
+  id          String   @id @default(cuid())
+  name        String
+  type        UpgradeType
+  cost        Int      // Upgrade cost in øre
+  duration    Int      @default(30) // Construction time in days
+  status      UpgradeStatus @default(PLANNED)
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  stadium     Stadium  @relation(fields: [stadiumId], references: [id])
+  stadiumId   String
+}
+
+enum FacilityType {
+  SEATING        // Seating capacity
+  LED_SCREENS    // LED screens and displays
+  SOUND_SYSTEM   // Sound and audio systems
+  LIGHTING       // Stadium lighting
+  PARKING        // Parking facilities
+  TRANSPORT      // Public transport connections
+  FAN_ZONE       // Pre-match fan areas
+  MERCHANDISE    // Merchandise shops
+  FOOD_BEVERAGE  // Food and beverage outlets
+  VIP_LOUNGE     // VIP and premium areas
+  WIFI           // WiFi coverage
+  ACCESSIBILITY  // Accessibility features
+  SECURITY       // Security systems
+  MEDIA          // Media facilities
+  SPONSOR        // Sponsor areas
+}
+
+enum UpgradeType {
+  CAPACITY_EXPANSION  // Expand stadium capacity
+  FACILITY_UPGRADE    // Upgrade existing facilities
+  NEW_FACILITY        // Add new facility type
+  RENOVATION          // General stadium renovation
+  TECHNOLOGY          // Technology upgrades
+  SUSTAINABILITY      // Green/sustainable upgrades
+}
+
+enum UpgradeStatus {
+  PLANNED      // Upgrade planned but not started
+  IN_PROGRESS  // Construction in progress
+  COMPLETED    // Upgrade completed
+  CANCELLED    // Upgrade cancelled
 }
 
 

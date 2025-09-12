@@ -14,6 +14,7 @@ import {
   ShoppingCart,
   Shield,
   UserCheck,
+  Building2,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -65,6 +66,11 @@ const getData = (t: any, isAdmin: boolean = false, isTestAccount: boolean = fals
       title: t('match'),
       url: "/match",
       icon: Gamepad2,
+    },
+    {
+      title: t('stadium'),
+      url: "/stadium",
+      icon: Building2,
     },
   ],
   admin: isAdmin ? [
