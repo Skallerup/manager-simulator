@@ -343,6 +343,33 @@ export default function StadiumPage() {
         </div>
       )}
 
+      {/* Budget Overview */}
+      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <DollarSign className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900">Hold Budget</h3>
+                <p className="text-3xl font-bold text-blue-800">{formatCurrency(teamData.budget)}</p>
+                <p className="text-sm text-blue-600">Tilgængeligt for stadion investeringer</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-blue-600 mb-1">Månedlig Netto</div>
+              <div className="text-xl font-semibold text-blue-800">
+                {stats.netProfit >= 0 ? '+' : ''}{formatCurrency(stats.netProfit)}
+              </div>
+              <div className="text-xs text-blue-500">
+                {formatCurrency(stats.totalRevenue)} - {formatCurrency(stats.totalCost)}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -814,7 +841,7 @@ export default function StadiumPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <h4 className="font-semibold mb-2">Hold Budget</h4>
                     <div className="text-3xl font-bold text-blue-600 mb-2">
@@ -831,6 +858,57 @@ export default function StadiumPage() {
                     </div>
                     <div className="text-sm text-muted-foreground">
                       Netto profit fra stadion operationer
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Budget Status</h4>
+                    <div className={`text-2xl font-bold mb-2 ${
+                      teamData.budget > 5000000 ? 'text-green-600' : 
+                      teamData.budget > 2000000 ? 'text-yellow-600' : 'text-red-600'
+                    }`}>
+                      {teamData.budget > 5000000 ? 'Høj' : 
+                       teamData.budget > 2000000 ? 'Medium' : 'Lav'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {teamData.budget > 5000000 ? 'Kan investere i dyre faciliteter' : 
+                       teamData.budget > 2000000 ? 'Kan investere i medium faciliteter' : 'Begrænset investeringsmuligheder'}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Budget Breakdown */}
+                <div className="mt-6 pt-6 border-t">
+                  <h5 className="font-semibold mb-4">Budget Fordeling</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Månedlig Indtægt:</span>
+                        <span className="font-medium text-green-600">+{formatCurrency(stats.totalRevenue)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Månedlige Omkostninger:</span>
+                        <span className="font-medium text-red-600">-{formatCurrency(stats.totalCost)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm font-semibold pt-2 border-t">
+                        <span>Netto Månedlig:</span>
+                        <span className={stats.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}>
+                          {stats.netProfit >= 0 ? '+' : ''}{formatCurrency(stats.netProfit)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Total Budget:</span>
+                        <span className="font-medium text-blue-600">{formatCurrency(teamData.budget)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Faciliteter:</span>
+                        <span className="font-medium">{stats.activeFacilities} aktive</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Opgraderinger:</span>
+                        <span className="font-medium">{stats.activeUpgrades} aktive</span>
+                      </div>
                     </div>
                   </div>
                 </div>
