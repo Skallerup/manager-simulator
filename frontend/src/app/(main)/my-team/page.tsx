@@ -119,6 +119,78 @@ export default function MyTeamPage() {
   const [isSettingCaptain, setIsSettingCaptain] = useState(false);
   const [currentTeamRating, setCurrentTeamRating] = useState(0);
   const [hasRatingChanged, setHasRatingChanged] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaveTime, setLastSaveTime] = useState(0);
+
+  // Debounced save function
+  const saveFormation = async () => {
+    const now = Date.now();
+    if (now - lastSaveTime < 2000) { // 2 seconds debounce
+      console.log("Save request ignored - too soon after last save");
+      return;
+    }
+    
+    if (isSaving) {
+      console.log("Save already in progress");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      setLastSaveTime(now);
+      
+      const starters = Object.values(formationPlayers).map(player => player.id);
+      const formationPositions: {[key: string]: string} = {};
+      Object.entries(formationPlayers).forEach(([positionId, player]) => {
+        formationPositions[player.id] = positionId;
+      });
+      
+      const response = await authApiFetch(`/api/teams/${teamData?.id}/starters`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ starters, formationPositions, formation: selectedFormation }),
+      });
+
+      if (response) {
+        // Update local team data with new rating and formation
+        setTeamData(prev => prev ? {
+          ...prev,
+          overallRating: currentTeamRating,
+          formation: selectedFormation,
+          players: prev.players.map(player => {
+            const isStarter = Object.values(formationPlayers).some(fp => fp.id === player.id);
+            const formationPosition = isStarter ? 
+              Object.entries(formationPlayers).find(([_, p]) => p.id === player.id)?.[0] : undefined;
+            
+            return {
+              ...player,
+              isStarter,
+              formationPosition: formationPosition || undefined
+            };
+          })
+        } : null);
+        alert("Holdopstilling gemt!");
+      }
+    } catch (err: any) {
+      console.error("Error saving formation:", err);
+      
+      let errorMessage = "Fejl: Kunne ikke gemme holdopstillingen. Prøv igen.";
+      
+      if (err?.message?.includes("429")) {
+        errorMessage = "For mange anmodninger. Vent et øjeblik og prøv igen.";
+      } else if (err?.message?.includes("Network")) {
+        errorMessage = "Netværksfejl. Tjek din internetforbindelse og prøv igen.";
+      } else if (err?.message?.includes("401")) {
+        errorMessage = "Du er ikke logget ind. Genindlæs siden og prøv igen.";
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Load team data
   useEffect(() => {
@@ -608,49 +680,12 @@ export default function MyTeamPage() {
           <Button variant="outline" onClick={autoFillFormation}>
             Auto-fyld
           </Button>
-          <Button onClick={async () => {
-            try {
-              const starters = Object.values(formationPlayers).map(player => player.id);
-              const formationPositions: {[key: string]: string} = {};
-              Object.entries(formationPlayers).forEach(([positionId, player]) => {
-                formationPositions[player.id] = positionId;
-              });
-              
-              
-              const response = await authApiFetch(`/api/teams/${teamData.id}/starters`, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ starters, formationPositions, formation: selectedFormation }),
-              });
-
-              if (response) {
-                // Update local team data with new rating and formation
-                setTeamData(prev => prev ? {
-                  ...prev,
-                  overallRating: currentTeamRating,
-                  formation: selectedFormation,
-                  players: prev.players.map(player => {
-                    const isStarter = Object.values(formationPlayers).some(fp => fp.id === player.id);
-                    const formationPosition = isStarter ? 
-                      Object.entries(formationPlayers).find(([_, p]) => p.id === player.id)?.[0] : undefined;
-                    
-                    return {
-                      ...player,
-                      isStarter,
-                      formationPosition: formationPosition || undefined
-                    };
-                  })
-                } : null);
-                alert("Holdopstilling gemt!");
-              }
-            } catch (err) {
-              console.error("Error saving formation:", err);
-              alert("Fejl: Kunne ikke gemme holdopstillingen. Prøv igen.");
-            }
-          }}>
-            Gem
+          <Button 
+            onClick={saveFormation}
+            disabled={isSaving}
+            className={isSaving ? "opacity-50 cursor-not-allowed" : ""}
+          >
+            {isSaving ? "Gemmer..." : "Gem"}
           </Button>
         </div>
       </div>
