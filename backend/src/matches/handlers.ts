@@ -115,7 +115,7 @@ export const simulateMatch = async (req: Request<{ id: string }, SimulateMatchRe
   try {
     const { id: matchId } = req.params;
 
-    // Get match with teams and their players
+    // Get match with teams, their players, and stadium data
     const match = await prisma.match.findUnique({
       where: { id: matchId },
       include: {
@@ -125,7 +125,8 @@ export const simulateMatch = async (req: Request<{ id: string }, SimulateMatchRe
               include: {
                 player: true
               }
-            }
+            },
+            stadium: true // Include stadium data for home advantage
           }
         },
         awayTeam: {
@@ -207,8 +208,12 @@ export const simulateMatch = async (req: Request<{ id: string }, SimulateMatchRe
       players: awayTeamPlayers
     };
 
-    // Simulate the match
-    const result = gameEngine.simulateMatch(homeTeam, awayTeam);
+    // Get stadium home advantage (default to 0.1 if no stadium)
+    const homeAdvantage = match.homeTeam.stadium?.homeAdvantage || 0.1;
+    console.log(`Match simulation - Home team: ${homeTeam.name}, Stadium home advantage: ${(homeAdvantage * 100).toFixed(1)}%`);
+    
+    // Simulate the match with stadium home advantage
+    const result = gameEngine.simulateMatch(homeTeam, awayTeam, { homeAdvantage });
 
     // Update match with results
     await prisma.match.update({

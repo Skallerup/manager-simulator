@@ -14,14 +14,15 @@ export class GameEngine {
   /**
    * Simulate a complete match between two teams
    */
-  public simulateMatch(homeTeam: Team, awayTeam: Team): MatchResult {
+  public simulateMatch(homeTeam: Team, awayTeam: Team, options?: { homeAdvantage?: number }): MatchResult {
     const events: MatchEvent[] = [];
     const highlights: MatchHighlight[] = [];
     let homeScore = 0;
     let awayScore = 0;
     
-    // Calculate team strengths
-    const homeStrength = this.calculateTeamStrength(homeTeam) + this.config.homeAdvantage;
+    // Calculate team strengths with dynamic home advantage
+    const homeAdvantage = options?.homeAdvantage ?? this.config.homeAdvantage;
+    const homeStrength = this.calculateTeamStrength(homeTeam) + homeAdvantage;
     const awayStrength = this.calculateTeamStrength(awayTeam);
     
     // Calculate possession based on team strength
