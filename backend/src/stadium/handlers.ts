@@ -575,9 +575,14 @@ async function updateStadiumStats(stadiumId: string) {
     isActive: f.isActive
   })));
 
-  const totalCapacity = stadium.facilities
+  // Calculate capacity from facilities + base capacity
+  const facilityCapacity = stadium.facilities
     .filter(f => f.type === FacilityType.SEATING && f.isActive)
-    .reduce((sum, f) => sum + (f.capacity || 0), 20000); // Base capacity
+    .reduce((sum, f) => sum + (f.capacity || 0), 0);
+  
+  // Use stadium's current capacity if it's higher than facility-based calculation
+  // This ensures tier upgrades are preserved
+  const totalCapacity = Math.max(stadium.capacity, facilityCapacity + 20000);
 
   console.log(`updateStadiumStats - Calculated totalCapacity: ${totalCapacity}`);
 
