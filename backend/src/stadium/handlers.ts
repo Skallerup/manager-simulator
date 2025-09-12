@@ -555,16 +555,31 @@ function calculateStadiumStats(stadium: any): StadiumStats {
 
 // Helper function to update stadium statistics
 async function updateStadiumStats(stadiumId: string) {
+  console.log(`=== updateStadiumStats DEBUG START for stadiumId: ${stadiumId} ===`);
+  
   const stadium = await prisma.stadium.findUnique({
     where: { id: stadiumId },
     include: { facilities: true }
   });
 
-  if (!stadium) return;
+  if (!stadium) {
+    console.log('updateStadiumStats - Stadium not found');
+    return;
+  }
+
+  console.log(`updateStadiumStats - Current stadium tier: ${stadium.tier}, capacity: ${stadium.capacity}`);
+  console.log(`updateStadiumStats - Stadium facilities:`, stadium.facilities.map(f => ({
+    type: f.type,
+    level: f.level,
+    capacity: f.capacity,
+    isActive: f.isActive
+  })));
 
   const totalCapacity = stadium.facilities
     .filter(f => f.type === FacilityType.SEATING && f.isActive)
     .reduce((sum, f) => sum + (f.capacity || 0), 20000); // Base capacity
+
+  console.log(`updateStadiumStats - Calculated totalCapacity: ${totalCapacity}`);
 
   const totalRevenue = stadium.facilities
     .filter(f => f.isActive)
@@ -596,16 +611,26 @@ async function updateStadiumStats(stadiumId: string) {
   else if (totalCapacity >= 35000) newTier = 2;
   else newTier = 1;
 
+  console.log(`updateStadiumStats - New tier calculation: ${newTier} (capacity: ${totalCapacity})`);
+  console.log(`updateStadiumStats - Tier thresholds: 35k(T2), 50k(T3), 75k(T4), 100k(T5)`);
+
+  const updateData = {
+    capacity: totalCapacity,
+    tier: newTier,
+    monthlyRevenue: totalRevenue,
+    maintenanceCost: totalCost,
+    atmosphere: Math.min(100, atmosphereBonus),
+    prestige: Math.min(100, prestigeBonus),
+    homeAdvantage: Math.min(0.2, 0.05 + (atmosphereBonus - 50) * 0.001)
+  };
+
+  console.log(`updateStadiumStats - Update data:`, updateData);
+
   await prisma.stadium.update({
     where: { id: stadiumId },
-    data: {
-      capacity: totalCapacity,
-      tier: newTier,
-      monthlyRevenue: totalRevenue,
-      maintenanceCost: totalCost,
-      atmosphere: Math.min(100, atmosphereBonus),
-      prestige: Math.min(100, prestigeBonus),
-      homeAdvantage: Math.min(0.2, 0.05 + (atmosphereBonus - 50) * 0.001)
-    }
+    data: updateData
   });
+
+  console.log(`updateStadiumStats - Stadium updated successfully`);
+  console.log(`=== updateStadiumStats DEBUG END ===`);
 }
