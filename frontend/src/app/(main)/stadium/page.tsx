@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FacilityType, formatCurrency } from "@/lib/stadium";
 import { useTranslation } from 'react-i18next';
-import { Loader2, AlertCircle, Building2, Users, TrendingUp, DollarSign, Plus, Settings, Info, Calculator, Target } from "lucide-react";
+import { Loader2, AlertCircle, Building2, Users, TrendingUp, DollarSign, Plus, Settings, Info, Calculator, Target, Trophy } from "lucide-react";
 import { authApiFetch } from "@/lib/api";
 
 interface Stadium {
@@ -239,9 +239,17 @@ export default function StadiumPage() {
   const upgradeTier = useCallback(async () => {
     if (!teamData) return;
     
-    await authApiFetch(`/api/stadium/${teamData.id}/tier`, {
-      method: 'PUT'
-    });
+    try {
+      await authApiFetch(`/api/stadium/${teamData.id}/tier`, {
+        method: 'PUT'
+      });
+    } catch (error: any) {
+      // Handle max tier case with a better message
+      if (error.message?.includes('Stadium is already at maximum tier')) {
+        throw new Error('Dit stadion er allerede på det højeste tier (Tier 5) og kan ikke opgraderes yderligere. Du har opnået maksimal kapacitet og prestige! 🏆');
+      }
+      throw error;
+    }
   }, [teamData]);
 
   useEffect(() => {
@@ -566,21 +574,28 @@ export default function StadiumPage() {
                         <span className="font-medium">60 dage</span>
                       </div>
                     </div>
-                    <button 
-                      onClick={() => handleAction(
-                        () => upgradeTier(),
-                        "tier-upgrade"
-                      )}
-                      disabled={teamData.budget < 5000000 || actionLoading === "tier-upgrade"}
-                      className="w-full mt-4 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                      {actionLoading === "tier-upgrade" ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Plus className="h-4 w-4" />
-                      )}
-                      {teamData.budget < 5000000 ? 'Ikke råd til udvidelse' : `Udvid til Tier ${stadium.tier + 1}`}
-                    </button>
+                    {stadium.tier >= 5 ? (
+                      <div className="w-full mt-4 px-4 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-md flex items-center justify-center gap-2">
+                        <Trophy className="h-5 w-5" />
+                        <span className="font-semibold">🏆 Maksimal Tier Opnået! 🏆</span>
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={() => handleAction(
+                          () => upgradeTier(),
+                          "tier-upgrade"
+                        )}
+                        disabled={teamData.budget < 5000000 || actionLoading === "tier-upgrade"}
+                        className="w-full mt-4 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {actionLoading === "tier-upgrade" ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4" />
+                        )}
+                        {teamData.budget < 5000000 ? 'Ikke råd til udvidelse' : `Udvid til Tier ${stadium.tier + 1}`}
+                      </button>
+                    )}
                   </div>
                 </div>
               </CardContent>

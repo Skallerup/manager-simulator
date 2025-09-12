@@ -424,7 +424,13 @@ export const upgradeTier = async (req: AuthenticatedRequest, res: Response) => {
     const nextTier = tierData.find(t => t.tier === stadium.tier + 1);
 
     if (!nextTier) {
-      return res.status(400).json({ error: 'Stadium is already at maximum tier' });
+      return res.status(400).json({ 
+        error: 'Stadium is already at maximum tier',
+        message: 'Dit stadion er allerede på det højeste tier (Tier 5) og kan ikke opgraderes yderligere. Du har opnået maksimal kapacitet og prestige!',
+        currentTier: stadium.tier,
+        maxTier: 5,
+        isMaxTier: true
+      });
     }
 
     const teamBudget = Number(team.budget);
