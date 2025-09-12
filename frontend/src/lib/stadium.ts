@@ -184,12 +184,7 @@ export const stadiumApi = {
 
 // Utility functions
 export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('da-DK', {
-    style: 'currency',
-    currency: 'DKK',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount / 100);
+  return (amount / 100).toLocaleString('da-DK') + ' kr';
 };
 
 export const formatNumber = (num: number): string => {

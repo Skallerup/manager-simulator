@@ -255,12 +255,7 @@ export default function TransfersPage() {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('da-DK', {
-      style: 'currency',
-      currency: 'DKK',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price / 100);
+    return (price / 100).toLocaleString('da-DK') + ' kr';
   };
 
   if (loading) {
