@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FacilityType, formatCurrency } from "@/lib/stadium";
 import { useTranslation } from 'react-i18next';
-import { Loader2, AlertCircle, Building2, Users, TrendingUp, DollarSign, Plus, Settings } from "lucide-react";
+import { Loader2, AlertCircle, Building2, Users, TrendingUp, DollarSign, Plus, Settings, Info, Calculator, Target } from "lucide-react";
 import { authApiFetch } from "@/lib/api";
 
 interface Stadium {
@@ -39,6 +39,133 @@ interface TeamData {
   name: string;
   budget: number;
 }
+
+// Facility explanations
+const getFacilityExplanation = (type: FacilityType) => {
+  const explanations: Record<FacilityType, { title: string; description: string; benefits: string[] }> = {
+    SEATING: {
+      title: "Siddepladser",
+      description: "Forbedrer komforten for tilskuere og øger kapaciteten",
+      benefits: ["Øger kapacitet", "Forbedrer atmosfære", "Højere indtægter"]
+    },
+    LED_SCREENS: {
+      title: "LED Skærme",
+      description: "Moderne skærme der viser kampstatistikker og reklamer",
+      benefits: ["Øger sponsorindtægter", "Forbedrer fanoplevelse", "Moderne udseende"]
+    },
+    SOUND_SYSTEM: {
+      title: "Lydanlæg",
+      description: "Højttalere der skaber bedre atmosfære under kampe",
+      benefits: ["Forbedrer atmosfære", "Bedre fanoplevelse", "Højere prestige"]
+    },
+    LIGHTING: {
+      title: "Belysning",
+      description: "Professionel belysning til kampe og events",
+      benefits: ["Bedre TV-kvalitet", "Fleksible spilletider", "Højere prestige"]
+    },
+    PARKING: {
+      title: "Parkering",
+      description: "Parkering for tilskuere og VIP-gæster",
+      benefits: ["Øger tilgængelighed", "VIP-indtægter", "Bedre fanoplevelse"]
+    },
+    TRANSPORT: {
+      title: "Transport",
+      description: "Bus- og togforbindelser til stadion",
+      benefits: ["Øger tilgængelighed", "Flere tilskuere", "Miljøvenlig"]
+    },
+    FAN_ZONE: {
+      title: "Fan Zone",
+      description: "Område med aktiviteter og underholdning for fans",
+      benefits: ["Øger atmosfære", "Højere indtægter", "Bedre fanoplevelse"]
+    },
+    MERCHANDISE: {
+      title: "Merchandise",
+      description: "Butikker der sælger holdtrøjer og souvenirs",
+      benefits: ["Højere indtægter", "Brand awareness", "Fan engagement"]
+    },
+    FOOD_BEVERAGE: {
+      title: "Mad & Drikke",
+      description: "Restauranter og barer i stadion",
+      benefits: ["Højere indtægter", "Bedre fanoplevelse", "Længere ophold"]
+    },
+    VIP_LOUNGE: {
+      title: "VIP Lounge",
+      description: "Eksklusivt område for VIP-gæster",
+      benefits: ["Høje VIP-indtægter", "Sponsorforhold", "Prestige"]
+    },
+    WIFI: {
+      title: "WiFi",
+      description: "Gratis internetadgang for tilskuere",
+      benefits: ["Bedre fanoplevelse", "Social media engagement", "Moderne faciliteter"]
+    },
+    ACCESSIBILITY: {
+      title: "Tilgængelighed",
+      description: "Faciliteter for handicappede tilskuere",
+      benefits: ["Inklusion", "Flere tilskuere", "Positivt omdømme"]
+    },
+    SECURITY: {
+      title: "Sikkerhed",
+      description: "Sikkerhedssystemer og personale",
+      benefits: ["Sikkerhed", "Professionel drift", "Tillid"]
+    },
+    MEDIA: {
+      title: "Medie",
+      description: "Faciliteter for journalister og TV-hold",
+      benefits: ["Bedre mediedækning", "Højere prestige", "Sponsorværdi"]
+    },
+    SPONSOR: {
+      title: "Sponsor",
+      description: "Reklamepladser og sponsorfaciliteter",
+      benefits: ["Højere sponsorindtægter", "Brand exposure", "Økonomisk stabilitet"]
+    }
+  };
+  
+  return explanations[type] || { title: type, description: "Facilitet", benefits: [] };
+};
+
+// Upgrade explanations
+const getUpgradeExplanation = (type: string) => {
+  const explanations: Record<string, { title: string; description: string; benefits: string[]; duration: string }> = {
+    CAPACITY_EXPANSION: {
+      title: "Kapacitet Udvidelse",
+      description: "Udvid dit stadion til næste tier for at øge kapaciteten betydeligt",
+      benefits: ["Øger kapacitet med 10,000+ sæder", "Højere indtægter", "Bedre prestige", "Flere tilskuere"],
+      duration: "60 dage"
+    },
+    FACILITY_UPGRADE: {
+      title: "Facilitet Opgradering",
+      description: "Opgrader eksisterende faciliteter til højere niveau",
+      benefits: ["Bedre faciliteter", "Højere indtægter", "Forbedret fanoplevelse", "Moderne udstyr"],
+      duration: "30 dage"
+    },
+    NEW_FACILITY: {
+      title: "Ny Facilitet",
+      description: "Byg helt nye faciliteter til dit stadion",
+      benefits: ["Nye indtægtskilder", "Bedre fanoplevelse", "Moderne faciliteter", "Konkurrencefordel"],
+      duration: "45 dage"
+    },
+    RENOVATION: {
+      title: "Renovering",
+      description: "Renover eksisterende områder for at forbedre kvaliteten",
+      benefits: ["Forbedret udseende", "Højere prestige", "Bedre atmosfære", "Moderne design"],
+      duration: "40 dage"
+    },
+    TECHNOLOGY: {
+      title: "Teknologi",
+      description: "Opgrader teknologiske systemer og infrastruktur",
+      benefits: ["Moderne teknologi", "Bedre effektivitet", "Højere prestige", "Fremtidssikret"],
+      duration: "35 dage"
+    },
+    SUSTAINABILITY: {
+      title: "Bæredygtighed",
+      description: "Implementer miljøvenlige løsninger og grøn teknologi",
+      benefits: ["Miljøvenlig", "Lavere omkostninger", "Positivt omdømme", "Fremtidssikret"],
+      duration: "50 dage"
+    }
+  };
+  
+  return explanations[type] || { title: type, description: "Opgradering", benefits: [], duration: "30 dage" };
+};
 
 export default function StadiumPage() {
   const { t } = useTranslation('stadium');
@@ -169,11 +296,16 @@ export default function StadiumPage() {
   ];
 
   const facilityTypes = [
-    { name: "LED Skærme", type: "LED_SCREENS", cost: 15000, level: 1 },
-    { name: "VIP Lounge", type: "VIP_LOUNGE", cost: 25000, level: 1 },
-    { name: "Fan Zone", type: "FAN_ZONE", cost: 8000, level: 1 },
-    { name: "Parkering", type: "PARKING", cost: 20000, level: 1 },
-    { name: "Mad & Drikke", type: "FOOD_BEVERAGE", cost: 12000, level: 1 },
+    { name: "LED Skærme", type: "LED_SCREENS", cost: 1500000, level: 1 },
+    { name: "VIP Lounge", type: "VIP_LOUNGE", cost: 2500000, level: 1 },
+    { name: "Fan Zone", type: "FAN_ZONE", cost: 800000, level: 1 },
+    { name: "Parkering", type: "PARKING", cost: 2000000, level: 1 },
+    { name: "Mad & Drikke", type: "FOOD_BEVERAGE", cost: 1200000, level: 1 },
+    { name: "Siddepladser", type: "SEATING", cost: 1000000, level: 1 },
+    { name: "Lydanlæg", type: "SOUND_SYSTEM", cost: 500000, level: 1 },
+    { name: "Belysning", type: "LIGHTING", cost: 800000, level: 1 },
+    { name: "WiFi", type: "WIFI", cost: 300000, level: 1 },
+    { name: "Sikkerhed", type: "SECURITY", cost: 600000, level: 1 },
   ];
 
   return (
@@ -195,6 +327,21 @@ export default function StadiumPage() {
           Opdater
         </button>
       </div>
+
+      {/* Budget Warning */}
+      {teamData.budget < 1000000 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+            <div>
+              <h4 className="font-medium text-yellow-900 mb-1">Lavt Budget Advarsel</h4>
+              <p className="text-sm text-yellow-700">
+                Dit hold budget er lavt ({formatCurrency(teamData.budget)}). Du kan kun tilføje billige faciliteter eller vente på flere indtægter.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -305,12 +452,22 @@ export default function StadiumPage() {
                     <h4 className="font-semibold mb-2">Økonomi</h4>
                     <div className="space-y-2">
                       <div className="flex justify-between">
+                        <span>Hold Budget:</span>
+                        <span className="font-medium text-blue-600">{formatCurrency(teamData.budget)}</span>
+                      </div>
+                      <div className="flex justify-between">
                         <span>Månedlig Indtægt:</span>
                         <span className="font-medium text-green-600">{formatCurrency(stadium.monthlyRevenue)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Vedligeholdelse:</span>
                         <span className="font-medium text-red-600">{formatCurrency(stadium.maintenanceCost)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Netto Profit:</span>
+                        <span className={`font-medium ${stats.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {formatCurrency(stats.netProfit)}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Hjemmefordel:</span>
@@ -340,23 +497,54 @@ export default function StadiumPage() {
                   
                   <div className="border-t pt-4">
                     <h4 className="font-semibold mb-2">Kapacitet Udvidelse</h4>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Udvid dit stadion til næste tier for at øge kapaciteten og indtægterne.
-                    </p>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-start gap-3">
+                        <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <div>
+                          <h5 className="font-medium text-blue-900 mb-1">Hvad gør en kapacitet udvidelse?</h5>
+                          <p className="text-sm text-blue-700 mb-2">
+                            Du udvider dit stadion til næste tier, hvilket øger kapaciteten betydeligt og giver dig mulighed for at have flere tilskuere til dine kampe.
+                          </p>
+                          <div className="text-xs text-blue-600">
+                            <strong>Fordele:</strong> Øger kapacitet med 10,000+ sæder • Højere indtægter • Bedre prestige • Flere tilskuere
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Nuværende Tier:</span>
+                        <span className="font-medium">Tier {stadium.tier}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Næste Tier:</span>
+                        <span className="font-medium">Tier {stadium.tier + 1}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Kostnad:</span>
+                        <span className={`font-medium ${teamData.budget >= 5000000 ? 'text-green-600' : 'text-red-600'}`}>
+                          {formatCurrency(5000000)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Varighed:</span>
+                        <span className="font-medium">60 dage</span>
+                      </div>
+                    </div>
                     <button 
                       onClick={() => handleAction(
                         () => createUpgrade("Kapacitet Udvidelse", "CAPACITY_EXPANSION", 5000000, 60),
                         "capacity-upgrade"
                       )}
                       disabled={teamData.budget < 5000000 || actionLoading === "capacity-upgrade"}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
+                      className="w-full mt-4 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       {actionLoading === "capacity-upgrade" ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <Plus className="h-4 w-4" />
                       )}
-                      Udvid til Tier {stadium.tier + 1} (5,000,000 DKK)
+                      {teamData.budget < 5000000 ? 'Ikke råd til udvidelse' : `Udvid til Tier ${stadium.tier + 1}`}
                     </button>
                   </div>
                 </div>
@@ -375,30 +563,63 @@ export default function StadiumPage() {
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-semibold mb-2">Nye Faciliteter</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {facilityTypes.map((facility) => (
-                        <div key={facility.type} className="border rounded-lg p-4">
-                          <h5 className="font-medium">{facility.name}</h5>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            Level {facility.level} • {formatCurrency(facility.cost)}
-                          </p>
-                          <button 
-                            onClick={() => handleAction(
-                              () => createFacility(facility.name, facility.type as FacilityType, facility.level),
-                              `facility-${facility.type}`
-                            )}
-                            disabled={teamData.budget < facility.cost || actionLoading === `facility-${facility.type}`}
-                            className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
-                          >
-                            {actionLoading === `facility-${facility.type}` ? (
-                              <Loader2 className="h-3 w-3 animate-spin" />
-                            ) : (
-                              <Plus className="h-3 w-3" />
-                            )}
-                            Tilføj
-                          </button>
-                        </div>
-                      ))}
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Vælg faciliteter at tilføje til dit stadion. Hver facilitet giver forskellige fordele og indtægter.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {facilityTypes.map((facility) => {
+                        const explanation = getFacilityExplanation(facility.type as FacilityType);
+                        const canAfford = teamData.budget >= facility.cost;
+                        return (
+                          <div key={facility.type} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div className="flex items-start justify-between mb-2">
+                              <h5 className="font-medium">{explanation.title}</h5>
+                              <Info className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              {explanation.description}
+                            </p>
+                            <div className="space-y-2 mb-3">
+                              <div className="flex justify-between text-sm">
+                                <span>Kostnad:</span>
+                                <span className={`font-medium ${canAfford ? 'text-green-600' : 'text-red-600'}`}>
+                                  {formatCurrency(facility.cost)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span>Level:</span>
+                                <span className="font-medium">{facility.level}</span>
+                              </div>
+                            </div>
+                            <div className="mb-3">
+                              <p className="text-xs font-medium text-muted-foreground mb-1">Fordele:</p>
+                              <ul className="text-xs text-muted-foreground space-y-1">
+                                {explanation.benefits.map((benefit, index) => (
+                                  <li key={index} className="flex items-center gap-1">
+                                    <Target className="h-3 w-3 text-green-500" />
+                                    {benefit}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <button 
+                              onClick={() => handleAction(
+                                () => createFacility(facility.name, facility.type as FacilityType, facility.level),
+                                `facility-${facility.type}`
+                              )}
+                              disabled={!canAfford || actionLoading === `facility-${facility.type}`}
+                              className="w-full px-3 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                              {actionLoading === `facility-${facility.type}` ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Plus className="h-3 w-3" />
+                              )}
+                              {!canAfford ? 'Ikke råd' : 'Tilføj'}
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -452,61 +673,118 @@ export default function StadiumPage() {
 
         {activeTab === "economy" && (
           <div className="space-y-6">
+            {/* Budget Overview */}
             <Card>
               <CardHeader>
-                <CardTitle>Økonomi & Indtægter</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5" />
+                  Budget Oversigt
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold mb-2">Hold Budget</h4>
+                    <div className="text-3xl font-bold text-blue-600 mb-2">
+                      {formatCurrency(teamData.budget)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Tilgængeligt budget for stadion investeringer
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Månedlig ROI</h4>
+                    <div className={`text-3xl font-bold ${stats.netProfit >= 0 ? 'text-green-600' : 'text-red-600'} mb-2`}>
+                      {formatCurrency(stats.netProfit)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Netto profit fra stadion operationer
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Financial Performance */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calculator className="h-5 w-5" />
+                  Finansiel Performance
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">{formatCurrency(stats.totalRevenue)}</div>
+                    <div className="text-sm text-muted-foreground">Månedlig Indtægt</div>
+                    <div className="text-xs text-green-600 mt-1">+{((stats.totalRevenue / (stats.totalCost || 1)) * 100).toFixed(1)}% af omkostninger</div>
+                  </div>
+                  <div className="text-center p-4 bg-red-50 rounded-lg">
+                    <div className="text-2xl font-bold text-red-600">{formatCurrency(stats.totalCost)}</div>
+                    <div className="text-sm text-muted-foreground">Månedlige Omkostninger</div>
+                    <div className="text-xs text-red-600 mt-1">Vedligeholdelse og drift</div>
+                  </div>
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className={`text-2xl font-bold ${stats.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatCurrency(stats.netProfit)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Netto Profit</div>
+                    <div className={`text-xs mt-1 ${stats.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {stats.netProfit >= 0 ? 'Profitabel' : 'Underskud'}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* ROI Calculator */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  ROI Beregner
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">{formatCurrency(stats.totalRevenue)}</div>
-                      <div className="text-sm text-muted-foreground">Månedlig Indtægt</div>
+                  <p className="text-sm text-muted-foreground">
+                    Beregn return on investment (ROI) for forskellige stadion investeringer.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium">Investering (DKK)</label>
+                      <input 
+                        type="number" 
+                        placeholder="1000000" 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        id="investment-amount"
+                      />
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-red-600">{formatCurrency(stats.totalCost)}</div>
-                      <div className="text-sm text-muted-foreground">Månedlige Omkostninger</div>
-                    </div>
-                    <div className="text-center">
-                      <div className={`text-2xl font-bold ${stats.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatCurrency(stats.netProfit)}
-                      </div>
-                      <div className="text-sm text-muted-foreground">Netto Profit</div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium">Månedlig Indtægt (DKK)</label>
+                      <input 
+                        type="number" 
+                        placeholder="50000" 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        id="monthly-revenue"
+                      />
                     </div>
                   </div>
-                  
-                  <div className="border-t pt-4">
-                    <h4 className="font-semibold mb-2">Billet Priser</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Basic</label>
-                        <input 
-                          type="number" 
-                          defaultValue="150" 
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Premium</label>
-                        <input 
-                          type="number" 
-                          defaultValue="300" 
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">VIP</label>
-                        <input 
-                          type="number" 
-                          defaultValue="500" 
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                      </div>
-                    </div>
-                    <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                      Opdater Priser
-                    </button>
-                  </div>
+                  <button 
+                    onClick={() => {
+                      const investment = parseInt((document.getElementById('investment-amount') as HTMLInputElement)?.value || '0');
+                      const revenue = parseInt((document.getElementById('monthly-revenue') as HTMLInputElement)?.value || '0');
+                      if (investment > 0 && revenue > 0) {
+                        const months = Math.ceil(investment / revenue);
+                        const annualROI = ((revenue * 12) / investment) * 100;
+                        alert(`ROI: ${annualROI.toFixed(1)}% årligt\nTilbagebetalingstid: ${months} måneder`);
+                      }
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Beregn ROI
+                  </button>
                 </div>
               </CardContent>
             </Card>

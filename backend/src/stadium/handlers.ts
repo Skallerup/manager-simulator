@@ -33,6 +33,29 @@ async function verifyTeamOwnership(teamId: string, userId: string) {
   return team;
 }
 
+// Helper function to check and deduct budget
+async function checkAndDeductBudget(teamId: string, cost: number) {
+  const team = await prisma.team.findUnique({
+    where: { id: teamId }
+  });
+  
+  if (!team) {
+    throw new Error('Team not found');
+  }
+  
+  if (team.budget < cost) {
+    throw new Error(`Insufficient budget. Required: ${cost} øre, Available: ${team.budget} øre`);
+  }
+  
+  // Deduct the cost
+  await prisma.team.update({
+    where: { id: teamId },
+    data: { budget: team.budget - cost }
+  });
+  
+  return team.budget - cost; // Return new budget
+}
+
 // Helper function to get or create stadium
 async function getOrCreateStadium(teamId: string, teamName: string) {
   let stadium = await prisma.stadium.findUnique({
