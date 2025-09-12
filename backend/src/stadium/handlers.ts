@@ -246,8 +246,9 @@ export const upgradeFacility = async (req: AuthenticatedRequest, res: Response) 
     // Check if team has enough budget for upgrade
     const facilityData = calculateFacilityData(facility.type as FacilityType, level);
     const upgradeCost = facilityData.cost - facility.cost;
+    const teamBudget = Number(facility.stadium.team.budget);
     
-    if (facility.stadium.team.budget < upgradeCost) {
+    if (teamBudget < upgradeCost) {
       return res.status(400).json({ error: 'Insufficient budget for upgrade' });
     }
 
@@ -263,10 +264,11 @@ export const upgradeFacility = async (req: AuthenticatedRequest, res: Response) 
     });
 
     // Deduct upgrade cost from team budget
+    const newBudget = facility.stadium.team.budget - BigInt(upgradeCost);
     await prisma.team.update({
       where: { id: facility.stadium.teamId },
       data: {
-        budget: facility.stadium.team.budget - upgradeCost
+        budget: newBudget
       }
     });
 
@@ -305,7 +307,8 @@ export const createUpgrade = async (req: AuthenticatedRequest, res: Response) =>
     }
 
     // Check if team has enough budget
-    if (team.budget < cost) {
+    const teamBudget = Number(team.budget);
+    if (teamBudget < cost) {
       return res.status(400).json({ error: 'Insufficient budget' });
     }
 
@@ -320,10 +323,11 @@ export const createUpgrade = async (req: AuthenticatedRequest, res: Response) =>
     });
 
     // Deduct cost from team budget
+    const newBudget = team.budget - BigInt(cost);
     await prisma.team.update({
       where: { id: teamId },
       data: {
-        budget: team.budget - cost
+        budget: newBudget
       }
     });
 
