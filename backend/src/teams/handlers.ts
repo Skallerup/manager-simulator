@@ -297,13 +297,15 @@ export async function getMyTeamHandler(req: Request, res: Response) {
       }
     }
 
+    const budgetNumber = Number(team.budget);
+    
     res.json({
       id: team.id,
       name: team.name,
       formation: team.formation,
       colors: team.colors ? JSON.parse(team.colors) : null,
       logo: team.logo,
-      budget: team.budget,
+      budget: budgetNumber,
       overallRating,
       players: team.players.map(tp => ({
         id: tp.player.id,

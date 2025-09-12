@@ -65,7 +65,7 @@ export class TeamService {
         name: data.name,
         colors,
         logo,
-        budget: 10000000, // 10,000,000 øre = 100,000 kr
+        budget: BigInt(4800000000), // 4,800,000,000 øre = 4,800,000 kr (4.8m)
         ownerId: data.ownerId,
         rookieLeagueId: rookieLeague.id
       }

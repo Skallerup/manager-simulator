@@ -38,22 +38,26 @@ async function checkAndDeductBudget(teamId: string, cost: number) {
   const team = await prisma.team.findUnique({
     where: { id: teamId }
   });
-  
+
   if (!team) {
     throw new Error('Team not found');
   }
-  
-  if (team.budget < cost) {
-    throw new Error(`Insufficient budget. Required: ${cost} øre, Available: ${team.budget} øre`);
+
+  const budget = Number(team.budget);
+  const costBigInt = BigInt(cost);
+
+  if (team.budget < costBigInt) {
+    throw new Error(`Insufficient budget. Required: ${cost} øre, Available: ${budget} øre`);
   }
-  
+
   // Deduct the cost
+  const newBudget = team.budget - costBigInt;
   await prisma.team.update({
     where: { id: teamId },
-    data: { budget: team.budget - cost }
+    data: { budget: newBudget }
   });
-  
-  return team.budget - cost; // Return new budget
+
+  return Number(newBudget); // Return new budget as number
 }
 
 // Helper function to get or create stadium
