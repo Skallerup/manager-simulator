@@ -944,7 +944,12 @@ export default function MyTeamPage() {
                 />
               </div>
               <p className="text-xs text-muted-foreground">
-                Minimum pris: {minimumPrice.toLocaleString()} kr
+                Minimum pris: {new Intl.NumberFormat('da-DK', {
+                  style: 'currency',
+                  currency: 'DKK',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                }).format(minimumPrice / 100)}
               </p>
             </div>
           </div>
