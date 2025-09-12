@@ -630,40 +630,172 @@ export default function StadiumPage() {
 
         {activeTab === "experience" && (
           <div className="space-y-6">
+            {/* Fan Experience Overview */}
             <Card>
               <CardHeader>
-                <CardTitle>Fan Oplevelse</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Fan Oplevelse Oversigt
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">Atmosfære</h4>
-                    <div className="flex items-center gap-4">
-                      <div className="text-3xl font-bold">{stadium.atmosphere}%</div>
-                      <div className="flex-1">
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                            style={{ width: `${stadium.atmosphere}%` }}
-                          ></div>
-                        </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <h5 className="font-medium text-blue-900 mb-2">Hvad er Fan Oplevelse?</h5>
+                      <p className="text-sm text-blue-700 mb-3">
+                        Fan Oplevelse måler hvor godt dine tilskuere har det i dit stadion. Det påvirker både indtægter, 
+                        hjemmefordel og dit holds omdømme. Jo bedre oplevelse, jo flere fans kommer tilbage og anbefaler dit stadion.
+                      </p>
+                      <div className="text-xs text-blue-600">
+                        <strong>Påvirkning:</strong> Højere indtægter • Bedre hjemmefordel • Flere tilskuere • Stærkere fanbase
                       </div>
                     </div>
                   </div>
-                  
-                  <div>
-                    <h4 className="font-semibold mb-2">Prestige</h4>
-                    <div className="flex items-center gap-4">
-                      <div className="text-3xl font-bold">{stadium.prestige}</div>
-                      <div className="flex-1">
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-purple-600 h-2 rounded-full transition-all duration-300" 
-                            style={{ width: `${stadium.prestige}%` }}
-                          ></div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Atmosphere */}
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold mb-2 flex items-center gap-2">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                        Atmosfære
+                      </h4>
+                      <div className="flex items-center gap-4">
+                        <div className="text-3xl font-bold text-blue-600">{stadium.atmosphere}%</div>
+                        <div className="flex-1">
+                          <div className="w-full bg-gray-200 rounded-full h-3">
+                            <div 
+                              className="bg-blue-600 h-3 rounded-full transition-all duration-300" 
+                              style={{ width: `${stadium.atmosphere}%` }}
+                            ></div>
+                          </div>
                         </div>
                       </div>
                     </div>
+                    
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <h5 className="font-medium text-sm mb-2">Hvad påvirker atmosfære?</h5>
+                      <ul className="text-xs text-gray-600 space-y-1">
+                        <li>• <strong>Lydanlæg:</strong> Bedre lyd = bedre atmosfære</li>
+                        <li>• <strong>Belysning:</strong> Professionel belysning skaber stemning</li>
+                        <li>• <strong>Fan Zone:</strong> Aktiviteter og underholdning</li>
+                        <li>• <strong>WiFi:</strong> Fans kan dele oplevelsen på sociale medier</li>
+                        <li>• <strong>Mad & Drikke:</strong> Gode faciliteter holder fans glade</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Prestige */}
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold mb-2 flex items-center gap-2">
+                        <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                        Prestige
+                      </h4>
+                      <div className="flex items-center gap-4">
+                        <div className="text-3xl font-bold text-purple-600">{stadium.prestige}</div>
+                        <div className="flex-1">
+                          <div className="w-full bg-gray-200 rounded-full h-3">
+                            <div 
+                              className="bg-purple-600 h-3 rounded-full transition-all duration-300" 
+                              style={{ width: `${stadium.prestige}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <h5 className="font-medium text-sm mb-2">Hvad påvirker prestige?</h5>
+                      <ul className="text-xs text-gray-600 space-y-1">
+                        <li>• <strong>VIP Lounge:</strong> Eksklusive faciliteter</li>
+                        <li>• <strong>LED Skærme:</strong> Moderne teknologi</li>
+                        <li>• <strong>Medie faciliteter:</strong> Professionel mediedækning</li>
+                        <li>• <strong>Stadion tier:</strong> Højere tier = mere prestige</li>
+                        <li>• <strong>Sponsor faciliteter:</strong> Professionelle reklamepladser</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Impact on Performance */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Påvirkning på Performance
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600 mb-1">
+                      +{(stadium.homeAdvantage * 100).toFixed(1)}%
+                    </div>
+                    <div className="text-sm font-medium text-green-800">Hjemmefordel</div>
+                    <div className="text-xs text-green-600 mt-1">
+                      {stadium.atmosphere > 70 ? 'Stærk fanbase!' : 'Kan forbedres'}
+                    </div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600 mb-1">
+                      {Math.round((stadium.atmosphere + stadium.prestige) / 2)}%
+                    </div>
+                    <div className="text-sm font-medium text-blue-800">Samlet Oplevelse</div>
+                    <div className="text-xs text-blue-600 mt-1">
+                      {Math.round((stadium.atmosphere + stadium.prestige) / 2) > 75 ? 'Fremragende!' : 'God, men kan forbedres'}
+                    </div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-600 mb-1">
+                      {stadium.capacity.toLocaleString()}
+                    </div>
+                    <div className="text-sm font-medium text-purple-800">Kapacitet</div>
+                    <div className="text-xs text-purple-600 mt-1">
+                      {stadium.capacity > 30000 ? 'Stort stadion!' : 'Kompakt stadion'}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tips for Improvement */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Tips til Forbedring
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h5 className="font-medium mb-2 text-green-700">For Bedre Atmosfære</h5>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>• Tilføj lydanlæg for bedre lyd</li>
+                      <li>• Opgrader belysning til professionel standard</li>
+                      <li>• Byg Fan Zone med aktiviteter</li>
+                      <li>• Installer WiFi for social media deling</li>
+                      <li>• Forbedre mad & drikke faciliteter</li>
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h5 className="font-medium mb-2 text-purple-700">For Højere Prestige</h5>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>• Byg VIP Lounge for eksklusive gæster</li>
+                      <li>• Installer LED skærme for moderne udseende</li>
+                      <li>• Forbedre medie faciliteter</li>
+                      <li>• Udvid stadion til højere tier</li>
+                      <li>• Tilføj sponsor faciliteter</li>
+                    </ul>
                   </div>
                 </div>
               </CardContent>
