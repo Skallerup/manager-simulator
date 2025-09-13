@@ -4,8 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FacilityType, formatCurrency } from "@/lib/stadium";
 import { useTranslation } from 'react-i18next';
-import { Loader2, AlertCircle, Building2, Users, TrendingUp, DollarSign, Plus, Settings, Info, Calculator, Target, Trophy } from "lucide-react";
+import { Loader2, AlertCircle, Building2, Users, TrendingUp, DollarSign, Plus, Settings, Info, Calculator, Target, Trophy, Eye, EyeOff } from "lucide-react";
 import { authApiFetch } from "@/lib/api";
+import StadiumVisualization from "@/components/stadium/StadiumVisualization";
+import Stadium3D from "@/components/stadium/Stadium3D";
+import CapacityVisualization from "@/components/stadium/CapacityVisualization";
 
 interface Stadium {
   id: string;
@@ -176,6 +179,8 @@ export default function StadiumPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [showVisualization, setShowVisualization] = useState(true);
+  const [visualizationMode, setVisualizationMode] = useState<'2d' | '3d' | 'capacity'>('2d');
 
   const fetchStadiumData = useCallback(async () => {
     try {
@@ -436,6 +441,103 @@ export default function StadiumPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Stadium Visualization */}
+      {showVisualization && (
+        <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                Stadion Visualisering
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <div className="flex bg-white rounded-lg p-1 border">
+                  <button
+                    onClick={() => setVisualizationMode('2d')}
+                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                      visualizationMode === '2d' 
+                        ? 'bg-blue-500 text-white' 
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    2D
+                  </button>
+                  <button
+                    onClick={() => setVisualizationMode('3d')}
+                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                      visualizationMode === '3d' 
+                        ? 'bg-blue-500 text-white' 
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    3D
+                  </button>
+                  <button
+                    onClick={() => setVisualizationMode('capacity')}
+                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                      visualizationMode === 'capacity' 
+                        ? 'bg-blue-500 text-white' 
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Kapacitet
+                  </button>
+                </div>
+                <button
+                  onClick={() => setShowVisualization(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <EyeOff className="h-4 w-4 text-gray-600" />
+                </button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {visualizationMode === '2d' && (
+              <StadiumVisualization
+                capacity={stadium.capacity}
+                tier={stadium.tier}
+                atmosphere={stadium.atmosphere}
+                prestige={stadium.prestige}
+                homeAdvantage={stadium.homeAdvantage}
+                name={stadium.name}
+              />
+            )}
+            {visualizationMode === '3d' && (
+              <Stadium3D
+                capacity={stadium.capacity}
+                tier={stadium.tier}
+                atmosphere={stadium.atmosphere}
+                prestige={stadium.prestige}
+                homeAdvantage={stadium.homeAdvantage}
+                name={stadium.name}
+              />
+            )}
+            {visualizationMode === 'capacity' && (
+              <CapacityVisualization
+                currentCapacity={stadium.capacity}
+                maxCapacity={stadium.tier >= 5 ? 100000 : [35000, 50000, 75000, 100000][stadium.tier]}
+                tier={stadium.tier}
+                nextTierCapacity={stadium.tier < 5 ? [35000, 50000, 75000, 100000][stadium.tier] : undefined}
+              />
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Show Visualization Button */}
+      {!showVisualization && (
+        <div className="text-center">
+          <button
+            onClick={() => setShowVisualization(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            <Eye className="h-4 w-4" />
+            Vis Stadion Visualisering
+          </button>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="space-y-6">
