@@ -61,7 +61,7 @@ model Team {
   formation     String   @default("4-4-2") // Default formation: 4-4-2, 4-3-3, 3-5-2, 5-3-2
   colors        String?  // JSON string for primary and secondary colors
   logo          String?  // Logo identifier
-  budget        BigInt   @default(4800000000) // Starting budget in øre (4.8m kr)
+  budget        BigInt   @default(10000000000) // Starting budget in øre (10m kr) - increased for balance
   overallRating Int      @default(0) // Team overall rating
   captainId     String?  @unique // Captain player ID
   isBot         Boolean  @default(false) // True for bot teams

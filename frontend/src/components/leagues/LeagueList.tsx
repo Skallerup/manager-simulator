@@ -55,9 +55,14 @@ export function LeagueList({}: LeagueListProps) {
 
         // Find user's league
         if (user) {
-          const response = await apiFetch<{league: League, userTeam: any}>('/api/leagues/user/current');
-          if (response) {
-            setUserLeague(response.league);
+          try {
+            const response = await apiFetch<{league: League, userTeam: any}>('/api/leagues/user/current');
+            if (response) {
+              setUserLeague(response.league);
+            }
+          } catch (err) {
+            // User not in a league yet, that's okay
+            console.log('User not in a league yet');
           }
         }
       } catch (err) {

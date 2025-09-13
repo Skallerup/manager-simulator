@@ -525,11 +525,13 @@ export class GameEngine {
       position,
       age: Math.floor(Math.random() * 10) + 20, // 20-30 years old
       overall: base.overall + Math.floor(Math.random() * 20) - 10, // ±10 from base
-      pace: base.pace + Math.floor(Math.random() * 20) - 10,
+      speed: 50 + Math.floor(Math.random() * 30),
       shooting: base.shooting + Math.floor(Math.random() * 20) - 10,
       passing: base.passing + Math.floor(Math.random() * 20) - 10,
       defending: base.defending + Math.floor(Math.random() * 20) - 10,
-      physical: base.physical + Math.floor(Math.random() * 20) - 10,
+      stamina: 50 + Math.floor(Math.random() * 30),
+      reflexes: 50 + Math.floor(Math.random() * 30),
+      isCaptain: false,
       isStarter: false
     };
   }

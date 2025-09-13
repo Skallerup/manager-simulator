@@ -1,12 +1,12 @@
 import { PlayerPosition } from "@prisma/client";
 
 export class PriceService {
-  // Base prices for different positions (in DKK)
+  // Base prices for different positions (in DKK) - 2x higher for better balance
   private static readonly BASE_PRICES = {
-    [PlayerPosition.GOALKEEPER]: 100000,
-    [PlayerPosition.DEFENDER]: 120000,
-    [PlayerPosition.MIDFIELDER]: 150000,
-    [PlayerPosition.ATTACKER]: 180000,
+    [PlayerPosition.GOALKEEPER]: 200000, // 200k kr
+    [PlayerPosition.DEFENDER]: 240000,  // 240k kr
+    [PlayerPosition.MIDFIELDER]: 300000, // 300k kr
+    [PlayerPosition.ATTACKER]: 360000,  // 360k kr
   };
 
   // Age multipliers
@@ -45,8 +45,8 @@ export class PriceService {
     // Calculate minimum price
     const minimumPrice = Math.round(basePrice * ratingMultiplier * ageMultiplier);
     
-    // Ensure minimum price is at least 10,000 DKK
-    return Math.max(minimumPrice, 10000);
+    // Ensure minimum price is at least 50,000 DKK (5x higher for balance)
+    return Math.max(minimumPrice, 50000);
   }
 
   /**

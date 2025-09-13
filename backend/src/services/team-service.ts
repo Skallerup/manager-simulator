@@ -15,7 +15,7 @@ export interface TeamWithPlayers {
   formation: string;
   colors: string | null;
   logo: string | null;
-  budget: number;
+  budget: bigint;
   overallRating: number;
   players: {
     id: string;
@@ -65,7 +65,7 @@ export class TeamService {
         name: data.name,
         colors,
         logo,
-        budget: BigInt(4800000000), // 4,800,000,000 øre = 4,800,000 kr (4.8m)
+        budget: BigInt(10000000000), // 10,000,000,000 øre = 10,000,000 kr (10m)
         ownerId: data.ownerId,
         rookieLeagueId: rookieLeague.id
       }
@@ -96,12 +96,16 @@ export class TeamService {
         });
 
         // Add player to team
+        const formationPosition = index < 11 ? this.getFormationPosition(playerData.position, index) : null;
+        const isStarter = index < 11; // Only first 11 players are starters
+        console.log(`Creating TeamPlayer: index=${index}, position=${playerData.position}, formationPosition=${formationPosition}, isStarter=${isStarter}`);
         await prisma.teamPlayer.create({
           data: {
             teamId: team.id,
             playerId: player.id,
-            position: this.getFieldPosition(playerData.position),
-            isStarter: true // All generated players start as starters
+            position: this.getFieldPosition(playerData.position, index),
+            formationPosition: formationPosition,
+            isStarter: isStarter
           }
         });
 
@@ -308,7 +312,7 @@ export class TeamService {
   /**
    * Converts database position to field position
    */
-  private static getFieldPosition(position: PlayerPosition): string {
+  private static getFieldPosition(position: PlayerPosition, index: number): string {
     switch (position) {
       case 'GOALKEEPER':
         return 'GK';
@@ -319,8 +323,34 @@ export class TeamService {
       case 'ATTACKER':
         return 'FWD';
       default:
-        return 'MID';
+        return 'SUB';
     }
+  }
+
+  /**
+   * Gets specific formation position for 4-4-2 formation
+   */
+  private static getFormationPosition(position: PlayerPosition, index: number): string | null {
+    // Formation positions for 4-4-2: 1 GK, 4 DEF, 4 MID, 2 ATT
+    const formationMap = [
+      'gk',           // 0: Goalkeeper
+      'lb',           // 1: Left Back
+      'cb1',          // 2: Center Back 1
+      'cb2',          // 3: Center Back 2
+      'rb',           // 4: Right Back
+      'lm',           // 5: Left Midfielder
+      'cm1',          // 6: Center Midfielder 1
+      'cm2',          // 7: Center Midfielder 2
+      'rm',           // 8: Right Midfielder
+      'st1',          // 9: Striker 1
+      'st2'           // 10: Striker 2
+    ];
+
+    if (index >= 0 && index < formationMap.length) {
+      return formationMap[index];
+    }
+    
+    return null;
   }
 
   /**
@@ -397,8 +427,8 @@ export class TeamService {
     const averageAge = players.length > 0 ? 
       Math.round(players.reduce((sum, player) => sum + player.age, 0) / players.length) : 0;
 
-    const positionCounts = players.reduce((counts, player) => {
-      const pos = this.getFieldPosition(player.position);
+    const positionCounts = players.reduce((counts, player, index) => {
+      const pos = this.getFieldPosition(player.position, index);
       counts[pos] = (counts[pos] || 0) + 1;
       return counts;
     }, {} as Record<string, number>);

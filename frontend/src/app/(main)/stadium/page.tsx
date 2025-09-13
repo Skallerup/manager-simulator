@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FacilityType, formatCurrency } from "@/lib/stadium";
 import { useTranslation } from 'react-i18next';
-import { Loader2, AlertCircle, Building2, Users, TrendingUp, DollarSign, Plus, Settings, Info, Calculator, Target, Trophy, Eye, EyeOff } from "lucide-react";
+import { Loader2, AlertCircle, Building2, Users, TrendingUp, DollarSign, Plus, Info, Calculator, Target, Trophy, Eye, EyeOff } from "lucide-react";
 import { authApiFetch } from "@/lib/api";
 import StadiumVisualization from "@/components/stadium/StadiumVisualization";
 import CapacityVisualization from "@/components/stadium/CapacityVisualization";
@@ -339,13 +339,6 @@ export default function StadiumPage() {
           </h1>
           <p className="text-muted-foreground">Administrer dit stadion og dets faciliteter</p>
         </div>
-        <button 
-          onClick={fetchStadiumData} 
-          className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
-        >
-          <Settings className="h-4 w-4" />
-          Opdater
-        </button>
       </div>
 
       {/* Budget Warning */}

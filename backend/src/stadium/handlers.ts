@@ -414,13 +414,13 @@ export const upgradeTier = async (req: AuthenticatedRequest, res: Response) => {
     }
 
     // Calculate next tier cost and capacity
-    const tierData = [
-      { tier: 1, capacity: 20000, cost: 0 },
-      { tier: 2, capacity: 35000, cost: 5000000 },
-      { tier: 3, capacity: 50000, cost: 15000000 },
-      { tier: 4, capacity: 75000, cost: 35000000 },
-      { tier: 5, capacity: 100000, cost: 75000000 }
-    ];
+          const tierData = [
+            { tier: 1, capacity: 20000, cost: 0 },
+            { tier: 2, capacity: 35000, cost: 2000000 }, // 2M kr (halveret)
+            { tier: 3, capacity: 50000, cost: 6000000 }, // 6M kr (halveret)
+            { tier: 4, capacity: 75000, cost: 14000000 }, // 14M kr (halveret)
+            { tier: 5, capacity: 100000, cost: 30000000 } // 30M kr (halveret)
+          ];
 
     const currentTier = tierData.find(t => t.tier === stadium.tier);
     const nextTier = tierData.find(t => t.tier === stadium.tier + 1);
@@ -479,49 +479,49 @@ function calculateFacilityData(type: FacilityType, level: number) {
   const facilityConfigs = {
     [FacilityType.SEATING]: {
       capacity: Math.floor(5000 * baseMultiplier),
-      revenue: Math.floor(100000 * baseMultiplier),
-      cost: Math.floor(50000 * baseMultiplier),
+      revenue: Math.floor(200000 * baseMultiplier), // 2x revenue
+      cost: Math.floor(500000 * baseMultiplier), // 10x cost - 500k-2.5M kr
       effect: { capacity: Math.floor(5000 * baseMultiplier) }
     },
     [FacilityType.LED_SCREENS]: {
       capacity: null,
-      revenue: Math.floor(25000 * baseMultiplier),
-      cost: Math.floor(15000 * baseMultiplier),
+      revenue: Math.floor(50000 * baseMultiplier), // 2x revenue
+      cost: Math.floor(150000 * baseMultiplier), // 10x cost - 150k-750k kr
       effect: { atmosphere: Math.floor(5 * level) }
     },
     [FacilityType.SOUND_SYSTEM]: {
       capacity: null,
-      revenue: Math.floor(20000 * baseMultiplier),
-      cost: Math.floor(10000 * baseMultiplier),
+      revenue: Math.floor(40000 * baseMultiplier), // 2x revenue
+      cost: Math.floor(100000 * baseMultiplier), // 10x cost - 100k-500k kr
       effect: { atmosphere: Math.floor(3 * level) }
     },
     [FacilityType.PARKING]: {
       capacity: Math.floor(1000 * baseMultiplier),
-      revenue: Math.floor(30000 * baseMultiplier),
-      cost: Math.floor(20000 * baseMultiplier),
+      revenue: Math.floor(60000 * baseMultiplier), // 2x revenue
+      cost: Math.floor(200000 * baseMultiplier), // 10x cost - 200k-1M kr
       effect: { accessibility: Math.floor(2 * level) }
     },
     [FacilityType.VIP_LOUNGE]: {
       capacity: Math.floor(100 * baseMultiplier),
-      revenue: Math.floor(50000 * baseMultiplier),
-      cost: Math.floor(25000 * baseMultiplier),
+      revenue: Math.floor(100000 * baseMultiplier), // 2x revenue
+      cost: Math.floor(250000 * baseMultiplier), // 10x cost - 250k-1.25M kr
       effect: { prestige: Math.floor(3 * level) }
     },
     [FacilityType.FAN_ZONE]: {
       capacity: null,
-      revenue: Math.floor(15000 * baseMultiplier),
-      cost: Math.floor(8000 * baseMultiplier),
+      revenue: Math.floor(30000 * baseMultiplier), // 2x revenue
+      cost: Math.floor(80000 * baseMultiplier), // 10x cost - 80k-400k kr
       effect: { atmosphere: Math.floor(2 * level) }
     },
     [FacilityType.FOOD_BEVERAGE]: {
       capacity: null,
-      revenue: Math.floor(30000 * baseMultiplier),
-      cost: Math.floor(12000 * baseMultiplier),
-      effect: { revenue: Math.floor(30000 * baseMultiplier) }
+      revenue: Math.floor(60000 * baseMultiplier), // 2x revenue
+      cost: Math.floor(120000 * baseMultiplier), // 10x cost - 120k-600k kr
+      effect: { revenue: Math.floor(60000 * baseMultiplier) }
     }
   };
 
-  const config = facilityConfigs[type] || {
+  const config = facilityConfigs[type as keyof typeof facilityConfigs] || {
     capacity: null,
     revenue: Math.floor(10000 * baseMultiplier),
     cost: Math.floor(5000 * baseMultiplier),
