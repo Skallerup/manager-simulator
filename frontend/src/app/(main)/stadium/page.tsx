@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { Loader2, AlertCircle, Building2, Users, TrendingUp, DollarSign, Plus, Settings, Info, Calculator, Target, Trophy, Eye, EyeOff } from "lucide-react";
 import { authApiFetch } from "@/lib/api";
 import StadiumVisualization from "@/components/stadium/StadiumVisualization";
-import Stadium3D from "@/components/stadium/Stadium3D";
 import CapacityVisualization from "@/components/stadium/CapacityVisualization";
 
 interface Stadium {
@@ -180,7 +179,7 @@ export default function StadiumPage() {
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showVisualization, setShowVisualization] = useState(true);
-  const [visualizationMode, setVisualizationMode] = useState<'2d' | '3d' | 'capacity'>('2d');
+  const [visualizationMode, setVisualizationMode] = useState<'2d' | 'capacity'>('2d');
 
   const fetchStadiumData = useCallback(async () => {
     try {
@@ -464,16 +463,6 @@ export default function StadiumPage() {
                     2D
                   </button>
                   <button
-                    onClick={() => setVisualizationMode('3d')}
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      visualizationMode === '3d' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    3D
-                  </button>
-                  <button
                     onClick={() => setVisualizationMode('capacity')}
                     className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                       visualizationMode === 'capacity' 
@@ -496,16 +485,6 @@ export default function StadiumPage() {
           <CardContent>
             {visualizationMode === '2d' && (
               <StadiumVisualization
-                capacity={stadium.capacity}
-                tier={stadium.tier}
-                atmosphere={stadium.atmosphere}
-                prestige={stadium.prestige}
-                homeAdvantage={stadium.homeAdvantage}
-                name={stadium.name}
-              />
-            )}
-            {visualizationMode === '3d' && (
-              <Stadium3D
                 capacity={stadium.capacity}
                 tier={stadium.tier}
                 atmosphere={stadium.atmosphere}
