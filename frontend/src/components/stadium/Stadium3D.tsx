@@ -31,8 +31,9 @@ function Stadium3DModel({ capacity, tier, atmosphere, prestige }: Omit<Stadium3D
     const capacityMultiplier = Math.sqrt(capacity / 20000); // Base capacity 20k
     return {
       radius: baseRadius * capacityMultiplier,
-      height: 1 + capacityMultiplier * 0.5,
-      seats: Math.min(50, Math.floor(capacity / 2000)) // Max 50 seat rings
+      height: 1 + capacityMultiplier * 0.8,
+      seatRows: Math.min(20, Math.floor(capacity / 1000)), // More realistic seat rows
+      seatsPerRow: Math.floor(capacity / Math.min(20, Math.floor(capacity / 1000)))
     };
   };
 
@@ -42,76 +43,196 @@ function Stadium3DModel({ capacity, tier, atmosphere, prestige }: Omit<Stadium3D
 
   return (
     <group ref={meshRef}>
-      {/* Stadium Base */}
+      {/* Stadium Base/Foundation */}
       <Cylinder
-        args={[dimensions.radius, dimensions.radius * 1.1, 0.2, 32]}
-        position={[0, 0, 0]}
+        args={[dimensions.radius * 1.1, dimensions.radius * 1.2, 0.3, 32]}
+        position={[0, -0.15, 0]}
       >
-        <meshStandardMaterial color={tierColor} />
+        <meshStandardMaterial color="#4B5563" />
       </Cylinder>
 
-      {/* Stadium Walls */}
+      {/* Stadium Structure/Walls */}
       <Cylinder
-        args={[dimensions.radius * 0.9, dimensions.radius * 0.9, dimensions.height, 32]}
-        position={[0, dimensions.height / 2, 0]}
+        args={[dimensions.radius * 0.95, dimensions.radius * 0.95, dimensions.height * 0.8, 32]}
+        position={[0, dimensions.height * 0.4, 0]}
       >
-        <meshStandardMaterial color={tierColor} opacity={0.7} transparent />
+        <meshStandardMaterial color={tierColor} opacity={0.3} transparent />
       </Cylinder>
 
-      {/* Seating Rings */}
-      {Array.from({ length: dimensions.seats }, (_, i) => {
-        const ringRadius = (dimensions.radius * 0.8) - (i * 0.05);
-        const ringHeight = dimensions.height * 0.3 + (i * 0.02);
-        const seatColor = new THREE.Color(tierColor).lerp(
-          new THREE.Color('#F59E0B'), 
-          atmosphereIntensity
-        );
+      {/* Individual Seat Rows - Lower Tier */}
+      {Array.from({ length: Math.floor(dimensions.seatRows * 0.6) }, (_, i) => {
+        const rowRadius = dimensions.radius * 0.7 - (i * 0.08);
+        const rowHeight = 0.2 + (i * 0.15);
+        const seatCount = Math.floor((rowRadius * 2 * Math.PI) / 0.3); // Seats based on circumference
         
         return (
-          <Cylinder
-            key={i}
-            args={[ringRadius, ringRadius, 0.1, 32]}
-            position={[0, ringHeight, 0]}
-          >
-            <meshStandardMaterial 
-              color={seatColor} 
-              emissive={seatColor}
-              emissiveIntensity={atmosphereIntensity * 0.2}
-            />
-          </Cylinder>
+          <group key={`lower-${i}`}>
+            {/* Seat Row Base */}
+            <Cylinder
+              args={[rowRadius, rowRadius, 0.1, 32]}
+              position={[0, rowHeight, 0]}
+            >
+              <meshStandardMaterial color="#1F2937" />
+            </Cylinder>
+            
+            {/* Individual Seats */}
+            {Array.from({ length: Math.min(seatCount, 40) }, (_, seatIndex) => {
+              const angle = (seatIndex / seatCount) * Math.PI * 2;
+              const x = Math.cos(angle) * rowRadius;
+              const z = Math.sin(angle) * rowRadius;
+              const seatColor = new THREE.Color(tierColor).lerp(
+                new THREE.Color('#F59E0B'), 
+                atmosphereIntensity
+              );
+              
+              return (
+                <Box
+                  key={`seat-${i}-${seatIndex}`}
+                  args={[0.15, 0.1, 0.2]}
+                  position={[x, rowHeight + 0.05, z]}
+                  rotation={[0, angle, 0]}
+                >
+                  <meshStandardMaterial 
+                    color={seatColor} 
+                    emissive={seatColor}
+                    emissiveIntensity={atmosphereIntensity * 0.1}
+                  />
+                </Box>
+              );
+            })}
+          </group>
+        );
+      })}
+
+      {/* Individual Seat Rows - Upper Tier */}
+      {Array.from({ length: Math.floor(dimensions.seatRows * 0.4) }, (_, i) => {
+        const rowIndex = Math.floor(dimensions.seatRows * 0.6) + i;
+        const rowRadius = dimensions.radius * 0.5 - (i * 0.06);
+        const rowHeight = 0.2 + (rowIndex * 0.12);
+        const seatCount = Math.floor((rowRadius * 2 * Math.PI) / 0.25);
+        
+        return (
+          <group key={`upper-${i}`}>
+            {/* Seat Row Base */}
+            <Cylinder
+              args={[rowRadius, rowRadius, 0.08, 32]}
+              position={[0, rowHeight, 0]}
+            >
+              <meshStandardMaterial color="#1F2937" />
+            </Cylinder>
+            
+            {/* Individual Seats */}
+            {Array.from({ length: Math.min(seatCount, 30) }, (_, seatIndex) => {
+              const angle = (seatIndex / seatCount) * Math.PI * 2;
+              const x = Math.cos(angle) * rowRadius;
+              const z = Math.sin(angle) * rowRadius;
+              const seatColor = new THREE.Color(tierColor).lerp(
+                new THREE.Color('#F59E0B'), 
+                atmosphereIntensity
+              );
+              
+              return (
+                <Box
+                  key={`seat-upper-${i}-${seatIndex}`}
+                  args={[0.12, 0.08, 0.15]}
+                  position={[x, rowHeight + 0.04, z]}
+                  rotation={[0, angle, 0]}
+                >
+                  <meshStandardMaterial 
+                    color={seatColor} 
+                    emissive={seatColor}
+                    emissiveIntensity={atmosphereIntensity * 0.1}
+                  />
+                </Box>
+              );
+            })}
+          </group>
         );
       })}
 
       {/* Field */}
       <Cylinder
-        args={[dimensions.radius * 0.4, dimensions.radius * 0.4, 0.05, 32]}
+        args={[dimensions.radius * 0.35, dimensions.radius * 0.35, 0.05, 32]}
         position={[0, 0.1, 0]}
       >
         <meshStandardMaterial color="#10B981" />
       </Cylinder>
 
       {/* Field Lines */}
-      <Box args={[dimensions.radius * 0.6, 0.01, 0.02]} position={[0, 0.11, 0]}>
+      <Box args={[dimensions.radius * 0.5, 0.01, 0.02]} position={[0, 0.11, 0]}>
         <meshStandardMaterial color="white" />
       </Box>
       
       <Cylinder
-        args={[dimensions.radius * 0.15, dimensions.radius * 0.15, 0.01, 32]}
+        args={[dimensions.radius * 0.12, dimensions.radius * 0.12, 0.01, 32]}
         position={[0, 0.11, 0]}
       >
         <meshStandardMaterial color="white" />
       </Cylinder>
 
-      {/* Prestige Effects */}
-      {prestige > 70 && (
-        <Sphere args={[0.1, 16, 16]} position={[0, dimensions.height + 0.5, 0]}>
-          <meshStandardMaterial 
-            color="#F59E0B" 
-            emissive="#F59E0B"
-            emissiveIntensity={0.5}
-          />
-        </Sphere>
+      {/* Corner Arcs */}
+      {Array.from({ length: 4 }, (_, i) => {
+        const angle = (i * Math.PI) / 2;
+        const x = Math.cos(angle) * dimensions.radius * 0.3;
+        const z = Math.sin(angle) * dimensions.radius * 0.3;
+        
+        return (
+          <Cylinder
+            key={`corner-${i}`}
+            args={[0.05, 0.05, 0.01, 8]}
+            position={[x, 0.11, z]}
+            rotation={[0, angle, 0]}
+          >
+            <meshStandardMaterial color="white" />
+          </Cylinder>
+        );
+      })}
+
+      {/* Stadium Roof (for higher tiers) */}
+      {tier >= 3 && (
+        <Cylinder
+          args={[dimensions.radius * 1.05, dimensions.radius * 1.05, 0.1, 32]}
+          position={[0, dimensions.height * 0.9, 0]}
+        >
+          <meshStandardMaterial color="#374151" opacity={0.8} transparent />
+        </Cylinder>
       )}
+
+      {/* Prestige Effects - Stadium Lights */}
+      {prestige > 70 && (
+        <group>
+          {Array.from({ length: 8 }, (_, i) => {
+            const angle = (i * Math.PI * 2) / 8;
+            const x = Math.cos(angle) * dimensions.radius * 0.8;
+            const z = Math.sin(angle) * dimensions.radius * 0.8;
+            
+            return (
+              <Sphere 
+                key={`light-${i}`}
+                args={[0.05, 8, 8]} 
+                position={[x, dimensions.height * 0.7, z]}
+              >
+                <meshStandardMaterial 
+                  color="#F59E0B" 
+                  emissive="#F59E0B"
+                  emissiveIntensity={0.8}
+                />
+              </Sphere>
+            );
+          })}
+        </group>
+      )}
+
+      {/* Capacity Indicator */}
+      <Text
+        position={[0, dimensions.height * 0.5, 0]}
+        fontSize={0.3}
+        color="#1F2937"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {capacity.toLocaleString('da-DK')} pladser
+      </Text>
     </group>
   );
 }

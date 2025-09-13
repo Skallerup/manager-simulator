@@ -93,29 +93,108 @@ const StadiumVisualization: React.FC<StadiumVisualizationProps> = ({
               viewBox={`0 0 ${stadiumSize.width} ${stadiumSize.height}`}
               className="drop-shadow-lg"
             >
-              {/* Stadium Structure */}
-              <ellipse
-                cx={stadiumSize.width / 2}
-                cy={stadiumSize.height / 2}
-                rx={stadiumSize.width / 2 - 20}
-                ry={stadiumSize.height / 2 - 20}
-                fill={tierColor}
-                fillOpacity={0.3}
-                stroke={tierColor}
-                strokeWidth="3"
-              />
+            {/* Stadium Structure */}
+            <ellipse
+              cx={stadiumSize.width / 2}
+              cy={stadiumSize.height / 2}
+              rx={stadiumSize.width / 2 - 20}
+              ry={stadiumSize.height / 2 - 20}
+              fill={tierColor}
+              fillOpacity={0.3}
+              stroke={tierColor}
+              strokeWidth="3"
+            />
+            
+            {/* Individual Seat Rows - Lower Tier */}
+            {Array.from({ length: Math.min(8, Math.floor(capacity / 5000)) }, (_, i) => {
+              const rowRadiusX = (stadiumSize.width / 2 - 40) - (i * 8);
+              const rowRadiusY = (stadiumSize.height / 2 - 40) - (i * 6);
+              const seatCount = Math.floor((rowRadiusX * 2 * Math.PI) / 12);
               
-              {/* Stadium Seats */}
-              <ellipse
-                cx={stadiumSize.width / 2}
-                cy={stadiumSize.height / 2}
-                rx={stadiumSize.width / 2 - 40}
-                ry={stadiumSize.height / 2 - 40}
-                fill={atmosphereColor}
-                fillOpacity={0.6}
-                stroke={atmosphereColor}
-                strokeWidth="2"
-              />
+              return (
+                <g key={`lower-row-${i}`}>
+                  {/* Seat Row Base */}
+                  <ellipse
+                    cx={stadiumSize.width / 2}
+                    cy={stadiumSize.height / 2}
+                    rx={rowRadiusX}
+                    ry={rowRadiusY}
+                    fill="#1F2937"
+                    fillOpacity={0.8}
+                    stroke="#374151"
+                    strokeWidth="1"
+                  />
+                  
+                  {/* Individual Seats */}
+                  {Array.from({ length: Math.min(seatCount, 32) }, (_, seatIndex) => {
+                    const angle = (seatIndex / seatCount) * Math.PI * 2;
+                    const x = stadiumSize.width / 2 + Math.cos(angle) * rowRadiusX * 0.8;
+                    const y = stadiumSize.height / 2 + Math.sin(angle) * rowRadiusY * 0.8;
+                    
+                    return (
+                      <rect
+                        key={`seat-${i}-${seatIndex}`}
+                        x={x - 3}
+                        y={y - 2}
+                        width="6"
+                        height="4"
+                        fill={atmosphereColor}
+                        fillOpacity={0.9}
+                        stroke={tierColor}
+                        strokeWidth="0.5"
+                        rx="1"
+                      />
+                    );
+                  })}
+                </g>
+              );
+            })}
+            
+            {/* Individual Seat Rows - Upper Tier */}
+            {Array.from({ length: Math.min(6, Math.floor(capacity / 8000)) }, (_, i) => {
+              const rowIndex = Math.min(8, Math.floor(capacity / 5000)) + i;
+              const rowRadiusX = (stadiumSize.width / 2 - 80) - (i * 6);
+              const rowRadiusY = (stadiumSize.height / 2 - 60) - (i * 4);
+              const seatCount = Math.floor((rowRadiusX * 2 * Math.PI) / 10);
+              
+              return (
+                <g key={`upper-row-${i}`}>
+                  {/* Seat Row Base */}
+                  <ellipse
+                    cx={stadiumSize.width / 2}
+                    cy={stadiumSize.height / 2}
+                    rx={rowRadiusX}
+                    ry={rowRadiusY}
+                    fill="#1F2937"
+                    fillOpacity={0.8}
+                    stroke="#374151"
+                    strokeWidth="1"
+                  />
+                  
+                  {/* Individual Seats */}
+                  {Array.from({ length: Math.min(seatCount, 24) }, (_, seatIndex) => {
+                    const angle = (seatIndex / seatCount) * Math.PI * 2;
+                    const x = stadiumSize.width / 2 + Math.cos(angle) * rowRadiusX * 0.8;
+                    const y = stadiumSize.height / 2 + Math.sin(angle) * rowRadiusY * 0.8;
+                    
+                    return (
+                      <rect
+                        key={`seat-upper-${i}-${seatIndex}`}
+                        x={x - 2.5}
+                        y={y - 1.5}
+                        width="5"
+                        height="3"
+                        fill={atmosphereColor}
+                        fillOpacity={0.9}
+                        stroke={tierColor}
+                        strokeWidth="0.5"
+                        rx="0.5"
+                      />
+                    );
+                  })}
+                </g>
+              );
+            })}
               
               {/* Center Field */}
               <ellipse
