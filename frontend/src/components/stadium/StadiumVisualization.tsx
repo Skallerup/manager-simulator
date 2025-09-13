@@ -225,25 +225,36 @@ const StadiumVisualization: React.FC<StadiumVisualizationProps> = ({
               />
             </svg>
 
-            {/* Floating Stats */}
+            {/* Prestige Indicator */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 }}
-              className="absolute -top-4 -right-4 bg-white rounded-full p-3 shadow-lg border-2"
+              className="absolute -top-2 -right-2 bg-white rounded-lg p-2 shadow-lg border-2"
               style={{ borderColor: tierColor }}
             >
-              <Star className="h-6 w-6" style={{ color: tierColor }} />
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4" style={{ color: tierColor }} />
+                <span className="text-xs font-semibold" style={{ color: tierColor }}>
+                  Prestige
+                </span>
+              </div>
             </motion.div>
 
+            {/* Home Advantage Indicator */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 1.0 }}
-              className="absolute -bottom-4 -left-4 bg-white rounded-full p-3 shadow-lg border-2"
+              className="absolute -bottom-2 -left-2 bg-white rounded-lg p-2 shadow-lg border-2"
               style={{ borderColor: atmosphereColor }}
             >
-              <Zap className="h-6 w-6" style={{ color: atmosphereColor }} />
+              <div className="flex items-center gap-1">
+                <Zap className="h-4 w-4" style={{ color: atmosphereColor }} />
+                <span className="text-xs font-semibold" style={{ color: atmosphereColor }}>
+                  Hjemmefordel
+                </span>
+              </div>
             </motion.div>
           </motion.div>
         </div>
@@ -277,10 +288,16 @@ const StadiumVisualization: React.FC<StadiumVisualizationProps> = ({
           </div>
           
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">
-              {prestige}%
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Star className="h-4 w-4 text-purple-600" />
+              <div className="text-2xl font-bold text-purple-600">
+                {prestige}%
+              </div>
             </div>
             <div className="text-sm text-gray-600">Prestige</div>
+            <div className="text-xs text-gray-500 mt-1">
+              Stadion status & renommé
+            </div>
           </div>
         </motion.div>
 
@@ -291,11 +308,19 @@ const StadiumVisualization: React.FC<StadiumVisualizationProps> = ({
           transition={{ duration: 0.6, delay: 1.4 }}
           className="mt-6 text-center"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-100 to-blue-100 rounded-full border-2 border-green-200">
-            <Zap className="h-5 w-5 text-green-600" />
-            <span className="font-semibold text-green-800">
-              Hjemmefordel: +{Math.round(homeAdvantage * 100)}%
-            </span>
+          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-green-100 to-blue-100 rounded-lg border-2 border-green-200 shadow-sm">
+            <div className="flex items-center gap-2">
+              <Zap className="h-6 w-6 text-green-600" />
+              <span className="font-semibold text-green-800 text-lg">
+                Hjemmefordel
+              </span>
+            </div>
+            <div className="text-2xl font-bold text-green-800">
+              +{Math.round(homeAdvantage * 100)}%
+            </div>
+            <div className="text-sm text-green-600">
+              (Baseret på atmosfære: {atmosphere}%)
+            </div>
           </div>
         </motion.div>
       </motion.div>
