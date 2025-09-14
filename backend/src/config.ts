@@ -8,7 +8,7 @@ const envSchema = z.object({
   ACCESS_TOKEN_TTL: z
     .string()
     .transform((v) => Number(v))
-    .default("900"),
+    .default("86400"),
   REFRESH_TOKEN_TTL: z
     .string()
     .transform((v) => Number(v))

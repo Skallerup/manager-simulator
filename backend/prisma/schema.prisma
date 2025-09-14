@@ -22,6 +22,7 @@ model User {
   teams         Team[]
   leagueMembers LeagueMember[]
   botMatches    BotMatch[]
+  trainingMatches TrainingMatch[]
 }
 
 model RefreshToken {
@@ -82,6 +83,8 @@ model Team {
   homeMatches Match[] @relation("HomeTeam")
   awayMatches Match[] @relation("AwayTeam")
   botMatches BotMatch[]
+  trainingMatchesAsUser TrainingMatch[] @relation("TrainingMatchUserTeam")
+  trainingMatchesAsOpponent TrainingMatch[] @relation("TrainingMatchOpponentTeam")
   
   // Transfer related
   transfersFrom Transfer[] @relation("TransferFrom")
@@ -256,6 +259,26 @@ model BotMatch {
   highlightsClips MatchHighlight[] @relation("BotMatchHighlights")
 }
 
+model TrainingMatch {
+  id            String      @id @default(cuid())
+  ownerId       String
+  userTeamId    String
+  opponentTeamId String
+  userScore     Int?        @default(0)
+  opponentScore Int?        @default(0)
+  status        MatchStatus @default(SCHEDULED)
+  events        String?     // JSON string of match events
+  highlights    String?     // JSON string of match highlights
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Relations
+  owner         User @relation(fields: [ownerId], references: [id])
+  userTeam      Team @relation("TrainingMatchUserTeam", fields: [userTeamId], references: [id])
+  opponentTeam  Team @relation("TrainingMatchOpponentTeam", fields: [opponentTeamId], references: [id])
+  highlightsClips MatchHighlight[] @relation("TrainingMatchHighlights")
+}
+
 model Transfer {
   id          String        @id @default(cuid())
   playerId    String
@@ -339,7 +362,8 @@ model MatchHighlight {
   createdAt   DateTime @default(now())
   
   // Relations
-  botMatch    BotMatch @relation("BotMatchHighlights", fields: [matchId], references: [id], onDelete: Cascade)
+  botMatch        BotMatch?        @relation("BotMatchHighlights", fields: [matchId], references: [id], onDelete: Cascade, map: "BotMatchHighlights_matchId_fkey")
+  trainingMatch   TrainingMatch?   @relation("TrainingMatchHighlights", fields: [matchId], references: [id], onDelete: Cascade, map: "TrainingMatchHighlights_matchId_fkey")
   
   @@index([matchId])
 }

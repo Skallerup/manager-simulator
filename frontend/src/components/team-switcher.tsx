@@ -46,9 +46,12 @@ export function TeamSwitcher({
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden">
                 <img
-                  src={activeTeam.logo}
+                  src={activeTeam.logo || "/avatars/default.svg"}
                   alt={`${activeTeam.name} logo`}
                   className="size-8 object-cover rounded-lg"
+                  onError={(e) => {
+                    e.currentTarget.src = "/avatars/default.svg";
+                  }}
                 />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -75,9 +78,12 @@ export function TeamSwitcher({
               >
                 <div className="flex size-6 items-center justify-center rounded-md border overflow-hidden">
                   <img
-                    src={team.logo}
+                    src={team.logo || "/avatars/default.svg"}
                     alt={`${team.name} logo`}
                     className="size-6 object-cover rounded-md"
+                    onError={(e) => {
+                      e.currentTarget.src = "/avatars/default.svg";
+                    }}
                   />
                 </div>
                 {team.name}

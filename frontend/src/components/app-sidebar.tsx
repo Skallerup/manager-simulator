@@ -15,6 +15,7 @@ import {
   Shield,
   UserCheck,
   Building2,
+  Zap,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -66,6 +67,11 @@ const getData = (t: any, isAdmin: boolean = false, isTestAccount: boolean = fals
       title: t('match'),
       url: "/match",
       icon: Gamepad2,
+    },
+    {
+      title: t('training'),
+      url: "/training",
+      icon: Zap,
     },
     {
       title: t('stadium'),

@@ -19,6 +19,7 @@ import { useTeams } from "../../hooks/useTeams";
 
 const createTeamSchema = z.object({
   name: z.string().min(1, "Team name is required").max(50),
+  logo: z.string().optional(),
 });
 
 type CreateTeamForm = z.infer<typeof createTeamSchema>;
@@ -45,7 +46,11 @@ export function CreateTeam({ leagueId, open, onOpenChange }: CreateTeamProps) {
   const onSubmit = async (data: CreateTeamForm) => {
     try {
       setIsSubmitting(true);
-      await createTeam({ name: data.name, leagueId });
+      await createTeam({ 
+        name: data.name, 
+        leagueId, 
+        logo: data.logo || "/avatars/default.svg" 
+      });
       reset();
       onOpenChange(false);
     } catch (error: unknown) {

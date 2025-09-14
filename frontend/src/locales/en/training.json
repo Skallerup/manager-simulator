@@ -1,0 +1,39 @@
+{
+  "title": "Training Matches",
+  "subtitle": "Play against other teams in your league to test your tactics",
+  "createMatch": {
+    "title": "Create Training Match",
+    "description": "Choose a team from your league to play against",
+    "selectOpponent": "Select opponent...",
+    "createButton": "Create Match",
+    "creating": "Creating..."
+  },
+  "currentMatch": {
+    "title": "Current Match",
+    "minute": "Minute",
+    "progress": "Progress",
+    "continue": "Continue",
+    "pause": "Pause",
+    "reset": "Reset",
+    "events": "Match Events",
+    "saved": "Match saved and simulated!"
+  },
+  "history": {
+    "title": "Training Matches",
+    "description": "Your previous and scheduled training matches",
+    "noMatches": "No training matches yet. Create your first match above!",
+    "start": "Start",
+    "vs": "vs"
+  },
+  "status": {
+    "scheduled": "Scheduled",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "badges": {
+    "rating": "Rating",
+    "formation": "Formation",
+    "bot": "Bot"
+  }
+}

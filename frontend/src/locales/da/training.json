@@ -1,0 +1,39 @@
+{
+  "title": "Træningskampe",
+  "subtitle": "Spil mod andre hold i din liga for at teste din taktik",
+  "createMatch": {
+    "title": "Opret Træningskamp",
+    "description": "Vælg et hold fra din liga at spille mod",
+    "selectOpponent": "Vælg modstander...",
+    "createButton": "Opret Kamp",
+    "creating": "Opretter..."
+  },
+  "currentMatch": {
+    "title": "Aktuel Kamp",
+    "minute": "Minut",
+    "progress": "Fremgang",
+    "continue": "Fortsæt",
+    "pause": "Pause",
+    "reset": "Nulstil",
+    "events": "Kampbegivenheder",
+    "saved": "Kampen er gemt og simuleret!"
+  },
+  "history": {
+    "title": "Træningskampe",
+    "description": "Dine tidligere og planlagte træningskampe",
+    "noMatches": "Ingen træningskampe endnu. Opret din første kamp ovenfor!",
+    "start": "Start",
+    "vs": "vs"
+  },
+  "status": {
+    "scheduled": "Planlagt",
+    "inProgress": "I gang",
+    "completed": "Færdig",
+    "cancelled": "Afbrudt"
+  },
+  "badges": {
+    "rating": "Rating",
+    "formation": "Formation",
+    "bot": "Bot"
+  }
+}

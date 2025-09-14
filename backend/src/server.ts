@@ -12,6 +12,7 @@ import matchRoutes from "./matches/routes";
 import transferRoutes from "./transfers/routes";
 import adminRoutes from "./admin/routes";
 import stadiumRoutes from "./stadium/routes";
+import trainingMatchRoutes from "./training-matches/routes";
 import { syncRoutes } from "./sync/routes";
 import seedRoutes from "./seed/routes";
 import { initializeSocket } from "./websocket/socket";
@@ -50,6 +51,7 @@ app.use("/api/matches", matchRoutes);
 app.use("/api/transfers", transferRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/stadium", stadiumRoutes);
+app.use("/api/training-matches", trainingMatchRoutes);
 app.use("/api/sync", syncRoutes);
 app.use("/api/seed", seedRoutes);
 

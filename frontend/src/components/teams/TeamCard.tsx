@@ -26,11 +26,23 @@ export function TeamCard({ team, onEdit, onDelete }: TeamCardProps) {
     <Card className="w-full">
       <CardHeader>
         <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg">{team.name}</CardTitle>
-            <CardDescription>
-              Owned by {team.owner?.name || team.owner?.email || 'Unknown'}
-            </CardDescription>
+          <div className="flex items-center gap-3">
+            <div className="flex size-12 items-center justify-center rounded-lg border overflow-hidden">
+              <img
+                src={team.logo || "/avatars/default.svg"}
+                alt={`${team.name} logo`}
+                className="size-12 object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/avatars/default.svg";
+                }}
+              />
+            </div>
+            <div>
+              <CardTitle className="text-lg">{team.name}</CardTitle>
+              <CardDescription>
+                Owned by {team.owner?.name || team.owner?.email || 'Unknown'}
+              </CardDescription>
+            </div>
           </div>
           {isOwner && <Badge variant="outline">Your Team</Badge>}
         </div>

@@ -73,7 +73,19 @@ export function verifyAccessToken(token: string) {
 }
 
 export function authenticateToken(req: any, res: any, next: any) {
-  const accessToken = req.cookies?.access_token as string | undefined;
+  let accessToken = req.cookies?.access_token as string | undefined;
+  
+  // If not found in cookies, try parsing from headers.cookie
+  if (!accessToken && req.headers.cookie) {
+    const cookieString = req.headers.cookie;
+    const cookies = cookieString.split(';').reduce((acc, cookie) => {
+      const [key, value] = cookie.trim().split('=');
+      acc[key] = value;
+      return acc;
+    }, {} as any);
+    accessToken = cookies.access_token;
+  }
+  
   if (!accessToken) {
     return res.status(401).json({ error: "Unauthenticated" });
   }

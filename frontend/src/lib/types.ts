@@ -37,6 +37,7 @@ export interface LeagueMember {
 export interface Team {
   id: string;
   name: string;
+  logo?: string;
   createdAt: string;
   updatedAt: string;
   owner: User;
@@ -79,8 +80,10 @@ export interface UpdateLeagueData {
 export interface CreateTeamData {
   name: string;
   leagueId: string;
+  logo?: string;
 }
 
 export interface UpdateTeamData {
   name?: string;
+  logo?: string;
 }
