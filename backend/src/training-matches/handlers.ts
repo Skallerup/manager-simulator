@@ -315,12 +315,12 @@ export const simulateTrainingMatch = async (req: Request<{ id: string }, Simulat
       events: result.events,
       highlights: result.highlights,
       stats: {
-        userPossession: result.stats.homePossession,
-        opponentPossession: result.stats.awayPossession,
-        userShots: result.stats.homeShots,
-        opponentShots: result.stats.awayShots,
-        userShotsOnTarget: result.stats.homeShotsOnTarget,
-        opponentShotsOnTarget: result.stats.awayShotsOnTarget
+        userPossession: result.possession?.home || 0,
+        opponentPossession: result.possession?.away || 0,
+        userShots: result.shots?.home || 0,
+        opponentShots: result.shots?.away || 0,
+        userShotsOnTarget: result.shotsOnTarget?.home || 0,
+        opponentShotsOnTarget: result.shotsOnTarget?.away || 0
       }
     };
 

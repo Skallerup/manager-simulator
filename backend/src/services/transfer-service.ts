@@ -302,7 +302,7 @@ export class TransferService {
         await tx.team.update({
           where: { id: buyerTeamId },
           data: {
-            budget: buyerTeam.budget - transfer.askingPrice,
+            budget: buyerTeam.budget - BigInt(transfer.askingPrice),
           },
         });
 
@@ -316,7 +316,7 @@ export class TransferService {
             await tx.team.update({
               where: { id: transfer.fromTeamId },
               data: {
-                budget: sellerTeam.budget + transfer.askingPrice,
+                budget: sellerTeam.budget + BigInt(transfer.askingPrice),
               },
             });
           }
