@@ -356,10 +356,14 @@ async function main() {
 
   // Clear existing data
   console.log("🧹 Clearing existing data...");
-  // await prisma.draftPick.deleteMany(); // Removed - no longer exists
+  // Delete in correct order to avoid foreign key constraints
   await prisma.teamPlayer.deleteMany();
   await prisma.transfer.deleteMany();
   await prisma.botMatch.deleteMany();
+  await prisma.trainingMatch.deleteMany();
+  await prisma.stadiumFacility.deleteMany();
+  await prisma.stadiumUpgrade.deleteMany();
+  await prisma.stadium.deleteMany();
   await prisma.team.deleteMany();
   await prisma.leagueMember.deleteMany();
   await prisma.league.deleteMany();

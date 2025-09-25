@@ -24,10 +24,11 @@ const PORT = config.port;
 app.use(
   cors({
     origin: [
-      config.frontendOrigin, 
+      config.frontendOrigin,
       "http://localhost:3001",
       "https://manager-simulator-frontend.vercel.app",
-      "https://manager-simulator-frontend-oghwy3jfu.vercel.app"
+      "https://manager-simulator-frontend-oghwy3jfu.vercel.app",
+      "https://manager-simulator-frontend-cwp5fptyf.vercel.app"
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
