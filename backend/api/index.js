@@ -52,8 +52,13 @@ app.post("/auth/test", (req, res) => {
 // Auth endpoints for frontend
 app.get("/auth/me", (req, res) => {
   res.json({ 
-    user: null, 
-    message: "Not authenticated - please login first" 
+    user: {
+      id: "1",
+      email: "test@example.com",
+      name: "Test User",
+      createdAt: new Date().toISOString()
+    }, 
+    message: "User authenticated successfully" 
   });
 });
 
@@ -67,6 +72,19 @@ app.post("/auth/login", (req, res) => {
   res.json({ 
     message: "Login endpoint - not implemented yet",
     body: req.body 
+  });
+});
+
+// Team endpoints
+app.get("/api/teams/my-team", (req, res) => {
+  res.json({
+    team: {
+      id: "1",
+      name: "Test Team",
+      logo: "/avatars/default.svg",
+      budget: 1000000,
+      leagueId: "1"
+    }
   });
 });
 
