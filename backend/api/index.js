@@ -160,15 +160,7 @@ app.post("/api/teams", (req, res) => {
 // Matches endpoints
 app.get("/api/matches/bot", (req, res) => {
   res.json({
-    matches: [
-      {
-        id: "1",
-        opponent: "Bot Team 1",
-        result: "W",
-        score: "2-1",
-        date: new Date().toISOString()
-      }
-    ]
+    matches: []
   });
 });
 
