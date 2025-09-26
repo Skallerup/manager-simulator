@@ -26,6 +26,8 @@ app.use(
     origin: [
       config.frontendOrigin,
       "http://localhost:3001",
+      "https://app.martinskallerup.dk",
+      "https://martinskallerup.dk",
       /^https:\/\/.*\.vercel\.app$/
     ],
     credentials: true,
