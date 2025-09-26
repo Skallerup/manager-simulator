@@ -51,15 +51,25 @@ app.post("/auth/test", (req, res) => {
 
 // Auth endpoints for frontend
 app.get("/auth/me", (req, res) => {
-  res.json({ 
-    user: {
-      id: "1",
-      email: "test@example.com",
-      name: "Test User",
-      createdAt: new Date().toISOString()
-    }, 
-    message: "User authenticated successfully" 
-  });
+  // Check if user is actually authenticated (simplified for now)
+  const isAuthenticated = req.headers.authorization || req.headers.cookie;
+  
+  if (isAuthenticated) {
+    res.json({ 
+      user: {
+        id: "1",
+        email: "test@example.com",
+        name: "Test User",
+        createdAt: new Date().toISOString()
+      }, 
+      message: "User authenticated successfully" 
+    });
+  } else {
+    res.status(401).json({ 
+      user: null, 
+      message: "Not authenticated - please login first" 
+    });
+  }
 });
 
 app.post("/auth/refresh", (req, res) => {
@@ -72,6 +82,12 @@ app.post("/auth/login", (req, res) => {
   res.json({ 
     message: "Login endpoint - not implemented yet",
     body: req.body 
+  });
+});
+
+app.post("/auth/logout", (req, res) => {
+  res.json({ 
+    message: "Logout successful" 
   });
 });
 
