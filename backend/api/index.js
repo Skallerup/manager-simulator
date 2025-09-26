@@ -182,14 +182,7 @@ app.get("/api/dashboard", (req, res) => {
       winRate: 0
     },
     recentActivity: [],
-    upcomingEvents: [
-      {
-        id: "1",
-        title: "Næste ligakamp",
-        date: "Snart",
-        type: "match"
-      }
-    ]
+    upcomingEvents: []
   });
 });
 
