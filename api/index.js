@@ -36,7 +36,7 @@ app.use(express.json());
 
 // Health check
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", version: "2.0" });
+  res.json({ status: "ok", version: "3.0" });
 });
 
 // Test endpoint
@@ -49,27 +49,9 @@ app.post("/auth/test", (req, res) => {
   res.json({ message: "Auth test endpoint working", body: req.body });
 });
 
-// Import and use routes - temporarily commented out for testing
-// const authRoutes = require('../dist/auth/routes.js');
-// const leagueRoutes = require('../dist/leagues/routes.js');
-// const teamRoutes = require('../dist/teams/routes.js');
-// const matchRoutes = require('../dist/matches/routes.js');
-// const transferRoutes = require('../dist/transfers/routes.js');
-// const adminRoutes = require('../dist/admin/routes.js');
-// const stadiumRoutes = require('../dist/stadium/routes.js');
-// const trainingMatchRoutes = require('../dist/training-matches/routes.js');
-// const syncRoutes = require('../dist/sync/routes.js');
-// const seedRoutes = require('../dist/seed/routes.js');
-
-// app.use("/auth", authRoutes);
-// app.use("/api/leagues", leagueRoutes);
-// app.use("/api/teams", teamRoutes);
-// app.use("/api/matches", matchRoutes);
-// app.use("/api/transfers", transferRoutes);
-// app.use("/api/admin", adminRoutes);
-// app.use("/api/stadium", stadiumRoutes);
-// app.use("/api/training-matches", trainingMatchRoutes);
-// app.use("/api/sync", syncRoutes);
-// app.use("/api/seed", seedRoutes);
+// Root endpoint
+app.get("/", (req, res) => {
+  res.json({ message: "Manager Simulator Backend API", version: "3.0" });
+});
 
 module.exports = app;
