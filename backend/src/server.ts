@@ -32,7 +32,16 @@ app.use(
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    allowedHeaders: [
+      "Content-Type", 
+      "Authorization", 
+      "Cookie",
+      "Accept",
+      "Origin",
+      "X-Requested-With",
+      "Access-Control-Request-Method",
+      "Access-Control-Request-Headers"
+    ],
   })
 );
 app.use(cookieParser());
@@ -63,10 +72,19 @@ app.use("/api/training-matches", trainingMatchRoutes);
 app.use("/api/sync", syncRoutes);
 app.use("/api/seed", seedRoutes);
 
-// Initialize WebSocket
-initializeSocket(server);
+// Initialize WebSocket (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  initializeSocket(server);
+}
 
-server.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Backend server running on http://localhost:${PORT}`);
-});
+// For Vercel deployment
+if (process.env.NODE_ENV === 'production') {
+  // Export for Vercel
+  module.exports = app;
+} else {
+  // For local development
+  server.listen(PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Backend server running on http://localhost:${PORT}`);
+  });
+}
