@@ -195,7 +195,7 @@ app.get("/api/dashboard", (req, res) => {
 
 // Root endpoint
 app.get("/", (req, res) => {
-  res.json({ message: "Manager Simulator Backend API", version: "4.0" });
+  res.json({ message: "Manager Simulator Backend API", version: "5.0" });
 });
 
 module.exports = app;
