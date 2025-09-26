@@ -82,12 +82,13 @@ app.post("/auth/login", (req, res) => {
   // Simple login implementation for testing
   const { email, password } = req.body;
   
-  if (email === "test@example.com" && password === "12345678") {
+  // Accept any email/password for testing
+  if (email && password) {
     res.json({ 
       user: {
         id: "1",
-        email: "test@example.com",
-        name: "Test User",
+        email: email,
+        name: email.split('@')[0], // Use email prefix as name
         createdAt: new Date().toISOString()
       },
       message: "Login successful"
