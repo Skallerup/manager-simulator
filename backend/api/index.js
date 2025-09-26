@@ -79,15 +79,42 @@ app.post("/auth/refresh", (req, res) => {
 });
 
 app.post("/auth/login", (req, res) => {
-  res.json({ 
-    message: "Login endpoint - not implemented yet",
-    body: req.body 
-  });
+  // Simple login implementation for testing
+  const { email, password } = req.body;
+  
+  if (email === "test@example.com" && password === "12345678") {
+    res.json({ 
+      user: {
+        id: "1",
+        email: "test@example.com",
+        name: "Test User",
+        createdAt: new Date().toISOString()
+      },
+      message: "Login successful"
+    });
+  } else {
+    res.status(401).json({ 
+      message: "Invalid credentials" 
+    });
+  }
 });
 
 app.post("/auth/logout", (req, res) => {
   res.json({ 
     message: "Logout successful" 
+  });
+});
+
+// League endpoints
+app.get("/api/leagues/user/current", (req, res) => {
+  res.json({
+    leagues: [
+      {
+        id: "1",
+        name: "Test League",
+        description: "A test league for development"
+      }
+    ]
   });
 });
 
@@ -101,6 +128,19 @@ app.get("/api/teams/my-team", (req, res) => {
       budget: 1000000,
       leagueId: "1"
     }
+  });
+});
+
+app.post("/api/teams", (req, res) => {
+  res.json({
+    team: {
+      id: "2",
+      name: req.body.name || "New Team",
+      logo: "/avatars/default.svg",
+      budget: 1000000,
+      leagueId: req.body.leagueId || "1"
+    },
+    message: "Team created successfully"
   });
 });
 
