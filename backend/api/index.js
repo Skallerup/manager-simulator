@@ -105,6 +105,27 @@ app.post("/auth/logout", (req, res) => {
   });
 });
 
+app.post("/auth/register", (req, res) => {
+  // Simple registration implementation for testing
+  const { email, password, name } = req.body;
+  
+  if (email && password && name) {
+    res.json({ 
+      user: {
+        id: "2",
+        email: email,
+        name: name,
+        createdAt: new Date().toISOString()
+      },
+      message: "Registration successful"
+    });
+  } else {
+    res.status(400).json({ 
+      message: "Missing required fields" 
+    });
+  }
+});
+
 // League endpoints
 app.get("/api/leagues/user/current", (req, res) => {
   res.json({
