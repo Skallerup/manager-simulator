@@ -45,16 +45,16 @@ app.get("/api/hello", (req, res) => {
 });
 
 // Import and use routes
-const authRoutes = require('../dist/auth/routes');
-const leagueRoutes = require('../dist/leagues/routes');
-const teamRoutes = require('../dist/teams/routes');
-const matchRoutes = require('../dist/matches/routes');
-const transferRoutes = require('../dist/transfers/routes');
-const adminRoutes = require('../dist/admin/routes');
-const stadiumRoutes = require('../dist/stadium/routes');
-const trainingMatchRoutes = require('../dist/training-matches/routes');
-const syncRoutes = require('../dist/sync/routes');
-const seedRoutes = require('../dist/seed/routes');
+const authRoutes = require('../dist/auth/routes.js');
+const leagueRoutes = require('../dist/leagues/routes.js');
+const teamRoutes = require('../dist/teams/routes.js');
+const matchRoutes = require('../dist/matches/routes.js');
+const transferRoutes = require('../dist/transfers/routes.js');
+const adminRoutes = require('../dist/admin/routes.js');
+const stadiumRoutes = require('../dist/stadium/routes.js');
+const trainingMatchRoutes = require('../dist/training-matches/routes.js');
+const syncRoutes = require('../dist/sync/routes.js');
+const seedRoutes = require('../dist/seed/routes.js');
 
 app.use("/auth", authRoutes);
 app.use("/api/leagues", leagueRoutes);
