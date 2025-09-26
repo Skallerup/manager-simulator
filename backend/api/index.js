@@ -36,7 +36,7 @@ app.use(express.json());
 
 // Health check
 app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+  res.json({ status: "ok", version: "2.0" });
 });
 
 // Test endpoint
