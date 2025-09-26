@@ -44,27 +44,32 @@ app.get("/api/hello", (req, res) => {
   res.json({ message: "Welcome to Manager Simulator Backend!" });
 });
 
-// Import and use routes
-const authRoutes = require('../dist/auth/routes.js');
-const leagueRoutes = require('../dist/leagues/routes.js');
-const teamRoutes = require('../dist/teams/routes.js');
-const matchRoutes = require('../dist/matches/routes.js');
-const transferRoutes = require('../dist/transfers/routes.js');
-const adminRoutes = require('../dist/admin/routes.js');
-const stadiumRoutes = require('../dist/stadium/routes.js');
-const trainingMatchRoutes = require('../dist/training-matches/routes.js');
-const syncRoutes = require('../dist/sync/routes.js');
-const seedRoutes = require('../dist/seed/routes.js');
+// Simple auth test endpoint
+app.post("/auth/test", (req, res) => {
+  res.json({ message: "Auth test endpoint working", body: req.body });
+});
 
-app.use("/auth", authRoutes);
-app.use("/api/leagues", leagueRoutes);
-app.use("/api/teams", teamRoutes);
-app.use("/api/matches", matchRoutes);
-app.use("/api/transfers", transferRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/stadium", stadiumRoutes);
-app.use("/api/training-matches", trainingMatchRoutes);
-app.use("/api/sync", syncRoutes);
-app.use("/api/seed", seedRoutes);
+// Import and use routes - temporarily commented out for testing
+// const authRoutes = require('../dist/auth/routes.js');
+// const leagueRoutes = require('../dist/leagues/routes.js');
+// const teamRoutes = require('../dist/teams/routes.js');
+// const matchRoutes = require('../dist/matches/routes.js');
+// const transferRoutes = require('../dist/transfers/routes.js');
+// const adminRoutes = require('../dist/admin/routes.js');
+// const stadiumRoutes = require('../dist/stadium/routes.js');
+// const trainingMatchRoutes = require('../dist/training-matches/routes.js');
+// const syncRoutes = require('../dist/sync/routes.js');
+// const seedRoutes = require('../dist/seed/routes.js');
+
+// app.use("/auth", authRoutes);
+// app.use("/api/leagues", leagueRoutes);
+// app.use("/api/teams", teamRoutes);
+// app.use("/api/matches", matchRoutes);
+// app.use("/api/transfers", transferRoutes);
+// app.use("/api/admin", adminRoutes);
+// app.use("/api/stadium", stadiumRoutes);
+// app.use("/api/training-matches", trainingMatchRoutes);
+// app.use("/api/sync", syncRoutes);
+// app.use("/api/seed", seedRoutes);
 
 module.exports = app;
