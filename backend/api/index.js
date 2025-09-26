@@ -49,6 +49,27 @@ app.post("/auth/test", (req, res) => {
   res.json({ message: "Auth test endpoint working", body: req.body });
 });
 
+// Auth endpoints for frontend
+app.get("/auth/me", (req, res) => {
+  res.json({ 
+    user: null, 
+    message: "Not authenticated - please login first" 
+  });
+});
+
+app.post("/auth/refresh", (req, res) => {
+  res.json({ 
+    message: "Refresh token endpoint - not implemented yet" 
+  });
+});
+
+app.post("/auth/login", (req, res) => {
+  res.json({ 
+    message: "Login endpoint - not implemented yet",
+    body: req.body 
+  });
+});
+
 // Root endpoint
 app.get("/", (req, res) => {
   res.json({ message: "Manager Simulator Backend API", version: "4.0" });
