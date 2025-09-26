@@ -166,6 +166,42 @@ app.post("/api/teams", (req, res) => {
   });
 });
 
+// Matches endpoints
+app.get("/api/matches/bot", (req, res) => {
+  res.json({
+    matches: [
+      {
+        id: "1",
+        opponent: "Bot Team 1",
+        result: "W",
+        score: "2-1",
+        date: new Date().toISOString()
+      }
+    ]
+  });
+});
+
+// Dashboard data endpoint
+app.get("/api/dashboard", (req, res) => {
+  res.json({
+    stats: {
+      wins: 0,
+      losses: 0,
+      matchesPlayed: 0,
+      winRate: 0
+    },
+    recentActivity: [],
+    upcomingEvents: [
+      {
+        id: "1",
+        title: "Næste ligakamp",
+        date: "Snart",
+        type: "match"
+      }
+    ]
+  });
+});
+
 // Root endpoint
 app.get("/", (req, res) => {
   res.json({ message: "Manager Simulator Backend API", version: "4.0" });
