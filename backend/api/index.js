@@ -208,7 +208,37 @@ app.get("/api/teams/my-team", (req, res) => {
       name: "Test Team",
       logo: "/avatars/default.svg",
       budget: 1000000,
-      leagueId: "1"
+      leagueId: "1",
+      players: [
+        {
+          id: "1",
+          name: "Test Player 1",
+          position: "GK",
+          rating: 75,
+          age: 25
+        },
+        {
+          id: "2", 
+          name: "Test Player 2",
+          position: "DEF",
+          rating: 80,
+          age: 27
+        },
+        {
+          id: "3",
+          name: "Test Player 3", 
+          position: "MID",
+          rating: 85,
+          age: 24
+        },
+        {
+          id: "4",
+          name: "Test Player 4",
+          position: "FWD", 
+          rating: 90,
+          age: 26
+        }
+      ]
     }
   });
 });
