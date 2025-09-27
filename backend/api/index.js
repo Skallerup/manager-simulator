@@ -124,6 +124,14 @@ app.post("/auth/login", (req, res) => {
   
   // Accept any email/password for testing
   if (email && password) {
+    // Set access token cookie
+    res.cookie('access_token', 'fake-access-token-' + Date.now(), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+    
     res.json({ 
       user: {
         id: "1",
