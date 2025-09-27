@@ -220,8 +220,15 @@ app.get("/api/teams/my-team", (req, res) => {
         position: "GK",
         rating: 75,
         age: 25,
-        isStarter: false,
-        isCaptain: false
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "gk",
+        speed: 60,
+        shooting: 40,
+        passing: 70,
+        defending: 80,
+        stamina: 85,
+        reflexes: 90
       },
       {
         id: "2", 
@@ -229,8 +236,15 @@ app.get("/api/teams/my-team", (req, res) => {
         position: "DEF",
         rating: 80,
         age: 27,
-        isStarter: false,
-        isCaptain: false
+        isStarter: true,
+        isCaptain: true,
+        formationPosition: "cb1",
+        speed: 70,
+        shooting: 50,
+        passing: 75,
+        defending: 90,
+        stamina: 80,
+        reflexes: 60
       },
       {
         id: "3",
@@ -238,8 +252,15 @@ app.get("/api/teams/my-team", (req, res) => {
         position: "MID",
         rating: 85,
         age: 24,
-        isStarter: false,
-        isCaptain: false
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "cm1",
+        speed: 80,
+        shooting: 70,
+        passing: 90,
+        defending: 75,
+        stamina: 85,
+        reflexes: 65
       },
       {
         id: "4",
@@ -247,8 +268,15 @@ app.get("/api/teams/my-team", (req, res) => {
         position: "FWD", 
         rating: 90,
         age: 26,
-        isStarter: false,
-        isCaptain: false
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "st1",
+        speed: 90,
+        shooting: 95,
+        passing: 80,
+        defending: 40,
+        stamina: 85,
+        reflexes: 70
       }
     ]
   });
