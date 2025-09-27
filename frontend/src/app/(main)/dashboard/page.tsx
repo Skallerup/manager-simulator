@@ -51,7 +51,7 @@ export default function Dashboard() {
 
         // Fetch match history
         const matches = await apiFetch('/api/matches/bot');
-        setMatchHistory(matches || []);
+        setMatchHistory(matches?.matches || []);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
       } finally {
