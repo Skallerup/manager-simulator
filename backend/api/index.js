@@ -286,6 +286,49 @@ app.get("/api/dashboard", (req, res) => {
   });
 });
 
+// Transfers endpoints
+app.get("/api/transfers/available", (req, res) => {
+  console.log("🔍 TRANSFERS/AVAILABLE - Headers:", req.headers);
+  console.log("🔍 TRANSFERS/AVAILABLE - Origin:", req.headers.origin);
+  
+  res.json({
+    transfers: [
+      {
+        id: "1",
+        player: {
+          id: "1",
+          name: "Available Player 1",
+          position: "MID",
+          rating: 80,
+          age: 25
+        },
+        askingPrice: 5000000,
+        seller: "Test Club"
+      },
+      {
+        id: "2", 
+        player: {
+          id: "2",
+          name: "Available Player 2",
+          position: "FWD",
+          rating: 85,
+          age: 23
+        },
+        askingPrice: 8000000,
+        seller: "Another Club"
+      }
+    ]
+  });
+});
+
+app.get("/api/transfers/my-transfers", (req, res) => {
+  console.log("🔍 TRANSFERS/MY-TRANSFERS - Headers:", req.headers);
+  
+  res.json({
+    transfers: []
+  });
+});
+
 // Root endpoint
 app.get("/", (req, res) => {
   console.log("🔍 ROOT - Headers:", req.headers);
