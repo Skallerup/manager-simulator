@@ -73,7 +73,23 @@ app.get("/auth/me", (req, res) => {
   console.log("🔍 AUTH/ME - Origin:", req.headers.origin);
   console.log("🔍 AUTH/ME - User-Agent:", req.headers['user-agent']);
   
-  // Always return authenticated user for testing
+  // Check if user has valid authentication
+  const hasValidAuth = req.cookies && req.cookies.access_token;
+  
+  if (!hasValidAuth) {
+    console.log("🔍 AUTH/ME - No valid authentication, returning 401");
+    return res.status(401).json({ 
+      message: "Unauthenticated",
+      debug: {
+        headers: req.headers,
+        cookies: req.cookies,
+        origin: req.headers.origin,
+        timestamp: new Date().toISOString()
+      }
+    });
+  }
+  
+  // Return authenticated user
   res.json({ 
     user: {
       id: "1",
