@@ -6,6 +6,14 @@ const cookieParser = require('cookie-parser');
 const app = express();
 
 // CORS configuration
+app.use((req, res, next) => {
+  console.log("🔍 CORS MIDDLEWARE - Request Origin:", req.headers.origin);
+  console.log("🔍 CORS MIDDLEWARE - Request Method:", req.method);
+  console.log("🔍 CORS MIDDLEWARE - Request Headers:", req.headers);
+  console.log("🔍 CORS MIDDLEWARE - FRONTEND_ORIGIN env:", process.env.FRONTEND_ORIGIN);
+  next();
+});
+
 app.use(
   cors({
     origin: [
@@ -36,7 +44,16 @@ app.use(express.json());
 
 // Health check
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", version: "4.0" });
+  console.log("🔍 HEALTH CHECK - Headers:", req.headers);
+  console.log("🔍 HEALTH CHECK - Origin:", req.headers.origin);
+  console.log("🔍 HEALTH CHECK - User-Agent:", req.headers['user-agent']);
+  res.json({ 
+    status: "ok", 
+    version: "6.0",
+    timestamp: new Date().toISOString(),
+    headers: req.headers,
+    origin: req.headers.origin
+  });
 });
 
 // Test endpoint
@@ -51,6 +68,11 @@ app.post("/auth/test", (req, res) => {
 
 // Auth endpoints for frontend
 app.get("/auth/me", (req, res) => {
+  console.log("🔍 AUTH/ME - Headers:", req.headers);
+  console.log("🔍 AUTH/ME - Cookies:", req.cookies);
+  console.log("🔍 AUTH/ME - Origin:", req.headers.origin);
+  console.log("🔍 AUTH/ME - User-Agent:", req.headers['user-agent']);
+  
   // Always return authenticated user for testing
   res.json({ 
     user: {
@@ -59,7 +81,13 @@ app.get("/auth/me", (req, res) => {
       name: "skallerup+5",
       createdAt: new Date().toISOString()
     }, 
-    message: "User authenticated successfully" 
+    message: "User authenticated successfully",
+    debug: {
+      headers: req.headers,
+      cookies: req.cookies,
+      origin: req.headers.origin,
+      timestamp: new Date().toISOString()
+    }
   });
 });
 
@@ -70,6 +98,11 @@ app.post("/auth/refresh", (req, res) => {
 });
 
 app.post("/auth/login", (req, res) => {
+  console.log("🔍 AUTH/LOGIN - Headers:", req.headers);
+  console.log("🔍 AUTH/LOGIN - Body:", req.body);
+  console.log("🔍 AUTH/LOGIN - Origin:", req.headers.origin);
+  console.log("🔍 AUTH/LOGIN - User-Agent:", req.headers['user-agent']);
+  
   // Simple login implementation for testing
   const { email, password } = req.body;
   
@@ -82,11 +115,23 @@ app.post("/auth/login", (req, res) => {
         name: email.split('@')[0], // Use email prefix as name
         createdAt: new Date().toISOString()
       },
-      message: "Login successful"
+      message: "Login successful",
+      debug: {
+        headers: req.headers,
+        body: req.body,
+        origin: req.headers.origin,
+        timestamp: new Date().toISOString()
+      }
     });
   } else {
     res.status(401).json({ 
-      message: "Invalid credentials" 
+      message: "Invalid credentials",
+      debug: {
+        headers: req.headers,
+        body: req.body,
+        origin: req.headers.origin,
+        timestamp: new Date().toISOString()
+      }
     });
   }
 });
@@ -166,6 +211,10 @@ app.get("/api/matches/bot", (req, res) => {
 
 // Dashboard data endpoint
 app.get("/api/dashboard", (req, res) => {
+  console.log("🔍 DASHBOARD - Headers:", req.headers);
+  console.log("🔍 DASHBOARD - Origin:", req.headers.origin);
+  console.log("🔍 DASHBOARD - User-Agent:", req.headers['user-agent']);
+  
   res.json({
     stats: {
       wins: 0,
@@ -174,13 +223,30 @@ app.get("/api/dashboard", (req, res) => {
       winRate: 0
     },
     recentActivity: [],
-    upcomingEvents: []
+    upcomingEvents: [],
+    debug: {
+      headers: req.headers,
+      origin: req.headers.origin,
+      timestamp: new Date().toISOString()
+    }
   });
 });
 
 // Root endpoint
 app.get("/", (req, res) => {
-  res.json({ message: "Manager Simulator Backend API", version: "5.0" });
+  console.log("🔍 ROOT - Headers:", req.headers);
+  console.log("🔍 ROOT - Origin:", req.headers.origin);
+  console.log("🔍 ROOT - User-Agent:", req.headers['user-agent']);
+  
+  res.json({ 
+    message: "Manager Simulator Backend API", 
+    version: "6.0",
+    debug: {
+      headers: req.headers,
+      origin: req.headers.origin,
+      timestamp: new Date().toISOString()
+    }
+  });
 });
 
 module.exports = app;
