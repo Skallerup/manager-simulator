@@ -202,6 +202,9 @@ app.get("/api/leagues/user/current", (req, res) => {
 
 // Team endpoints
 app.get("/api/teams/my-team", (req, res) => {
+  console.log("🔍 TEAMS/MY-TEAM - Headers:", req.headers);
+  console.log("🔍 TEAMS/MY-TEAM - Origin:", req.headers.origin);
+  
   res.json({
     team: {
       id: "1",
@@ -239,7 +242,37 @@ app.get("/api/teams/my-team", (req, res) => {
           age: 26
         }
       ]
-    }
+    },
+    players: [
+      {
+        id: "1",
+        name: "Test Player 1",
+        position: "GK",
+        rating: 75,
+        age: 25
+      },
+      {
+        id: "2", 
+        name: "Test Player 2",
+        position: "DEF",
+        rating: 80,
+        age: 27
+      },
+      {
+        id: "3",
+        name: "Test Player 3", 
+        position: "MID",
+        rating: 85,
+        age: 24
+      },
+      {
+        id: "4",
+        name: "Test Player 4",
+        position: "FWD", 
+        rating: 90,
+        age: 26
+      }
+    ]
   });
 });
 
