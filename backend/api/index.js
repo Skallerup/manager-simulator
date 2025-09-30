@@ -24,7 +24,7 @@ app.use(
       /^https:\/\/.*\.vercel\.app$/
     ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "Content-Type", 
       "Authorization", 
@@ -185,6 +185,27 @@ app.post("/auth/register", (req, res) => {
       message: "Missing required fields" 
     });
   }
+});
+
+// Profile endpoints
+app.patch("/auth/profile", (req, res) => {
+  console.log("🔍 AUTH/PROFILE (PATCH) - Headers:", req.headers);
+  console.log("🔍 AUTH/PROFILE (PATCH) - Body:", req.body);
+  console.log("🔍 AUTH/PROFILE (PATCH) - Origin:", req.headers.origin);
+
+  const { name, email } = req.body || {};
+
+  // Echo back updated user; in real app we'd persist to DB
+  res.json({
+    success: true,
+    user: {
+      id: "1",
+      name: name || "Martin Skallerup",
+      email: email || "skallerup+5@gmail.com",
+      updatedAt: new Date().toISOString(),
+    },
+    message: "Profile updated",
+  });
 });
 
 // League endpoints
