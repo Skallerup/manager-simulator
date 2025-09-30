@@ -524,32 +524,8 @@ app.get("/api/transfers/available", (req, res) => {
   console.log("🔍 TRANSFERS/AVAILABLE - Headers:", req.headers);
   console.log("🔍 TRANSFERS/AVAILABLE - Origin:", req.headers.origin);
   
-  res.json([
-    {
-      id: "1",
-      player: {
-        id: "1",
-        name: "Available Player 1",
-        position: "MIDFIELDER",
-        rating: 80,
-        age: 25
-      },
-      askingPrice: 5000000,
-      seller: "Test Club"
-    },
-    {
-      id: "2", 
-      player: {
-        id: "2",
-        name: "Available Player 2",
-        position: "ATTACKER",
-        rating: 85,
-        age: 23
-      },
-      askingPrice: 8000000,
-      seller: "Another Club"
-    }
-  ]);
+  // Return empty array - no available transfers
+  res.json([]);
 });
 
 // Frontend expects "/api/transfers/my-team" returning an array
@@ -562,44 +538,24 @@ app.get("/api/transfers/free-transfer", (req, res) => {
   console.log("🔍 TRANSFERS/FREE-TRANSFER - Headers:", req.headers);
   console.log("🔍 TRANSFERS/FREE-TRANSFER - Origin:", req.headers.origin);
   
-  res.json([
-    {
-      id: "free1",
-      player: {
-        id: "free1",
-        name: "Erik Hansen",
-        position: "MIDFIELDER",
-        rating: 75,
-        age: 22
-      },
-      askingPrice: 0,
-      seller: "Free Agent"
-    },
-    {
-      id: "free2", 
-      player: {
-        id: "free2",
-        name: "Peter Nielsen",
-        position: "DEFENDER",
-        rating: 72,
-        age: 24
-      },
-      askingPrice: 0,
-      seller: "Free Agent"
-    },
-    {
-      id: "free3",
-      player: {
-        id: "free3",
-        name: "Anders Larsen",
-        position: "ATTACKER",
-        rating: 78,
-        age: 21
-      },
-      askingPrice: 0,
-      seller: "Free Agent"
-    }
-  ]);
+  // Return empty array - no free transfers
+  res.json([]);
+});
+
+// Fire player endpoint
+app.delete("/api/transfers/fire/:id", (req, res) => {
+  console.log("🔍 TRANSFERS/FIRE - Headers:", req.headers);
+  console.log("🔍 TRANSFERS/FIRE - Player ID:", req.params.id);
+  console.log("🔍 TRANSFERS/FIRE - Origin:", req.headers.origin);
+  
+  const playerId = req.params.id;
+  
+  // For now, just return success - in real implementation would remove player from team
+  res.json({
+    success: true,
+    message: `Player ${playerId} fired successfully`,
+    playerId: playerId
+  });
 });
 
 // Root endpoint
