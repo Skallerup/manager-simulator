@@ -89,21 +89,16 @@ app.get("/auth/me", (req, res) => {
     });
   }
   
-  // Return authenticated user
-  res.json({ 
-    user: {
-      id: "1",
-      email: "skallerup+5@gmail.com",
-      name: "Martin Skallerup",
-      createdAt: new Date().toISOString()
-    }, 
-    message: "User authenticated successfully",
-    debug: {
-      headers: req.headers,
-      cookies: req.cookies,
-      origin: req.headers.origin,
-      timestamp: new Date().toISOString()
-    }
+  // Build user from cookies (so profile updates persist)
+  const cookieName = req.cookies.user_name || "Martin Skallerup";
+  const cookieEmail = req.cookies.user_email || "skallerup+5@gmail.com";
+
+  // Return user object directly (frontend expects the raw user object)
+  res.json({
+    id: "1",
+    email: cookieEmail,
+    name: cookieName,
+    createdAt: new Date().toISOString(),
   });
 });
 
@@ -124,28 +119,23 @@ app.post("/auth/login", (req, res) => {
   
   // Accept any email/password for testing
   if (email && password) {
-    // Set access token cookie
+    // Set access token cookie and basic user cookies
     res.cookie('access_token', 'fake-access-token-' + Date.now(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
+    res.cookie('user_email', email, { sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000 });
+    // Derive a friendly name from email if no profile yet
+    const derivedName = (email.split('@')[0] || 'Martin').replace(/\W+/g, ' ');
+    res.cookie('user_name', derivedName, { sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000 });
     
-    res.json({ 
-      user: {
-        id: "1",
-        email: email,
-        name: "Martin Skallerup",
-        createdAt: new Date().toISOString()
-      },
-      message: "Login successful",
-      debug: {
-        headers: req.headers,
-        body: req.body,
-        origin: req.headers.origin,
-        timestamp: new Date().toISOString()
-      }
+    res.json({
+      id: "1",
+      email,
+      name: derivedName,
+      createdAt: new Date().toISOString(),
     });
   } else {
     res.status(401).json({ 
@@ -195,17 +185,11 @@ app.patch("/auth/profile", (req, res) => {
 
   const { name, email } = req.body || {};
 
-  // Echo back updated user; in real app we'd persist to DB
-  res.json({
-    success: true,
-    user: {
-      id: "1",
-      name: name || "Martin Skallerup",
-      email: email || "skallerup+5@gmail.com",
-      updatedAt: new Date().toISOString(),
-    },
-    message: "Profile updated",
-  });
+  // Persist to simple cookies so subsequent /auth/me reflects changes
+  if (name) res.cookie('user_name', name, { sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000 });
+  if (email) res.cookie('user_email', email, { sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000 });
+
+  res.json({ success: true });
 });
 
 // League endpoints
