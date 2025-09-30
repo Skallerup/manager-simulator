@@ -516,6 +516,74 @@ app.put("/api/teams/:teamId/captain/:playerId", (req, res) => {
   });
 });
 
+// Stadium endpoints
+app.get("/api/stadium/:teamId", (req, res) => {
+  console.log("🔍 STADIUM - Headers:", req.headers);
+  console.log("🔍 STADIUM - Team ID:", req.params.teamId);
+  console.log("🔍 STADIUM - Origin:", req.headers.origin);
+  
+  const { teamId } = req.params;
+  
+  res.json({
+    id: teamId,
+    name: "Test Stadium",
+    capacity: 50000,
+    level: 1,
+    facilities: [
+      {
+        id: "1",
+        name: "Training Ground",
+        level: 1,
+        type: "TRAINING",
+        cost: 1000000,
+        benefits: ["+5% Player Development"]
+      },
+      {
+        id: "2", 
+        name: "Youth Academy",
+        level: 1,
+        type: "YOUTH",
+        cost: 2000000,
+        benefits: ["+10% Youth Player Quality"]
+      }
+    ],
+    upgrades: [
+      {
+        id: "1",
+        name: "Stadium Expansion",
+        level: 2,
+        cost: 5000000,
+        benefits: ["+10000 Capacity"]
+      }
+    ]
+  });
+});
+
+app.get("/api/stadium/:teamId/stats", (req, res) => {
+  console.log("🔍 STADIUM/STATS - Headers:", req.headers);
+  console.log("🔍 STADIUM/STATS - Team ID:", req.params.teamId);
+  console.log("🔍 STADIUM/STATS - Origin:", req.headers.origin);
+  
+  const { teamId } = req.params;
+  
+  res.json({
+    teamId: teamId,
+    attendance: {
+      average: 35000,
+      capacity: 50000,
+      percentage: 70
+    },
+    revenue: {
+      matchday: 150000,
+      season: 3000000
+    },
+    facilities: {
+      total: 2,
+      level: 1
+    }
+  });
+});
+
 // Matches endpoints (bot matches)
 let botMatchStore = {
   matches: [], // { id, createdAt, opponentName, result }
