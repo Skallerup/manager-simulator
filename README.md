@@ -1,20 +1,38 @@
 ## Release flow (local → preview → production)
 
-1) Feature branch
+### 1) Feature branch
 - Udvikl lokalt. Synk miljøvariabler: `vercel env pull .env.local` i både `frontend` og `backend`.
 - Prod-build check lokalt:
   - Frontend: `npm run build` i `frontend`
   - Backend: `npm run build` i `backend`
+- Kør smoke tests lokalt: `npm run test:e2e` i `frontend`
 
-2) Pull Request til `develop`
-- CI kører build/typecheck/tests.
+### 2) Pull Request til `develop`
+- CI kører build/typecheck/tests automatisk.
 - Vercel laver automatisk Preview deploy.
-- Verificér preview manuelt og via kommende smoke-tests.
+- CI kører Playwright smoke tests mod preview URL.
+- **Kun merge når CI er grøn** (alle tests passer).
 
-3) Merge til `main` (production)
-- Kun når preview er grønt.
+### 3) Merge til `main` (production)
+- Kun når preview er grønt og alle tests passer.
+- Production deploy sker automatisk efter merge.
 
-Miljøvariabler skal være sat i Vercel for både Preview og Production. Brug `vercel env pull` for at holde lokal == preview.
+### Miljøvariabler
+- Sæt i Vercel for både Preview og Production.
+- Brug `vercel env pull` for at holde lokal == preview.
+- GitHub Secret: `E2E_BASE_URL` (optional, default: `https://app.martinskallerup.dk`)
+
+### Commands
+```bash
+# Lokal udvikling
+npm run dev                    # Start både frontend og backend
+npm run build                  # Build begge apps
+npm run test                   # Kør alle tests
+npm run test:e2e              # Kør Playwright smoke tests
+
+# Miljøvariabler
+vercel env pull .env.local    # Synk vars fra Vercel
+```
 
 # Manager Simulator
 
