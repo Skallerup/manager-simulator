@@ -524,88 +524,82 @@ app.get("/api/transfers/available", (req, res) => {
   console.log("🔍 TRANSFERS/AVAILABLE - Headers:", req.headers);
   console.log("🔍 TRANSFERS/AVAILABLE - Origin:", req.headers.origin);
   
-  res.json({
-    transfers: [
-      {
+  res.json([
+    {
+      id: "1",
+      player: {
         id: "1",
-        player: {
-          id: "1",
-          name: "Available Player 1",
-          position: "MID",
-          rating: 80,
-          age: 25
-        },
-        askingPrice: 5000000,
-        seller: "Test Club"
+        name: "Available Player 1",
+        position: "MIDFIELDER",
+        rating: 80,
+        age: 25
       },
-      {
-        id: "2", 
-        player: {
-          id: "2",
-          name: "Available Player 2",
-          position: "FWD",
-          rating: 85,
-          age: 23
-        },
-        askingPrice: 8000000,
-        seller: "Another Club"
-      }
-    ]
-  });
+      askingPrice: 5000000,
+      seller: "Test Club"
+    },
+    {
+      id: "2", 
+      player: {
+        id: "2",
+        name: "Available Player 2",
+        position: "ATTACKER",
+        rating: 85,
+        age: 23
+      },
+      askingPrice: 8000000,
+      seller: "Another Club"
+    }
+  ]);
 });
 
-app.get("/api/transfers/my-transfers", (req, res) => {
+// Frontend expects "/api/transfers/my-team" returning an array
+app.get("/api/transfers/my-team", (req, res) => {
   console.log("🔍 TRANSFERS/MY-TRANSFERS - Headers:", req.headers);
-  
-  res.json({
-    transfers: []
-  });
+  res.json([]);
 });
 
 app.get("/api/transfers/free-transfer", (req, res) => {
   console.log("🔍 TRANSFERS/FREE-TRANSFER - Headers:", req.headers);
   console.log("🔍 TRANSFERS/FREE-TRANSFER - Origin:", req.headers.origin);
   
-  res.json({
-    transfers: [
-      {
+  res.json([
+    {
+      id: "free1",
+      player: {
         id: "free1",
-        player: {
-          id: "free1",
-          name: "Erik Hansen",
-          position: "MIDFIELDER",
-          rating: 75,
-          age: 22
-        },
-        askingPrice: 0,
-        seller: "Free Agent"
+        name: "Erik Hansen",
+        position: "MIDFIELDER",
+        rating: 75,
+        age: 22
       },
-      {
-        id: "free2", 
-        player: {
-          id: "free2",
-          name: "Peter Nielsen",
-          position: "DEFENDER",
-          rating: 72,
-          age: 24
-        },
-        askingPrice: 0,
-        seller: "Free Agent"
+      askingPrice: 0,
+      seller: "Free Agent"
+    },
+    {
+      id: "free2", 
+      player: {
+        id: "free2",
+        name: "Peter Nielsen",
+        position: "DEFENDER",
+        rating: 72,
+        age: 24
       },
-      {
+      askingPrice: 0,
+      seller: "Free Agent"
+    },
+    {
+      id: "free3",
+      player: {
         id: "free3",
-        player: {
-          id: "free3",
-          name: "Anders Larsen",
-          position: "ATTACKER",
-          rating: 78,
-          age: 21
-        },
-        askingPrice: 0,
-        seller: "Free Agent"
-      }
-    ]
-  });
+        name: "Anders Larsen",
+        position: "ATTACKER",
+        rating: 78,
+        age: 21
+      },
+      askingPrice: 0,
+      seller: "Free Agent"
+    }
+  ]);
 });
 
 // Root endpoint
