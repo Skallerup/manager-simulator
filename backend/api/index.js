@@ -584,6 +584,94 @@ app.get("/api/stadium/:teamId/stats", (req, res) => {
   });
 });
 
+// Stadium facilities endpoints
+app.get("/api/stadium/:teamId/facilities", (req, res) => {
+  console.log("🔍 STADIUM/FACILITIES - Headers:", req.headers);
+  console.log("🔍 STADIUM/FACILITIES - Team ID:", req.params.teamId);
+  console.log("🔍 STADIUM/FACILITIES - Origin:", req.headers.origin);
+  
+  const { teamId } = req.params;
+  
+  res.json({
+    facilities: [
+      {
+        id: "1",
+        name: "Training Ground",
+        type: "TRAINING",
+        level: 1,
+        cost: 1000000,
+        benefits: ["+5% Player Development"]
+      },
+      {
+        id: "2",
+        name: "Youth Academy", 
+        type: "YOUTH",
+        level: 1,
+        cost: 2000000,
+        benefits: ["+10% Youth Player Quality"]
+      }
+    ]
+  });
+});
+
+app.post("/api/stadium/:teamId/facilities", (req, res) => {
+  console.log("🔍 STADIUM/FACILITIES (POST) - Headers:", req.headers);
+  console.log("🔍 STADIUM/FACILITIES (POST) - Team ID:", req.params.teamId);
+  console.log("🔍 STADIUM/FACILITIES (POST) - Body:", req.body);
+  console.log("🔍 STADIUM/FACILITIES (POST) - Origin:", req.headers.origin);
+  
+  const { teamId } = req.params;
+  const { name, type, level, cost } = req.body;
+  
+  res.json({
+    success: true,
+    facility: {
+      id: "facility-" + Date.now(),
+      name: name || "New Facility",
+      type: type || "GENERAL",
+      level: level || 1,
+      cost: cost || 1000000,
+      benefits: ["+5% Stadium Value"]
+    },
+    message: "Facility created successfully"
+  });
+});
+
+app.put("/api/stadium/:teamId/facilities/:facilityId", (req, res) => {
+  console.log("🔍 STADIUM/FACILITIES (PUT) - Headers:", req.headers);
+  console.log("🔍 STADIUM/FACILITIES (PUT) - Team ID:", req.params.teamId);
+  console.log("🔍 STADIUM/FACILITIES (PUT) - Facility ID:", req.params.facilityId);
+  console.log("🔍 STADIUM/FACILITIES (PUT) - Body:", req.body);
+  console.log("🔍 STADIUM/FACILITIES (PUT) - Origin:", req.headers.origin);
+  
+  const { teamId, facilityId } = req.params;
+  const { level } = req.body;
+  
+  res.json({
+    success: true,
+    facility: {
+      id: facilityId,
+      level: level || 2,
+      cost: 2000000
+    },
+    message: "Facility upgraded successfully"
+  });
+});
+
+app.delete("/api/stadium/:teamId/facilities/:facilityId", (req, res) => {
+  console.log("🔍 STADIUM/FACILITIES (DELETE) - Headers:", req.headers);
+  console.log("🔍 STADIUM/FACILITIES (DELETE) - Team ID:", req.params.teamId);
+  console.log("🔍 STADIUM/FACILITIES (DELETE) - Facility ID:", req.params.facilityId);
+  console.log("🔍 STADIUM/FACILITIES (DELETE) - Origin:", req.headers.origin);
+  
+  const { teamId, facilityId } = req.params;
+  
+  res.json({
+    success: true,
+    message: `Facility ${facilityId} removed successfully`
+  });
+});
+
 // Matches endpoints (bot matches)
 let botMatchStore = {
   matches: [], // { id, createdAt, opponentName, result }

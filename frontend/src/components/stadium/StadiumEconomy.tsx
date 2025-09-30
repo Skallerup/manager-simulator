@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Stadium, StadiumStats, formatCurrency, formatNumber } from "@/lib/stadium";
 import { useTranslation } from 'react-i18next';
-import { DollarSign, TrendingUp, TrendingDown, Settings } from "lucide-react";
+import { DollarSign, TrendingUp, TrendingDown, Cog } from "lucide-react";
 
 interface StadiumEconomyProps {
   stadium: Stadium;
@@ -144,7 +144,7 @@ export function StadiumEconomy({ stadium, stats, teamBudget, onUpdatePrices }: S
             <Dialog open={isPriceDialogOpen} onOpenChange={setIsPriceDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline">
-                  <Settings className="w-4 h-4 mr-2" />
+                  <Cog className="w-4 h-4 mr-2" />
                   {t('economy.setPrices')}
                 </Button>
               </DialogTrigger>
