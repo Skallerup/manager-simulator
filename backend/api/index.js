@@ -498,11 +498,57 @@ app.post("/api/teams", (req, res) => {
   });
 });
 
-// Matches endpoints
+// Matches endpoints (bot matches)
+let botMatchStore = {
+  matches: [], // { id, createdAt, opponentName, result }
+  highlightsById: {}, // id -> highlights array
+};
+
+// History
 app.get("/api/matches/bot", (req, res) => {
-  res.json({
-    matches: []
+  res.json({ matches: botMatchStore.matches });
+});
+
+// Create a new bot match
+app.post("/api/matches/bot", (req, res) => {
+  const id = Date.now().toString();
+  // Create a placeholder match entry; result decided on simulate
+  botMatchStore.matches.unshift({
+    id,
+    createdAt: new Date().toISOString(),
+    opponentName: "Bot United",
+    result: "pending",
   });
+  botMatchStore.highlightsById[id] = [];
+  res.json({ id });
+});
+
+// Simulate a bot match and store result + highlights
+app.post("/api/matches/bot/:id/simulate", (req, res) => {
+  const { id } = req.params;
+  const match = botMatchStore.matches.find((m) => m.id === id);
+  if (!match) return res.status(404).json({ error: "Match not found" });
+
+  // Simple simulation
+  const playerGoals = Math.floor(Math.random() * 5);
+  const botGoals = Math.floor(Math.random() * 5);
+  match.result = playerGoals >= botGoals ? (playerGoals === botGoals ? "draw" : "win") : "loss";
+
+  const highlights = [
+    { minute: 5, team: "player", player: "Flemming Jørgensen", description: "Skud på mål" },
+    { minute: 28, team: "bot", player: "Bot Spiller", description: "Stor chance" },
+    { minute: 67, team: "player", player: "Rasmus Poulsen", description: "Mål!" },
+  ];
+  botMatchStore.highlightsById[id] = highlights;
+
+  res.json({ id, playerScore: playerGoals, botScore: botGoals, highlights });
+});
+
+// Highlights for a specific match
+app.get("/api/matches/bot/:id/highlights", (req, res) => {
+  const { id } = req.params;
+  const highlights = botMatchStore.highlightsById[id] || [];
+  res.json({ highlights });
 });
 
 // Dashboard data endpoint
