@@ -1,3 +1,21 @@
+## Release flow (local → preview → production)
+
+1) Feature branch
+- Udvikl lokalt. Synk miljøvariabler: `vercel env pull .env.local` i både `frontend` og `backend`.
+- Prod-build check lokalt:
+  - Frontend: `npm run build` i `frontend`
+  - Backend: `npm run build` i `backend`
+
+2) Pull Request til `develop`
+- CI kører build/typecheck/tests.
+- Vercel laver automatisk Preview deploy.
+- Verificér preview manuelt og via kommende smoke-tests.
+
+3) Merge til `main` (production)
+- Kun når preview er grønt.
+
+Miljøvariabler skal være sat i Vercel for både Preview og Production. Brug `vercel env pull` for at holde lokal == preview.
+
 # Manager Simulator
 
 A football manager simulator game where two teams compete against each other using a game engine. Built with Next.js, Express, Prisma, and PostgreSQL.
