@@ -237,34 +237,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Team Logo */}
-            <div className="space-y-3">
-              <Label className="text-foreground">Vælg logo</Label>
-              <div className="grid grid-cols-6 gap-3">
-                {TEAM_LOGOS.map((logo, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => setSelectedLogo(logo)}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      selectedLogo === logo
-                        ? 'border-foreground ring-2 ring-foreground/20'
-                        : 'border-muted hover:border-muted-foreground/50'
-                    }`}
-                  >
-                    <div className="w-8 h-8 mx-auto mb-2 flex items-center justify-center">
-                      <LogoIcon 
-                        type={logo} 
-                        size={32} 
-                        primaryColor={selectedColors.primary}
-                        secondaryColor={selectedColors.secondary}
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground capitalize">{logo}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Team Logo - Removed logo selection */}
 
             {/* Team Preview */}
             <Card className="bg-muted/50">

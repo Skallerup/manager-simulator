@@ -94,7 +94,7 @@ app.get("/auth/me", (req, res) => {
     user: {
       id: "1",
       email: "skallerup+5@gmail.com",
-      name: "skallerup+5",
+      name: "Martin Skallerup",
       createdAt: new Date().toISOString()
     }, 
     message: "User authenticated successfully",
@@ -136,7 +136,7 @@ app.post("/auth/login", (req, res) => {
       user: {
         id: "1",
         email: email,
-        name: email.split('@')[0], // Use email prefix as name
+        name: "Martin Skallerup",
         createdAt: new Date().toISOString()
       },
       message: "Login successful",
@@ -495,6 +495,24 @@ app.post("/api/teams", (req, res) => {
       leagueId: req.body.leagueId || "1"
     },
     message: "Team created successfully"
+  });
+});
+
+// Set team captain endpoint
+app.put("/api/teams/:teamId/captain/:playerId", (req, res) => {
+  console.log("🔍 TEAMS/CAPTAIN - Headers:", req.headers);
+  console.log("🔍 TEAMS/CAPTAIN - Team ID:", req.params.teamId);
+  console.log("🔍 TEAMS/CAPTAIN - Player ID:", req.params.playerId);
+  console.log("🔍 TEAMS/CAPTAIN - Origin:", req.headers.origin);
+  
+  const { teamId, playerId } = req.params;
+  
+  // For now, just return success - in real implementation would update database
+  res.json({
+    success: true,
+    message: `Player ${playerId} set as captain for team ${teamId}`,
+    teamId: teamId,
+    captainId: playerId
   });
 });
 
