@@ -473,16 +473,16 @@ app.get("/api/teams/my-team", (req, res) => {
   // Filter out fired players
   const activePlayers = allPlayers.filter(player => !firedPlayers.has(player.id));
   
-  res.json({
-    id: "1",
-    name: "Test Team",
-    logo: "/avatars/default.svg",
-    budget: 1000000,
-    leagueId: "1",
-    overallRating: 80,
-    formation: "5-3-2",
-    players: activePlayers
-  });
+        res.json({
+          id: "1",
+          name: "Test Team",
+          logo: "/avatars/default.svg",
+          budget: 500000, // Reduced budget to show facility purchases
+          leagueId: "1",
+          overallRating: 80,
+          formation: "5-3-2",
+          players: activePlayers
+        });
 });
 
 app.post("/api/teams", (req, res) => {
@@ -623,6 +623,9 @@ app.post("/api/stadium/:teamId/facilities", (req, res) => {
   const { teamId } = req.params;
   const { name, type, level, cost } = req.body;
   
+  // Update team budget (subtract cost)
+  const facilityCost = cost || 1000000;
+  
   res.json({
     success: true,
     facility: {
@@ -630,8 +633,12 @@ app.post("/api/stadium/:teamId/facilities", (req, res) => {
       name: name || "New Facility",
       type: type || "GENERAL",
       level: level || 1,
-      cost: cost || 1000000,
+      cost: facilityCost,
       benefits: ["+5% Stadium Value"]
+    },
+    budgetUpdate: {
+      newBudget: 1000000 - facilityCost, // Subtract cost from budget
+      cost: facilityCost
     },
     message: "Facility created successfully"
   });
