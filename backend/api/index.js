@@ -562,6 +562,52 @@ app.get("/api/transfers/my-transfers", (req, res) => {
   });
 });
 
+app.get("/api/transfers/free-transfer", (req, res) => {
+  console.log("🔍 TRANSFERS/FREE-TRANSFER - Headers:", req.headers);
+  console.log("🔍 TRANSFERS/FREE-TRANSFER - Origin:", req.headers.origin);
+  
+  res.json({
+    transfers: [
+      {
+        id: "free1",
+        player: {
+          id: "free1",
+          name: "Erik Hansen",
+          position: "MIDFIELDER",
+          rating: 75,
+          age: 22
+        },
+        askingPrice: 0,
+        seller: "Free Agent"
+      },
+      {
+        id: "free2", 
+        player: {
+          id: "free2",
+          name: "Peter Nielsen",
+          position: "DEFENDER",
+          rating: 72,
+          age: 24
+        },
+        askingPrice: 0,
+        seller: "Free Agent"
+      },
+      {
+        id: "free3",
+        player: {
+          id: "free3",
+          name: "Anders Larsen",
+          position: "ATTACKER",
+          rating: 78,
+          age: 21
+        },
+        askingPrice: 0,
+        seller: "Free Agent"
+      }
+    ]
+  });
+});
+
 // Root endpoint
 app.get("/", (req, res) => {
   console.log("🔍 ROOT - Headers:", req.headers);
