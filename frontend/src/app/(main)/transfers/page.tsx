@@ -102,9 +102,9 @@ export default function TransfersPage() {
         }
 
         // Fetch my transfers
-        const myTransfersResponse = await authApiFetch('/api/transfers/my-team');
+        const myTransfersResponse = await authApiFetch('/api/transfers');
         if (myTransfersResponse) {
-          setMyTransfers(myTransfersResponse as Transfer[]);
+          setMyTransfers(myTransfersResponse.transfers as Transfer[]);
         }
 
         // Fetch team data
@@ -162,8 +162,12 @@ export default function TransfersPage() {
       if (response) {
         setSelectedPlayer(null);
         setAskingPrice("");
-        // Refresh data
-        window.location.reload();
+        
+        // Show success notification
+        alert(`✅ Spiller er blevet sat på transfer! Pris: ${Number(askingPrice).toLocaleString('da-DK')} DKK`);
+        
+        // Refresh transfer data instead of full page reload
+        await fetchData();
       } else {
         setError('Failed to list player for transfer');
       }

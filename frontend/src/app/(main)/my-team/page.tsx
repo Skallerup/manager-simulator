@@ -493,7 +493,8 @@ export default function MyTeamPage() {
       const response = await authApiFetch(`/api/transfers/minimum-price/${player.id}`) as any;
       if (response) {
         setMinimumPrice(response.minimumPrice);
-        setAskingPrice(response.suggestedPrice.toString());
+        // Use minimumPrice as the suggested price since API doesn't return suggestedPrice
+        setAskingPrice(response.minimumPrice.toString());
       }
       
       setTransferModalOpen(true);

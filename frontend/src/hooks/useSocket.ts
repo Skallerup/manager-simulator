@@ -30,7 +30,7 @@ export function useSocket() {
       return;
     }
 
-    const newSocket = io(process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5002', {
+    const newSocket = io(process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000', {
       auth: {
         token: token,
       },
@@ -71,6 +71,8 @@ export function useSocket() {
     removeNotification,
   };
 }
+
+
 
 
 

@@ -5,7 +5,7 @@ export async function apiFetch<T>(
   const res = await fetch(
     process.env.NEXT_PUBLIC_BACKEND_URL
       ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${path}`
-      : `http://localhost:5002${path}`,
+      : `http://localhost:3000${path}`,
     {
       credentials: "include",
       headers: {
@@ -26,7 +26,7 @@ export async function apiFetch<T>(
         const refreshRes = await fetch(
           process.env.NEXT_PUBLIC_BACKEND_URL
             ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/refresh`
-            : `http://localhost:5002/auth/refresh`,
+            : `http://localhost:3000/auth/refresh`,
           {
             method: "POST",
             credentials: "include",
@@ -38,7 +38,7 @@ export async function apiFetch<T>(
           const retryRes = await fetch(
             process.env.NEXT_PUBLIC_BACKEND_URL
               ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${path}`
-              : `http://localhost:5002${path}`,
+              : `http://localhost:3000${path}`,
             {
               credentials: "include",
               headers: {

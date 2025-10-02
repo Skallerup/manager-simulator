@@ -193,20 +193,277 @@ app.patch("/auth/profile", (req, res) => {
 });
 
 // League endpoints
+app.get("/api/leagues", (req, res) => {
+  console.log("🔍 LEAGUES - Headers:", req.headers);
+  console.log("🔍 LEAGUES - Origin:", req.headers.origin);
+  
+  res.json([
+    {
+      id: "1",
+      name: "Test League",
+      description: "A test league for development",
+      level: 1,
+      maxTeams: 16,
+      status: "active",
+      teams: [
+        { id: "1", name: "Team Alpha", isBot: false },
+        { id: "2", name: "Team Beta", isBot: false },
+        { id: "3", name: "Team Gamma", isBot: true },
+        { id: "4", name: "Team Delta", isBot: true },
+        { id: "5", name: "Team Echo", isBot: true },
+        { id: "6", name: "Team Foxtrot", isBot: true }
+      ],
+      seasons: [
+        { id: "1", year: 2024, status: "active" }
+      ]
+    },
+    {
+      id: "2", 
+      name: "Championship League",
+      description: "The main championship league",
+      level: 2,
+      maxTeams: 20,
+      status: "active",
+      teams: [
+        { id: "7", name: "Championship A", isBot: false },
+        { id: "8", name: "Championship B", isBot: false },
+        { id: "9", name: "Championship C", isBot: true },
+        { id: "10", name: "Championship D", isBot: true },
+        { id: "11", name: "Championship E", isBot: true },
+        { id: "12", name: "Championship F", isBot: true },
+        { id: "13", name: "Championship G", isBot: true },
+        { id: "14", name: "Championship H", isBot: true }
+      ],
+      seasons: [
+        { id: "2", year: 2024, status: "active" }
+      ]
+    },
+    {
+      id: "3",
+      name: "Premier League",
+      description: "The premier division",
+      level: 3,
+      maxTeams: 12,
+      status: "active",
+      teams: [
+        { id: "15", name: "Premier A", isBot: false },
+        { id: "16", name: "Premier B", isBot: true },
+        { id: "17", name: "Premier C", isBot: true },
+        { id: "18", name: "Premier D", isBot: true },
+        { id: "19", name: "Premier E", isBot: true },
+        { id: "20", name: "Premier F", isBot: true }
+      ],
+      seasons: [
+        { id: "3", year: 2024, status: "active" }
+      ]
+    }
+  ]);
+});
+
+app.get("/api/leagues/browse", (req, res) => {
+  console.log("🔍 LEAGUES/BROWSE - Headers:", req.headers);
+  console.log("🔍 LEAGUES/BROWSE - Origin:", req.headers.origin);
+  
+  res.json([
+    {
+      id: "1",
+      name: "Test League",
+      description: "A test league for development",
+      level: 1,
+      maxTeams: 16,
+      status: "active",
+      teams: [
+        { id: "1", name: "Team Alpha", isBot: false },
+        { id: "2", name: "Team Beta", isBot: false },
+        { id: "3", name: "Team Gamma", isBot: true },
+        { id: "4", name: "Team Delta", isBot: true },
+        { id: "5", name: "Team Echo", isBot: true },
+        { id: "6", name: "Team Foxtrot", isBot: true }
+      ],
+      seasons: [
+        { id: "1", year: 2024, status: "active" }
+      ]
+    },
+    {
+      id: "2", 
+      name: "Championship League",
+      description: "The main championship league",
+      level: 2,
+      maxTeams: 20,
+      status: "active",
+      teams: [
+        { id: "7", name: "Championship A", isBot: false },
+        { id: "8", name: "Championship B", isBot: false },
+        { id: "9", name: "Championship C", isBot: true },
+        { id: "10", name: "Championship D", isBot: true },
+        { id: "11", name: "Championship E", isBot: true },
+        { id: "12", name: "Championship F", isBot: true },
+        { id: "13", name: "Championship G", isBot: true },
+        { id: "14", name: "Championship H", isBot: true }
+      ],
+      seasons: [
+        { id: "2", year: 2024, status: "active" }
+      ]
+    },
+    {
+      id: "3",
+      name: "Premier League",
+      description: "The premier division",
+      level: 3,
+      maxTeams: 12,
+      status: "active",
+      teams: [
+        { id: "15", name: "Premier A", isBot: false },
+        { id: "16", name: "Premier B", isBot: true },
+        { id: "17", name: "Premier C", isBot: true },
+        { id: "18", name: "Premier D", isBot: true },
+        { id: "19", name: "Premier E", isBot: true },
+        { id: "20", name: "Premier F", isBot: true }
+      ],
+      seasons: [
+        { id: "3", year: 2024, status: "active" }
+      ]
+    }
+  ]);
+});
+
+app.get("/api/leagues/:id", (req, res) => {
+  console.log("🔍 LEAGUES/:ID - Headers:", req.headers);
+  console.log("🔍 LEAGUES/:ID - League ID:", req.params.id);
+  console.log("🔍 LEAGUES/:ID - Origin:", req.headers.origin);
+  
+  const { id } = req.params;
+  
+  // Return different data based on league ID
+  const leagueData = {
+    "1": {
+      id: "1",
+      name: "Test League",
+      description: "A test league for development",
+      level: 1,
+      maxTeams: 16,
+      status: "active",
+      teams: [
+        { id: "1", name: "Team Alpha", isBot: false },
+        { id: "2", name: "Team Beta", isBot: false },
+        { id: "3", name: "Team Gamma", isBot: true },
+        { id: "4", name: "Team Delta", isBot: true },
+        { id: "5", name: "Team Echo", isBot: true },
+        { id: "6", name: "Team Foxtrot", isBot: true }
+      ],
+      seasons: [
+        { id: "1", year: 2024, status: "active" }
+      ],
+      standings: [
+        { position: 1, team: "Team Alpha", points: 30, played: 10, won: 9, drawn: 3, lost: 0 },
+        { position: 2, team: "Team Beta", points: 25, played: 10, won: 8, drawn: 1, lost: 1 },
+        { position: 3, team: "Team Gamma", points: 22, played: 10, won: 7, drawn: 1, lost: 2 }
+      ]
+    },
+    "2": {
+      id: "2",
+      name: "Championship League",
+      description: "The main championship league",
+      level: 2,
+      maxTeams: 20,
+      status: "active",
+      teams: [
+        { id: "7", name: "Championship A", isBot: false },
+        { id: "8", name: "Championship B", isBot: false },
+        { id: "9", name: "Championship C", isBot: true },
+        { id: "10", name: "Championship D", isBot: true },
+        { id: "11", name: "Championship E", isBot: true },
+        { id: "12", name: "Championship F", isBot: true },
+        { id: "13", name: "Championship G", isBot: true },
+        { id: "14", name: "Championship H", isBot: true }
+      ],
+      seasons: [
+        { id: "2", year: 2024, status: "active" }
+      ],
+      standings: [
+        { position: 1, team: "Championship A", points: 28, played: 10, won: 8, drawn: 4, lost: 0 },
+        { position: 2, team: "Championship B", points: 24, played: 10, won: 7, drawn: 3, lost: 1 },
+        { position: 3, team: "Championship C", points: 21, played: 10, won: 6, drawn: 3, lost: 2 }
+      ]
+    },
+    "3": {
+      id: "3",
+      name: "Premier League",
+      description: "The premier division",
+      level: 3,
+      maxTeams: 12,
+      status: "active",
+      teams: [
+        { id: "15", name: "Premier A", isBot: false },
+        { id: "16", name: "Premier B", isBot: true },
+        { id: "17", name: "Premier C", isBot: true },
+        { id: "18", name: "Premier D", isBot: true },
+        { id: "19", name: "Premier E", isBot: true },
+        { id: "20", name: "Premier F", isBot: true }
+      ],
+      seasons: [
+        { id: "3", year: 2024, status: "active" }
+      ],
+      standings: [
+        { position: 1, team: "Premier A", points: 26, played: 10, won: 8, drawn: 2, lost: 0 },
+        { position: 2, team: "Premier B", points: 22, played: 10, won: 7, drawn: 1, lost: 2 },
+        { position: 3, team: "Premier C", points: 19, played: 10, won: 6, drawn: 1, lost: 3 }
+      ]
+    }
+  };
+  
+  const league = leagueData[id] || {
+    id: id,
+    name: `League ${id}`,
+    description: `Description for league ${id}`,
+    level: 1,
+    maxTeams: 16,
+    status: "active",
+    teams: [],
+    seasons: [],
+    standings: []
+  };
+  
+  res.json(league);
+});
+
 app.get("/api/leagues/user/current", (req, res) => {
+  console.log("🔍 LEAGUES/USER/CURRENT - Headers:", req.headers);
+  console.log("🔍 LEAGUES/USER/CURRENT - Origin:", req.headers.origin);
+  
   res.json({
-    leagues: [
-      {
-        id: "1",
-        name: "Test League",
-        description: "A test league for development"
-      }
-    ]
+    league: {
+      id: "1",
+      name: "Test League",
+      description: "A test league for development",
+      level: 1,
+      maxTeams: 16,
+      status: "active",
+      teams: [
+        { id: "1", name: "Team Alpha", isBot: false },
+        { id: "2", name: "Team Beta", isBot: false },
+        { id: "3", name: "Team Gamma", isBot: true },
+        { id: "4", name: "Team Delta", isBot: true },
+        { id: "5", name: "Team Echo", isBot: true },
+        { id: "6", name: "Team Foxtrot", isBot: true }
+      ],
+      seasons: [
+        { id: "1", year: 2024, status: "active" }
+      ]
+    },
+    userTeam: {
+      id: "1",
+      name: "Team Alpha",
+      isBot: false
+    }
   });
 });
 
 // Store fired players in memory (in real app this would be in database)
 let firedPlayers = new Set();
+
+// Store transfer list in memory (in real app this would be in database)
+let transferList = new Map();
 
 // Team endpoints
 app.get("/api/teams/my-team", (req, res) => {
@@ -684,6 +941,81 @@ app.delete("/api/stadium/:teamId/facilities/:facilityId", (req, res) => {
   });
 });
 
+// Training matches endpoints
+app.get("/api/training-matches", (req, res) => {
+  console.log("🔍 TRAINING-MATCHES - Headers:", req.headers);
+  console.log("🔍 TRAINING-MATCHES - Origin:", req.headers.origin);
+  
+  res.json([
+    {
+      id: "1",
+      opponent: "Training Team A",
+      date: new Date().toISOString(),
+      status: "scheduled",
+      type: "friendly"
+    },
+    {
+      id: "2",
+      opponent: "Training Team B", 
+      date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      status: "scheduled",
+      type: "friendly"
+    }
+  ]);
+});
+
+app.get("/api/training-matches/league-teams", (req, res) => {
+  console.log("🔍 TRAINING-MATCHES/LEAGUE-TEAMS - Headers:", req.headers);
+  console.log("🔍 TRAINING-MATCHES/LEAGUE-TEAMS - Origin:", req.headers.origin);
+  
+  res.json([
+    { id: "1", name: "Team Alpha", rating: 85 },
+    { id: "2", name: "Team Beta", rating: 82 },
+    { id: "3", name: "Team Gamma", rating: 78 },
+    { id: "4", name: "Team Delta", rating: 75 }
+  ]);
+});
+
+app.post("/api/training-matches", (req, res) => {
+  console.log("🔍 TRAINING-MATCHES (POST) - Headers:", req.headers);
+  console.log("🔍 TRAINING-MATCHES (POST) - Body:", req.body);
+  console.log("🔍 TRAINING-MATCHES (POST) - Origin:", req.headers.origin);
+  
+  const { opponent, date, type } = req.body;
+  
+  res.json({
+    id: Date.now().toString(),
+    opponent: opponent || "Training Team",
+    date: date || new Date().toISOString(),
+    status: "scheduled",
+    type: type || "friendly"
+  });
+});
+
+app.post("/api/training-matches/:id/simulate", (req, res) => {
+  console.log("🔍 TRAINING-MATCHES/SIMULATE - Headers:", req.headers);
+  console.log("🔍 TRAINING-MATCHES/SIMULATE - Match ID:", req.params.id);
+  console.log("🔍 TRAINING-MATCHES/SIMULATE - Origin:", req.headers.origin);
+  
+  const { id } = req.params;
+  
+  // Simple simulation
+  const playerGoals = Math.floor(Math.random() * 4);
+  const opponentGoals = Math.floor(Math.random() * 4);
+  
+  res.json({
+    id: id,
+    playerScore: playerGoals,
+    opponentScore: opponentGoals,
+    result: playerGoals > opponentGoals ? "win" : playerGoals < opponentGoals ? "loss" : "draw",
+    highlights: [
+      { minute: 15, team: "player", player: "Flemming Jørgensen", description: "Skud på mål" },
+      { minute: 45, team: "opponent", player: "Opponent Player", description: "Stor chance" },
+      { minute: 67, team: "player", player: "Rasmus Poulsen", description: "Mål!" }
+    ]
+  });
+});
+
 // Matches endpoints (bot matches)
 let botMatchStore = {
   matches: [], // { id, createdAt, opponentName, result }
@@ -783,6 +1115,123 @@ app.get("/api/transfers/free-transfer", (req, res) => {
   res.json([]);
 });
 
+// Get minimum price for a player
+app.get("/api/transfers/minimum-price/:id", (req, res) => {
+  console.log("🔍 TRANSFERS/MINIMUM-PRICE - Headers:", req.headers);
+  console.log("🔍 TRANSFERS/MINIMUM-PRICE - Player ID:", req.params.id);
+  console.log("🔍 TRANSFERS/MINIMUM-PRICE - Origin:", req.headers.origin);
+  
+  const playerId = req.params.id;
+  
+  // Calculate minimum price based on player rating and age
+  // This is a simple calculation - in a real app this would be more complex
+  const basePrice = 100000; // Base price
+  const ratingMultiplier = 1.5; // Price increases with rating
+  const agePenalty = 0.1; // Price decreases with age
+  
+  // Mock player data for calculation
+  const playerRating = 75 + (parseInt(playerId) % 25); // 75-99 rating
+  const playerAge = 20 + (parseInt(playerId) % 15); // 20-34 age
+  
+  const minimumPrice = Math.round(
+    basePrice * 
+    (1 + (playerRating - 50) * ratingMultiplier / 100) * 
+    (1 - (playerAge - 20) * agePenalty / 100)
+  );
+  
+  res.json({
+    playerId: playerId,
+    minimumPrice: minimumPrice,
+    currency: "DKK",
+    calculation: {
+      basePrice: basePrice,
+      playerRating: playerRating,
+      playerAge: playerAge,
+      ratingMultiplier: ratingMultiplier,
+      agePenalty: agePenalty
+    }
+  });
+});
+
+// Get transfer list endpoint
+app.get("/api/transfers", (req, res) => {
+  console.log("🔍 TRANSFERS/GET - Headers:", req.headers);
+  console.log("🔍 TRANSFERS/GET - Origin:", req.headers.origin);
+  
+  // Convert transfer list Map to array with player details
+  const transfers = Array.from(transferList.values()).map(transfer => {
+    // Find player details from team data
+    const allPlayers = [
+      // Starters (11 players)
+      { id: "1", name: "Lars Andersen", age: 28, position: "GK", rating: 85, speed: 70, shooting: 45, passing: 60, defending: 90, stamina: 80, reflexes: 88, isCaptain: true, isStarter: true },
+      { id: "2", name: "Erik Nielsen", age: 26, position: "DEF", rating: 82, speed: 75, shooting: 50, passing: 70, defending: 85, stamina: 85, reflexes: 60, isCaptain: false, isStarter: true },
+      { id: "3", name: "Mikkel Hansen", age: 24, position: "DEF", rating: 78, speed: 80, shooting: 45, passing: 65, defending: 80, stamina: 90, reflexes: 55, isCaptain: false, isStarter: true },
+      { id: "4", name: "Anders Larsen", age: 29, position: "DEF", rating: 80, speed: 70, shooting: 40, passing: 75, defending: 85, stamina: 80, reflexes: 60, isCaptain: false, isStarter: true },
+      { id: "5", name: "Thomas Sørensen", age: 27, position: "DEF", rating: 76, speed: 75, shooting: 50, passing: 70, defending: 78, stamina: 85, reflexes: 55, isCaptain: false, isStarter: true },
+      { id: "6", name: "Jesper Madsen", age: 25, position: "MID", rating: 84, speed: 80, shooting: 75, passing: 85, defending: 70, stamina: 90, reflexes: 60, isCaptain: false, isStarter: true },
+      { id: "7", name: "Nikolaj Christensen", age: 23, position: "MID", rating: 82, speed: 85, shooting: 80, passing: 80, defending: 65, stamina: 85, reflexes: 55, isCaptain: false, isStarter: true },
+      { id: "8", name: "Rasmus Poulsen", age: 26, position: "MID", rating: 79, speed: 75, shooting: 70, passing: 75, defending: 75, stamina: 80, reflexes: 60, isCaptain: false, isStarter: true },
+      { id: "9", name: "Flemming Jørgensen", age: 30, position: "MID", rating: 81, speed: 70, shooting: 85, passing: 80, defending: 60, stamina: 75, reflexes: 55, isCaptain: false, isStarter: true },
+      { id: "10", name: "Henrik Møller", age: 22, position: "FWD", rating: 83, speed: 90, shooting: 85, passing: 70, defending: 50, stamina: 80, reflexes: 60, isCaptain: false, isStarter: true },
+      { id: "11", name: "Ole Mortensen", age: 24, position: "FWD", rating: 80, speed: 85, shooting: 80, passing: 65, defending: 45, stamina: 85, reflexes: 55, isCaptain: false, isStarter: true },
+      // Substitutes (5 players)
+      { id: "12", name: "Peter Jensen", age: 31, position: "GK", rating: 75, speed: 65, shooting: 40, passing: 55, defending: 80, stamina: 70, reflexes: 82, isCaptain: false, isStarter: false },
+      { id: "13", name: "Michael Andersen", age: 28, position: "DEF", rating: 72, speed: 70, shooting: 45, passing: 60, defending: 75, stamina: 75, reflexes: 55, isCaptain: false, isStarter: false },
+      { id: "14", name: "Daniel Nielsen", age: 25, position: "MID", rating: 74, speed: 75, shooting: 65, passing: 70, defending: 65, stamina: 80, reflexes: 55, isCaptain: false, isStarter: false },
+      { id: "15", name: "Simon Larsen", age: 23, position: "FWD", rating: 76, speed: 80, shooting: 75, passing: 60, defending: 40, stamina: 75, reflexes: 55, isCaptain: false, isStarter: false },
+      { id: "16", name: "Christian Hansen", age: 27, position: "MID", rating: 73, speed: 70, shooting: 70, passing: 75, defending: 60, stamina: 75, reflexes: 55, isCaptain: false, isStarter: false }
+    ];
+    
+    const player = allPlayers.find(p => p.id === transfer.playerId);
+    
+    return {
+      id: transfer.playerId,
+      playerId: transfer.playerId,
+      askingPrice: transfer.askingPrice,
+      status: transfer.status,
+      createdAt: transfer.listedAt,
+      player: player || { id: transfer.playerId, name: "Unknown Player", age: 25, position: "UNK", rating: 50 }
+    };
+  });
+  
+  console.log("🔍 TRANSFERS/GET - Transfer list with player details:", transfers);
+  
+  res.json({
+    success: true,
+    transfers: transfers,
+    count: transfers.length
+  });
+});
+
+// List player for transfer endpoint
+app.post("/api/transfers/list/:id", (req, res) => {
+  console.log("🔍 TRANSFERS/LIST - Headers:", req.headers);
+  console.log("🔍 TRANSFERS/LIST - Player ID:", req.params.id);
+  console.log("🔍 TRANSFERS/LIST - Body:", req.body);
+  console.log("🔍 TRANSFERS/LIST - Origin:", req.headers.origin);
+  
+  const playerId = req.params.id;
+  const { askingPrice } = req.body;
+  
+  // Add player to transfer list
+  transferList.set(playerId, {
+    playerId: playerId,
+    askingPrice: askingPrice || 1000000, // Default price if not provided
+    listedAt: new Date().toISOString(),
+    status: "available"
+  });
+  
+  console.log("🔍 TRANSFERS/LIST - Player listed, transfer list now:", Array.from(transferList.entries()));
+  
+  res.json({
+    success: true,
+    message: `Player ${playerId} listed for transfer successfully`,
+    playerId: playerId,
+    askingPrice: askingPrice || 1000000,
+    listedAt: new Date().toISOString()
+  });
+});
+
 // Fire player endpoint
 app.delete("/api/transfers/fire/:id", (req, res) => {
   console.log("🔍 TRANSFERS/FIRE - Headers:", req.headers);
@@ -803,6 +1252,23 @@ app.delete("/api/transfers/fire/:id", (req, res) => {
   });
 });
 
+// Seed endpoint
+app.post("/api/seed", (req, res) => {
+  console.log("🔍 SEED - Headers:", req.headers);
+  console.log("🔍 SEED - Body:", req.body);
+  console.log("🔍 SEED - Origin:", req.headers.origin);
+  
+  res.json({
+    success: true,
+    message: "Database seeded successfully",
+    data: {
+      leagues: 3,
+      teams: 12,
+      players: 144
+    }
+  });
+});
+
 // Root endpoint
 app.get("/", (req, res) => {
   console.log("🔍 ROOT - Headers:", req.headers);
@@ -818,6 +1284,12 @@ app.get("/", (req, res) => {
       timestamp: new Date().toISOString()
     }
   });
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Backend server running on http://localhost:${PORT}`);
 });
 
 module.exports = app;
