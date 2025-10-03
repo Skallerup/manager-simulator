@@ -36,25 +36,17 @@ app.get('/test', (req, res) => {
 // Auth endpoints - mock responses (both with and without /api prefix)
 app.get('/auth/me', (req, res) => {
   res.json({
-    success: true,
-    user: {
-      id: 'test-user-1',
-      email: 'skallerup+5@gmail.com',
-      name: 'Martin Skallerup',
-      isAuthenticated: true
-    }
+    id: 'test-user-1',
+    email: 'skallerup+5@gmail.com',
+    name: 'Martin Skallerup'
   });
 });
 
 app.get('/api/auth/me', (req, res) => {
   res.json({
-    success: true,
-    user: {
-      id: 'test-user-1',
-      email: 'skallerup+5@gmail.com',
-      name: 'Martin Skallerup',
-      isAuthenticated: true
-    }
+    id: 'test-user-1',
+    email: 'skallerup+5@gmail.com',
+    name: 'Martin Skallerup'
   });
 });
 
@@ -64,15 +56,9 @@ app.post('/auth/login', (req, res) => {
   // Simple mock login - accept any credentials
   if (email && password) {
     res.json({
-      success: true,
-      message: 'Login successful',
-      user: {
-        id: 'test-user-1',
-        email: email,
-        name: 'Martin Skallerup',
-        isAuthenticated: true
-      },
-      token: 'mock-token-' + Date.now()
+      id: 'test-user-1',
+      email: email,
+      name: 'Martin Skallerup'
     });
   } else {
     res.status(400).json({
@@ -88,15 +74,9 @@ app.post('/api/auth/login', (req, res) => {
   // Simple mock login - accept any credentials
   if (email && password) {
     res.json({
-      success: true,
-      message: 'Login successful',
-      user: {
-        id: 'test-user-1',
-        email: email,
-        name: 'Martin Skallerup',
-        isAuthenticated: true
-      },
-      token: 'mock-token-' + Date.now()
+      id: 'test-user-1',
+      email: email,
+      name: 'Martin Skallerup'
     });
   } else {
     res.status(400).json({
