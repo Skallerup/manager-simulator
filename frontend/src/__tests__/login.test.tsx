@@ -44,10 +44,10 @@ describe("Login Page", () => {
       </AuthProvider>
     );
 
-    expect(screen.getByText("Login")).toBeInTheDocument();
-    expect(screen.getByLabelText("Email")).toBeInTheDocument();
-    expect(screen.getByLabelText("Password")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Sign in" })).toBeInTheDocument();
+    expect(screen.getByText("welcomeBack")).toBeInTheDocument();
+    expect(screen.getByLabelText("email")).toBeInTheDocument();
+    expect(screen.getByLabelText("password")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "login" })).toBeInTheDocument();
   });
 
   it("should submit form with valid credentials", async () => {
@@ -60,10 +60,10 @@ describe("Login Page", () => {
       </AuthProvider>
     );
 
-    await user.type(screen.getByLabelText("Email"), "test@example.com");
-    await user.type(screen.getByLabelText("Password"), "password123");
+    await user.type(screen.getByLabelText("email"), "test@example.com");
+    await user.type(screen.getByLabelText("password"), "password123");
 
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await user.click(screen.getByRole("button", { name: "login" }));
 
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith({
@@ -163,10 +163,10 @@ describe("Login Page", () => {
       </AuthProvider>
     );
 
-    await user.type(screen.getByLabelText("Email"), "test@example.com");
-    await user.type(screen.getByLabelText("Password"), "wrongpassword");
+    await user.type(screen.getByLabelText("email"), "test@example.com");
+    await user.type(screen.getByLabelText("password"), "wrongpassword");
 
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await user.click(screen.getByRole("button", { name: "login" }));
 
     await waitFor(() => {
       expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
@@ -182,7 +182,7 @@ describe("Login Page", () => {
     );
 
     // Try to submit without filling required fields
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await user.click(screen.getByRole("button", { name: "login" }));
 
     // HTML5 validation should prevent submission
     expect(mockLogin).not.toHaveBeenCalled();

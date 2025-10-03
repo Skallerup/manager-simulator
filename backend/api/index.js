@@ -1,7 +1,14 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const { createClient } = require('@supabase/supabase-js');
+
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const app = express();
 
@@ -462,8 +469,7 @@ app.get("/api/leagues/user/current", (req, res) => {
 // Store fired players in memory (in real app this would be in database)
 let firedPlayers = new Set();
 
-// Store transfer list in memory (in real app this would be in database)
-let transferList = new Map();
+// Transfer list is now stored in Supabase database
 
 // Team endpoints
 app.get("/api/teams/my-team", (req, res) => {
@@ -1154,12 +1160,23 @@ app.get("/api/transfers/minimum-price/:id", (req, res) => {
 });
 
 // Get transfer list endpoint
-app.get("/api/transfers", (req, res) => {
+app.get("/api/transfers", async (req, res) => {
   console.log("🔍 TRANSFERS/GET - Headers:", req.headers);
   console.log("🔍 TRANSFERS/GET - Origin:", req.headers.origin);
   
-  // Convert transfer list Map to array with player details
-  const transfers = Array.from(transferList.values()).map(transfer => {
+  try {
+    // Get transfers from Supabase
+    const { data: transfers, error } = await supabase
+      .from('transfers')
+      .select('*')
+      .eq('status', 'available')
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error("🔍 TRANSFERS/GET - Supabase error:", error);
+      return res.status(500).json({ error: 'Failed to fetch transfers' });
+    }
+    
     // Find player details from team data
     const allPlayers = [
       // Starters (11 players)
@@ -1182,29 +1199,35 @@ app.get("/api/transfers", (req, res) => {
       { id: "16", name: "Christian Hansen", age: 27, position: "MID", rating: 73, speed: 70, shooting: 70, passing: 75, defending: 60, stamina: 75, reflexes: 55, isCaptain: false, isStarter: false }
     ];
     
-    const player = allPlayers.find(p => p.id === transfer.playerId);
+    // Enrich with player details
+    const enrichedTransfers = transfers.map(transfer => {
+      const player = allPlayers.find(p => p.id === transfer.player_id);
+      
+      return {
+        id: transfer.id,
+        playerId: transfer.player_id,
+        askingPrice: transfer.asking_price,
+        status: transfer.status,
+        createdAt: transfer.created_at,
+        player: player || { id: transfer.player_id, name: "Unknown Player", age: 25, position: "UNK", rating: 50 }
+      };
+    });
     
-    return {
-      id: transfer.playerId,
-      playerId: transfer.playerId,
-      askingPrice: transfer.askingPrice,
-      status: transfer.status,
-      createdAt: transfer.listedAt,
-      player: player || { id: transfer.playerId, name: "Unknown Player", age: 25, position: "UNK", rating: 50 }
-    };
-  });
-  
-  console.log("🔍 TRANSFERS/GET - Transfer list with player details:", transfers);
-  
-  res.json({
-    success: true,
-    transfers: transfers,
-    count: transfers.length
-  });
+    console.log("🔍 TRANSFERS/GET - Transfer list with player details:", enrichedTransfers);
+    
+    res.json({
+      success: true,
+      transfers: enrichedTransfers,
+      count: enrichedTransfers.length
+    });
+  } catch (error) {
+    console.error("🔍 TRANSFERS/GET - Error:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // List player for transfer endpoint
-app.post("/api/transfers/list/:id", (req, res) => {
+app.post("/api/transfers/list/:id", async (req, res) => {
   console.log("🔍 TRANSFERS/LIST - Headers:", req.headers);
   console.log("🔍 TRANSFERS/LIST - Player ID:", req.params.id);
   console.log("🔍 TRANSFERS/LIST - Body:", req.body);
@@ -1213,23 +1236,38 @@ app.post("/api/transfers/list/:id", (req, res) => {
   const playerId = req.params.id;
   const { askingPrice } = req.body;
   
-  // Add player to transfer list
-  transferList.set(playerId, {
-    playerId: playerId,
-    askingPrice: askingPrice || 1000000, // Default price if not provided
-    listedAt: new Date().toISOString(),
-    status: "available"
-  });
-  
-  console.log("🔍 TRANSFERS/LIST - Player listed, transfer list now:", Array.from(transferList.entries()));
-  
-  res.json({
-    success: true,
-    message: `Player ${playerId} listed for transfer successfully`,
-    playerId: playerId,
-    askingPrice: askingPrice || 1000000,
-    listedAt: new Date().toISOString()
-  });
+  try {
+    // Add player to transfer list in Supabase
+    const { data, error } = await supabase
+      .from('transfers')
+      .insert([
+        {
+          player_id: playerId,
+          asking_price: askingPrice || 1000000,
+          status: 'available',
+          created_at: new Date().toISOString()
+        }
+      ])
+      .select();
+    
+    if (error) {
+      console.error("🔍 TRANSFERS/LIST - Supabase error:", error);
+      return res.status(500).json({ error: 'Failed to list player for transfer' });
+    }
+    
+    console.log("🔍 TRANSFERS/LIST - Player listed successfully:", data);
+    
+    res.json({
+      success: true,
+      message: `Player ${playerId} listed for transfer successfully`,
+      playerId: playerId,
+      askingPrice: askingPrice || 1000000,
+      listedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("🔍 TRANSFERS/LIST - Error:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Fire player endpoint

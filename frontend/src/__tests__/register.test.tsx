@@ -45,13 +45,13 @@ describe("Register Page", () => {
     );
 
     expect(
-      screen.getByRole("heading", { name: "Create account" })
+      screen.getByRole("heading", { name: "createAccount" })
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("Name (optional)")).toBeInTheDocument();
-    expect(screen.getByLabelText("Email")).toBeInTheDocument();
-    expect(screen.getByLabelText("Password")).toBeInTheDocument();
+    expect(screen.getByLabelText("nameOptional")).toBeInTheDocument();
+    expect(screen.getByLabelText("email")).toBeInTheDocument();
+    expect(screen.getByLabelText("password")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Create account" })
+      screen.getByRole("button", { name: "Næste: Opret hold" })
     ).toBeInTheDocument();
   });
 
@@ -65,11 +65,11 @@ describe("Register Page", () => {
       </AuthProvider>
     );
 
-    await user.type(screen.getByLabelText("Name (optional)"), "Test User");
-    await user.type(screen.getByLabelText("Email"), "test@example.com");
-    await user.type(screen.getByLabelText("Password"), "password123");
+    await user.type(screen.getByLabelText("nameOptional"), "Test User");
+    await user.type(screen.getByLabelText("email"), "test@example.com");
+    await user.type(screen.getByLabelText("password"), "password123");
 
-    await user.click(screen.getByRole("button", { name: "Create account" }));
+    await user.click(screen.getByRole("button", { name: "Næste: Opret hold" }));
 
     await waitFor(() => {
       expect(mockRegister).toHaveBeenCalledWith({
@@ -181,10 +181,10 @@ describe("Register Page", () => {
       </AuthProvider>
     );
 
-    await user.type(screen.getByLabelText("Email"), "test@example.com");
-    await user.type(screen.getByLabelText("Password"), "password123");
+    await user.type(screen.getByLabelText("email"), "test@example.com");
+    await user.type(screen.getByLabelText("password"), "password123");
 
-    await user.click(screen.getByRole("button", { name: "Create account" }));
+    await user.click(screen.getByRole("button", { name: "Næste: Opret hold" }));
 
     await waitFor(() => {
       expect(screen.getByText("Email already in use")).toBeInTheDocument();
@@ -200,7 +200,7 @@ describe("Register Page", () => {
     );
 
     // Try to submit without filling required fields
-    await user.click(screen.getByRole("button", { name: "Create account" }));
+    await user.click(screen.getByRole("button", { name: "Næste: Opret hold" }));
 
     // HTML5 validation should prevent submission
     expect(mockRegister).not.toHaveBeenCalled();
@@ -216,11 +216,11 @@ describe("Register Page", () => {
       </AuthProvider>
     );
 
-    await user.type(screen.getByLabelText("Email"), "test@example.com");
-    await user.type(screen.getByLabelText("Password"), "password123");
+    await user.type(screen.getByLabelText("email"), "test@example.com");
+    await user.type(screen.getByLabelText("password"), "password123");
     // Don't fill name field
 
-    await user.click(screen.getByRole("button", { name: "Create account" }));
+    await user.click(screen.getByRole("button", { name: "Næste: Opret hold" }));
 
     await waitFor(() => {
       expect(mockRegister).toHaveBeenCalledWith({
