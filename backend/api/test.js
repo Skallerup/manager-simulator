@@ -821,6 +821,114 @@ app.put('/api/auth/password', (req, res) => {
   });
 });
 
+// Additional missing auth endpoints
+app.patch('/auth/profile', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Profile updated successfully'
+  });
+});
+
+app.patch('/auth/password', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Password updated successfully'
+  });
+});
+
+// Additional missing team endpoints
+app.put('/api/teams/:id/starters', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Formation saved successfully'
+  });
+});
+
+app.put('/api/teams/:id/captain/:playerId', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Captain changed successfully'
+  });
+});
+
+// Additional missing transfer endpoints
+app.post('/api/transfers/list/:id', (req, res) => {
+  res.json({
+    success: true,
+    message: `Player ${req.params.id} listed for transfer successfully`
+  });
+});
+
+app.post('/api/transfers/sign-free/:id', (req, res) => {
+  res.json({
+    success: true,
+    message: `Player ${req.params.id} signed successfully`
+  });
+});
+
+// Additional missing stadium endpoints
+app.post('/api/stadium/:id/facilities', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Facility upgraded successfully'
+  });
+});
+
+app.post('/api/stadium/:id/upgrades', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Stadium upgraded successfully'
+  });
+});
+
+app.put('/api/stadium/:id/tier', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Stadium tier upgraded successfully'
+  });
+});
+
+// Additional missing match endpoints
+app.post('/api/matches/bot/:id/simulate', (req, res) => {
+  res.json({
+    success: true,
+    match: {
+      id: req.params.id,
+      status: 'completed',
+      userScore: 2,
+      botScore: 1,
+      events: [
+        { minute: 15, type: 'goal', team: 'user', player: 'Flemming Jørgensen' },
+        { minute: 45, type: 'goal', team: 'bot', player: 'Bot Player' },
+        { minute: 78, type: 'goal', team: 'user', player: 'Rasmus Poulsen' }
+      ],
+      highlights: [
+        { minute: 15, type: 'goal', description: 'Flemming Jørgensen scores!' },
+        { minute: 78, type: 'goal', description: 'Rasmus Poulsen scores the winner!' }
+      ]
+    }
+  });
+});
+
+// Additional missing training endpoints
+app.post('/api/training-matches/:id/simulate', (req, res) => {
+  res.json({
+    success: true,
+    match: {
+      id: req.params.id,
+      status: 'completed',
+      userScore: 3,
+      opponentScore: 1,
+      events: [
+        { minute: 20, type: 'goal', team: 'user', player: 'Flemming Jørgensen' },
+        { minute: 35, type: 'goal', team: 'user', player: 'Rasmus Poulsen' },
+        { minute: 60, type: 'goal', team: 'opponent', player: 'Opponent Player' },
+        { minute: 85, type: 'goal', team: 'user', player: 'Daniel Simonsen' }
+      ]
+    }
+  });
+});
+
 // Catch all for other routes
 app.use('*', (req, res) => {
   res.status(404).json({
