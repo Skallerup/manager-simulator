@@ -33,7 +33,7 @@ app.get('/test', (req, res) => {
   });
 });
 
-// Auth endpoints - mock responses
+// Auth endpoints - mock responses (both with and without /api prefix)
 app.get('/auth/me', (req, res) => {
   res.json({
     success: true,
@@ -46,7 +46,43 @@ app.get('/auth/me', (req, res) => {
   });
 });
 
+app.get('/api/auth/me', (req, res) => {
+  res.json({
+    success: true,
+    user: {
+      id: 'test-user-1',
+      email: 'skallerup+5@gmail.com',
+      name: 'Test User',
+      isAuthenticated: true
+    }
+  });
+});
+
 app.post('/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  // Simple mock login - accept any credentials
+  if (email && password) {
+    res.json({
+      success: true,
+      message: 'Login successful',
+      user: {
+        id: 'test-user-1',
+        email: email,
+        name: 'Test User',
+        isAuthenticated: true
+      },
+      token: 'mock-token-' + Date.now()
+    });
+  } else {
+    res.status(400).json({
+      success: false,
+      message: 'Email and password required'
+    });
+  }
+});
+
+app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
   
   // Simple mock login - accept any credentials
@@ -83,7 +119,20 @@ app.post('/auth/refresh', (req, res) => {
   });
 });
 
-// Teams endpoints - mock responses
+app.post('/api/auth/refresh', (req, res) => {
+  res.json({
+    success: true,
+    token: 'mock-refresh-token-' + Date.now(),
+    user: {
+      id: 'test-user-1',
+      email: 'skallerup+5@gmail.com',
+      name: 'Test User',
+      isAuthenticated: true
+    }
+  });
+});
+
+// Teams endpoints - mock responses (both with and without /api prefix)
 app.get('/teams/my-team', (req, res) => {
   res.json({
     success: true,
@@ -110,8 +159,50 @@ app.get('/teams/my-team', (req, res) => {
   });
 });
 
-// Transfers endpoints - mock responses
+app.get('/api/teams/my-team', (req, res) => {
+  res.json({
+    success: true,
+    team: {
+      id: 'test-team-1',
+      name: 'Test Team',
+      players: [
+        {
+          id: '1',
+          name: 'Test Player 1',
+          position: 'GK',
+          rating: 75,
+          age: 25
+        },
+        {
+          id: '2',
+          name: 'Test Player 2',
+          position: 'DEF',
+          rating: 80,
+          age: 28
+        }
+      ]
+    }
+  });
+});
+
+// Transfers endpoints - mock responses (both with and without /api prefix)
 app.get('/transfers', (req, res) => {
+  res.json({
+    success: true,
+    transfers: [],
+    count: 0
+  });
+});
+
+app.get('/api/transfers', (req, res) => {
+  res.json({
+    success: true,
+    transfers: [],
+    count: 0
+  });
+});
+
+app.get('/api/transfers/available', (req, res) => {
   res.json({
     success: true,
     transfers: [],
@@ -128,7 +219,16 @@ app.post('/transfers/list/:id', (req, res) => {
   });
 });
 
-// Leagues endpoints - mock responses
+app.post('/api/transfers/list/:id', (req, res) => {
+  res.json({
+    success: true,
+    message: `Player ${req.params.id} listed for transfer successfully`,
+    playerId: req.params.id,
+    askingPrice: req.body.askingPrice || 1000000
+  });
+});
+
+// Leagues endpoints - mock responses (both with and without /api prefix)
 app.get('/leagues', (req, res) => {
   res.json({
     success: true,
@@ -142,7 +242,31 @@ app.get('/leagues', (req, res) => {
   });
 });
 
+app.get('/api/leagues', (req, res) => {
+  res.json({
+    success: true,
+    leagues: [
+      {
+        id: 'test-league-1',
+        name: 'Test League',
+        teams: []
+      }
+    ]
+  });
+});
+
 app.get('/leagues/user/current', (req, res) => {
+  res.json({
+    success: true,
+    league: {
+      id: 'test-league-1',
+      name: 'Test League',
+      teams: []
+    }
+  });
+});
+
+app.get('/api/leagues/user/current', (req, res) => {
   res.json({
     success: true,
     league: {
