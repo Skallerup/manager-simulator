@@ -535,17 +535,6 @@ app.get('/leagues/user/current', (req, res) => {
   });
 });
 
-app.get('/api/leagues/user/current', (req, res) => {
-  res.json({
-    success: true,
-    league: {
-      id: 'test-league-1',
-      name: 'Test League',
-      teams: []
-    }
-  });
-});
-
 // Teams endpoints
 app.get('/api/teams', (req, res) => {
   res.json({
