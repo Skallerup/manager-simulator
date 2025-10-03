@@ -210,6 +210,22 @@ app.get('/api/transfers/available', (req, res) => {
   });
 });
 
+app.get('/api/transfers/free-transfer', (req, res) => {
+  res.json({
+    success: true,
+    transfers: [],
+    count: 0
+  });
+});
+
+app.get('/transfers/free-transfer', (req, res) => {
+  res.json({
+    success: true,
+    transfers: [],
+    count: 0
+  });
+});
+
 app.post('/transfers/list/:id', (req, res) => {
   res.json({
     success: true,
@@ -225,6 +241,35 @@ app.post('/api/transfers/list/:id', (req, res) => {
     message: `Player ${req.params.id} listed for transfer successfully`,
     playerId: req.params.id,
     askingPrice: req.body.askingPrice || 1000000
+  });
+});
+
+// Additional transfer endpoints
+app.delete('/api/transfers/cancel/:id', (req, res) => {
+  res.json({
+    success: true,
+    message: `Transfer ${req.params.id} cancelled successfully`
+  });
+});
+
+app.delete('/api/transfers/fire/:id', (req, res) => {
+  res.json({
+    success: true,
+    message: `Player ${req.params.id} fired successfully`
+  });
+});
+
+app.post('/api/transfers/sign-free/:id', (req, res) => {
+  res.json({
+    success: true,
+    message: `Player ${req.params.id} signed successfully`
+  });
+});
+
+app.post('/api/transfers/buy/:id', (req, res) => {
+  res.json({
+    success: true,
+    message: `Player ${req.params.id} bought successfully`
   });
 });
 
@@ -274,6 +319,66 @@ app.get('/api/leagues/user/current', (req, res) => {
       name: 'Test League',
       teams: []
     }
+  });
+});
+
+// Teams endpoints
+app.get('/api/teams', (req, res) => {
+  res.json({
+    success: true,
+    teams: [
+      {
+        id: 'test-team-1',
+        name: 'Test Team 1',
+        leagueId: 'test-league-1'
+      },
+      {
+        id: 'test-team-2',
+        name: 'Test Team 2',
+        leagueId: 'test-league-1'
+      }
+    ]
+  });
+});
+
+app.get('/api/teams/:id', (req, res) => {
+  res.json({
+    success: true,
+    team: {
+      id: req.params.id,
+      name: 'Test Team',
+      leagueId: 'test-league-1',
+      players: []
+    }
+  });
+});
+
+app.post('/api/teams', (req, res) => {
+  res.json({
+    success: true,
+    team: {
+      id: 'new-team-' + Date.now(),
+      name: req.body.name || 'New Team',
+      leagueId: req.body.leagueId || 'test-league-1'
+    }
+  });
+});
+
+app.put('/api/teams/:id', (req, res) => {
+  res.json({
+    success: true,
+    team: {
+      id: req.params.id,
+      name: req.body.name || 'Updated Team',
+      leagueId: req.body.leagueId || 'test-league-1'
+    }
+  });
+});
+
+app.delete('/api/teams/:id', (req, res) => {
+  res.json({
+    success: true,
+    message: `Team ${req.params.id} deleted successfully`
   });
 });
 
