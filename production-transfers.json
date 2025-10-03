@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "transfers": [
+    {
+      "id": "transfer-1",
+      "playerId": "5",
+      "askingPrice": 1500000,
+      "status": "available",
+      "createdAt": "2025-10-03T18:57:41.658Z",
+      "player": {
+        "id": "5",
+        "name": "Available Player 1",
+        "position": "MID",
+        "rating": 75,
+        "age": 27,
+        "speed": 80,
+        "shooting": 70,
+        "passing": 85,
+        "defending": 65,
+        "stamina": 80,
+        "reflexes": 60,
+        "isCaptain": false,
+        "isStarter": false
+      }
+    }
+  ],
+  "count": 1
+}

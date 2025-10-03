@@ -1,0 +1,72 @@
+{
+  "id": "test-team-1",
+  "name": "Test Team",
+  "overallRating": 78,
+  "formation": "4-4-2",
+  "players": [
+    {
+      "id": "1",
+      "name": "Test Player 1",
+      "position": "GK",
+      "rating": 75,
+      "age": 25,
+      "speed": 70,
+      "shooting": 60,
+      "passing": 65,
+      "defending": 85,
+      "stamina": 80,
+      "reflexes": 90,
+      "isCaptain": false,
+      "isStarter": true,
+      "formationPosition": "GK"
+    },
+    {
+      "id": "2",
+      "name": "Test Player 2",
+      "position": "DEF",
+      "rating": 80,
+      "age": 28,
+      "speed": 75,
+      "shooting": 50,
+      "passing": 70,
+      "defending": 90,
+      "stamina": 85,
+      "reflexes": 60,
+      "isCaptain": true,
+      "isStarter": true,
+      "formationPosition": "CB1"
+    },
+    {
+      "id": "3",
+      "name": "Test Player 3",
+      "position": "MID",
+      "rating": 78,
+      "age": 26,
+      "speed": 80,
+      "shooting": 75,
+      "passing": 85,
+      "defending": 70,
+      "stamina": 90,
+      "reflexes": 65,
+      "isCaptain": false,
+      "isStarter": true,
+      "formationPosition": "CM1"
+    },
+    {
+      "id": "4",
+      "name": "Test Player 4",
+      "position": "FWD",
+      "rating": 82,
+      "age": 24,
+      "speed": 90,
+      "shooting": 85,
+      "passing": 70,
+      "defending": 50,
+      "stamina": 85,
+      "reflexes": 60,
+      "isCaptain": false,
+      "isStarter": true,
+      "formationPosition": "ST1"
+    }
+  ]
+}

@@ -161,74 +161,269 @@ app.get('/teams/my-team', (req, res) => {
 
 app.get('/api/teams/my-team', (req, res) => {
   res.json({
-    id: 'test-team-1',
+    id: '1',
     name: 'Test Team',
-    overallRating: 78,
-    formation: '4-4-2',
+    logo: '/avatars/default.svg',
+    budget: 500000,
+    leagueId: '1',
+    overallRating: 80,
+    formation: '5-3-2',
     players: [
       {
         id: '1',
-        name: 'Test Player 1',
-        position: 'GK',
+        name: 'Lars Andersen',
+        position: 'GOALKEEPER',
         rating: 75,
         age: 25,
-        speed: 70,
-        shooting: 60,
-        passing: 65,
-        defending: 85,
-        stamina: 80,
-        reflexes: 90,
-        isCaptain: false,
         isStarter: true,
-        formationPosition: 'GK'
+        isCaptain: true,
+        formationPosition: 'gk',
+        speed: 60,
+        shooting: 40,
+        passing: 70,
+        defending: 80,
+        stamina: 85,
+        reflexes: 90
       },
       {
         id: '2',
-        name: 'Test Player 2',
-        position: 'DEF',
+        name: 'Mikkel Hansen',
+        position: 'DEFENDER',
         rating: 80,
-        age: 28,
-        speed: 75,
-        shooting: 50,
-        passing: 70,
-        defending: 90,
-        stamina: 85,
-        reflexes: 60,
-        isCaptain: true,
+        age: 27,
         isStarter: true,
-        formationPosition: 'CB1'
+        isCaptain: false,
+        formationPosition: 'cb1',
+        speed: 70,
+        shooting: 50,
+        passing: 75,
+        defending: 90,
+        stamina: 80,
+        reflexes: 60
       },
       {
         id: '3',
-        name: 'Test Player 3',
-        position: 'MID',
+        name: 'Jesper Nielsen',
+        position: 'DEFENDER',
         rating: 78,
-        age: 26,
-        speed: 80,
-        shooting: 75,
-        passing: 85,
-        defending: 70,
-        stamina: 90,
-        reflexes: 65,
-        isCaptain: false,
+        age: 24,
         isStarter: true,
-        formationPosition: 'CM1'
+        isCaptain: false,
+        formationPosition: 'cb2',
+        speed: 72,
+        shooting: 45,
+        passing: 70,
+        defending: 85,
+        stamina: 82,
+        reflexes: 65
       },
       {
         id: '4',
-        name: 'Test Player 4',
-        position: 'FWD',
-        rating: 82,
-        age: 24,
-        speed: 90,
-        shooting: 85,
-        passing: 70,
-        defending: 50,
-        stamina: 85,
-        reflexes: 60,
-        isCaptain: false,
+        name: 'Christian Larsen',
+        position: 'DEFENDER',
+        rating: 76,
+        age: 26,
         isStarter: true,
-        formationPosition: 'ST1'
+        isCaptain: false,
+        formationPosition: 'lb',
+        speed: 75,
+        shooting: 55,
+        passing: 80,
+        defending: 82,
+        stamina: 85,
+        reflexes: 70
+      },
+      {
+        id: '5',
+        name: 'Thomas Møller',
+        position: 'DEFENDER',
+        rating: 74,
+        age: 28,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: 'rb',
+        speed: 73,
+        shooting: 50,
+        passing: 75,
+        defending: 80,
+        stamina: 83,
+        reflexes: 68
+      },
+      {
+        id: '6',
+        name: 'Michael Sørensen',
+        position: 'MIDFIELDER',
+        rating: 85,
+        age: 24,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: 'cm1',
+        speed: 80,
+        shooting: 70,
+        passing: 90,
+        defending: 75,
+        stamina: 85,
+        reflexes: 65
+      },
+      {
+        id: '7',
+        name: 'Henrik Madsen',
+        position: 'MIDFIELDER',
+        rating: 82,
+        age: 25,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: 'cm2',
+        speed: 78,
+        shooting: 75,
+        passing: 85,
+        defending: 70,
+        stamina: 88,
+        reflexes: 62
+      },
+      {
+        id: '8',
+        name: 'Steen Christensen',
+        position: 'MIDFIELDER',
+        rating: 79,
+        age: 26,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: 'cm3',
+        speed: 76,
+        shooting: 68,
+        passing: 82,
+        defending: 72,
+        stamina: 86,
+        reflexes: 67
+      },
+      {
+        id: '9',
+        name: 'Flemming Jørgensen',
+        position: 'ATTACKER',
+        rating: 90,
+        age: 26,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: 'st1',
+        speed: 90,
+        shooting: 95,
+        passing: 80,
+        defending: 40,
+        stamina: 85,
+        reflexes: 70
+      },
+      {
+        id: '10',
+        name: 'Rasmus Poulsen',
+        position: 'ATTACKER',
+        rating: 87,
+        age: 23,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: 'st2',
+        speed: 88,
+        shooting: 92,
+        passing: 75,
+        defending: 35,
+        stamina: 87,
+        reflexes: 72
+      },
+      {
+        id: '11',
+        name: 'Daniel Simonsen',
+        position: 'ATTACKER',
+        rating: 84,
+        age: 24,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: 'st3',
+        speed: 85,
+        shooting: 88,
+        passing: 78,
+        defending: 38,
+        stamina: 84,
+        reflexes: 68
+      },
+      {
+        id: '12',
+        name: 'Nikolaj Andersen',
+        position: 'DEFENDER',
+        rating: 72,
+        age: 22,
+        isStarter: false,
+        isCaptain: false,
+        formationPosition: null,
+        speed: 70,
+        shooting: 45,
+        passing: 68,
+        defending: 75,
+        stamina: 80,
+        reflexes: 60
+      },
+      {
+        id: '13',
+        name: 'Mads Larsen',
+        position: 'MIDFIELDER',
+        rating: 76,
+        age: 21,
+        isStarter: false,
+        isCaptain: false,
+        formationPosition: null,
+        speed: 75,
+        shooting: 65,
+        passing: 80,
+        defending: 68,
+        stamina: 82,
+        reflexes: 63
+      },
+      {
+        id: '14',
+        name: 'Simon Hansen',
+        position: 'ATTACKER',
+        rating: 81,
+        age: 20,
+        isStarter: false,
+        isCaptain: false,
+        formationPosition: null,
+        speed: 82,
+        shooting: 85,
+        passing: 72,
+        defending: 32,
+        stamina: 83,
+        reflexes: 65
+      },
+      {
+        id: '15',
+        name: 'Claus Nielsen',
+        position: 'GOALKEEPER',
+        rating: 68,
+        age: 19,
+        isStarter: false,
+        isCaptain: false,
+        formationPosition: null,
+        speed: 55,
+        shooting: 30,
+        passing: 65,
+        defending: 70,
+        stamina: 75,
+        reflexes: 85
+      },
+      {
+        id: '16',
+        name: 'Ole Møller',
+        position: 'DEFENDER',
+        rating: 70,
+        age: 23,
+        isStarter: false,
+        isCaptain: false,
+        formationPosition: null,
+        speed: 68,
+        shooting: 42,
+        passing: 70,
+        defending: 78,
+        stamina: 79,
+        reflexes: 62
       }
     ]
   });
@@ -236,112 +431,23 @@ app.get('/api/teams/my-team', (req, res) => {
 
 // Transfers endpoints - mock responses (both with and without /api prefix)
 app.get('/transfers', (req, res) => {
-  res.json({
-    success: true,
-    transfers: [],
-    count: 0
-  });
+  res.json([]);
 });
 
 app.get('/api/transfers', (req, res) => {
-  res.json({
-    success: true,
-    transfers: [
-      {
-        id: 'transfer-1',
-        playerId: '5',
-        askingPrice: 1500000,
-        status: 'available',
-        createdAt: new Date().toISOString(),
-        player: {
-          id: '5',
-          name: 'Transfer Player 1',
-          position: 'MID',
-          rating: 75,
-          age: 27,
-          speed: 80,
-          shooting: 70,
-          passing: 85,
-          defending: 65,
-          stamina: 80,
-          reflexes: 60,
-          isCaptain: false,
-          isStarter: false
-        }
-      }
-    ],
-    count: 1
-  });
+  res.json([]);
 });
 
 app.get('/api/transfers/available', (req, res) => {
-  res.json({
-    success: true,
-    transfers: [
-      {
-        id: 'transfer-1',
-        playerId: '5',
-        askingPrice: 1500000,
-        status: 'available',
-        createdAt: new Date().toISOString(),
-        player: {
-          id: '5',
-          name: 'Available Player 1',
-          position: 'MID',
-          rating: 75,
-          age: 27,
-          speed: 80,
-          shooting: 70,
-          passing: 85,
-          defending: 65,
-          stamina: 80,
-          reflexes: 60,
-          isCaptain: false,
-          isStarter: false
-        }
-      }
-    ],
-    count: 1
-  });
+  res.json([]);
 });
 
 app.get('/api/transfers/free-transfer', (req, res) => {
-  res.json({
-    success: true,
-    transfers: [
-      {
-        id: 'free-1',
-        playerId: '6',
-        askingPrice: 0,
-        status: 'free',
-        createdAt: new Date().toISOString(),
-        player: {
-          id: '6',
-          name: 'Free Player 1',
-          position: 'FWD',
-          rating: 70,
-          age: 22,
-          speed: 85,
-          shooting: 75,
-          passing: 60,
-          defending: 40,
-          stamina: 75,
-          reflexes: 55,
-          isCaptain: false,
-          isStarter: false
-        }
-      }
-    ],
-    count: 1
-  });
+  res.json([]);
 });
 
 app.get('/transfers/free-transfer', (req, res) => {
-  res.json({
-    success: true,
-    transfers: [],
-    count: 0
-  });
+  res.json([]);
 });
 
 app.post('/transfers/list/:id', (req, res) => {
