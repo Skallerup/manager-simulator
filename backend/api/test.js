@@ -171,16 +171,64 @@ app.get('/api/teams/my-team', (req, res) => {
           name: 'Test Player 1',
           position: 'GK',
           rating: 75,
-          age: 25
+          age: 25,
+          speed: 70,
+          shooting: 60,
+          passing: 65,
+          defending: 85,
+          stamina: 80,
+          reflexes: 90,
+          isCaptain: false,
+          isStarter: true
         },
         {
           id: '2',
           name: 'Test Player 2',
           position: 'DEF',
           rating: 80,
-          age: 28
+          age: 28,
+          speed: 75,
+          shooting: 50,
+          passing: 70,
+          defending: 90,
+          stamina: 85,
+          reflexes: 60,
+          isCaptain: true,
+          isStarter: true
+        },
+        {
+          id: '3',
+          name: 'Test Player 3',
+          position: 'MID',
+          rating: 78,
+          age: 26,
+          speed: 80,
+          shooting: 75,
+          passing: 85,
+          defending: 70,
+          stamina: 90,
+          reflexes: 65,
+          isCaptain: false,
+          isStarter: true
+        },
+        {
+          id: '4',
+          name: 'Test Player 4',
+          position: 'FWD',
+          rating: 82,
+          age: 24,
+          speed: 90,
+          shooting: 85,
+          passing: 70,
+          defending: 50,
+          stamina: 85,
+          reflexes: 60,
+          isCaptain: false,
+          isStarter: true
         }
-      ]
+      ],
+      formation: '4-4-2',
+      rating: 78
     }
   });
 });
@@ -197,24 +245,93 @@ app.get('/transfers', (req, res) => {
 app.get('/api/transfers', (req, res) => {
   res.json({
     success: true,
-    transfers: [],
-    count: 0
+    transfers: [
+      {
+        id: 'transfer-1',
+        playerId: '5',
+        askingPrice: 1500000,
+        status: 'available',
+        createdAt: new Date().toISOString(),
+        player: {
+          id: '5',
+          name: 'Transfer Player 1',
+          position: 'MID',
+          rating: 75,
+          age: 27,
+          speed: 80,
+          shooting: 70,
+          passing: 85,
+          defending: 65,
+          stamina: 80,
+          reflexes: 60,
+          isCaptain: false,
+          isStarter: false
+        }
+      }
+    ],
+    count: 1
   });
 });
 
 app.get('/api/transfers/available', (req, res) => {
   res.json({
     success: true,
-    transfers: [],
-    count: 0
+    transfers: [
+      {
+        id: 'transfer-1',
+        playerId: '5',
+        askingPrice: 1500000,
+        status: 'available',
+        createdAt: new Date().toISOString(),
+        player: {
+          id: '5',
+          name: 'Available Player 1',
+          position: 'MID',
+          rating: 75,
+          age: 27,
+          speed: 80,
+          shooting: 70,
+          passing: 85,
+          defending: 65,
+          stamina: 80,
+          reflexes: 60,
+          isCaptain: false,
+          isStarter: false
+        }
+      }
+    ],
+    count: 1
   });
 });
 
 app.get('/api/transfers/free-transfer', (req, res) => {
   res.json({
     success: true,
-    transfers: [],
-    count: 0
+    transfers: [
+      {
+        id: 'free-1',
+        playerId: '6',
+        askingPrice: 0,
+        status: 'free',
+        createdAt: new Date().toISOString(),
+        player: {
+          id: '6',
+          name: 'Free Player 1',
+          position: 'FWD',
+          rating: 70,
+          age: 22,
+          speed: 85,
+          shooting: 75,
+          passing: 60,
+          defending: 40,
+          stamina: 75,
+          reflexes: 55,
+          isCaptain: false,
+          isStarter: false
+        }
+      }
+    ],
+    count: 1
   });
 });
 
