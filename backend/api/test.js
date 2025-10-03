@@ -606,6 +606,232 @@ app.delete('/api/teams/:id', (req, res) => {
   });
 });
 
+// Additional missing endpoints
+app.get('/api/transfers/my-team', (req, res) => {
+  res.json([]);
+});
+
+app.get('/api/matches/bot', (req, res) => {
+  res.json([]);
+});
+
+app.post('/api/matches/bot', (req, res) => {
+  res.json({
+    success: true,
+    match: {
+      id: 'match-1',
+      userTeam: {
+        id: '1',
+        name: 'Test Team',
+        rating: 80
+      },
+      botTeam: {
+        id: 'bot-1',
+        name: 'Bot United',
+        rating: 75
+      },
+      status: 'in_progress',
+      currentMinute: 0,
+      userScore: 0,
+      botScore: 0
+    }
+  });
+});
+
+app.get('/api/matches/bot/:id/simulate', (req, res) => {
+  res.json({
+    success: true,
+    match: {
+      id: req.params.id,
+      status: 'completed',
+      userScore: 2,
+      botScore: 1,
+      events: [
+        { minute: 15, type: 'goal', team: 'user', player: 'Flemming Jørgensen' },
+        { minute: 45, type: 'goal', team: 'bot', player: 'Bot Player' },
+        { minute: 78, type: 'goal', team: 'user', player: 'Rasmus Poulsen' }
+      ],
+      highlights: [
+        { minute: 15, type: 'goal', description: 'Flemming Jørgensen scores!' },
+        { minute: 78, type: 'goal', description: 'Rasmus Poulsen scores the winner!' }
+      ]
+    }
+  });
+});
+
+app.get('/api/matches/bot/:id/highlights', (req, res) => {
+  res.json({
+    success: true,
+    highlights: [
+      { minute: 15, type: 'goal', description: 'Flemming Jørgensen scores!' },
+      { minute: 78, type: 'goal', description: 'Rasmus Poulsen scores the winner!' }
+    ]
+  });
+});
+
+app.get('/api/training-matches/league-teams', (req, res) => {
+  res.json([]);
+});
+
+app.get('/api/training-matches', (req, res) => {
+  res.json([]);
+});
+
+app.post('/api/training-matches', (req, res) => {
+  res.json({
+    success: true,
+    match: {
+      id: 'training-1',
+      opponent: req.body.opponent || 'Training Team',
+      status: 'scheduled'
+    }
+  });
+});
+
+app.post('/api/training-matches/:id/simulate', (req, res) => {
+  res.json({
+    success: true,
+    match: {
+      id: req.params.id,
+      status: 'completed',
+      userScore: 3,
+      opponentScore: 1,
+      events: [
+        { minute: 20, type: 'goal', team: 'user', player: 'Flemming Jørgensen' },
+        { minute: 35, type: 'goal', team: 'user', player: 'Rasmus Poulsen' },
+        { minute: 60, type: 'goal', team: 'opponent', player: 'Opponent Player' },
+        { minute: 85, type: 'goal', team: 'user', player: 'Daniel Simonsen' }
+      ]
+    }
+  });
+});
+
+app.get('/api/stadium/:id', (req, res) => {
+  res.json({
+    id: req.params.id,
+    name: 'Test Stadium',
+    capacity: 25000,
+    tier: 1,
+    facilities: {
+      trainingGround: 1,
+      youthAcademy: 1,
+      medicalCenter: 1,
+      scoutingNetwork: 1
+    }
+  });
+});
+
+app.get('/api/stadium/:id/stats', (req, res) => {
+  res.json({
+    id: req.params.id,
+    attendance: 22000,
+    revenue: 150000,
+    maintenance: 50000,
+    upgrades: 0
+  });
+});
+
+app.post('/api/stadium/:id/facilities', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Facility upgraded successfully'
+  });
+});
+
+app.post('/api/stadium/:id/upgrades', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Stadium upgraded successfully'
+  });
+});
+
+app.post('/api/stadium/:id/tier', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Stadium tier upgraded successfully'
+  });
+});
+
+app.get('/api/teams/:id/starters', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Formation retrieved successfully'
+  });
+});
+
+app.post('/api/teams/:id/starters', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Formation saved successfully'
+  });
+});
+
+app.post('/api/teams/:id/captain/:playerId', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Captain changed successfully'
+  });
+});
+
+app.get('/api/transfers/minimum-price/:id', (req, res) => {
+  res.json({
+    success: true,
+    minimumPrice: 1000000
+  });
+});
+
+app.post('/api/transfers/buy/:id', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Player purchased successfully'
+  });
+});
+
+app.get('/api/leagues/user/current', (req, res) => {
+  res.json({
+    id: '1',
+    name: 'Test League',
+    tier: 1,
+    teams: [
+      { id: '1', name: 'Test Team', points: 15, played: 5, won: 5, drawn: 0, lost: 0 },
+      { id: '2', name: 'Team 2', points: 12, played: 5, won: 4, drawn: 0, lost: 1 },
+      { id: '3', name: 'Team 3', points: 9, played: 5, won: 3, drawn: 0, lost: 2 }
+    ]
+  });
+});
+
+app.post('/api/seed', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Database seeded successfully'
+  });
+});
+
+app.get('/api/auth/profile', (req, res) => {
+  res.json({
+    success: true,
+    user: {
+      id: 'test-user-1',
+      email: 'skallerup+5@gmail.com',
+      name: 'Test User'
+    }
+  });
+});
+
+app.put('/api/auth/profile', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Profile updated successfully'
+  });
+});
+
+app.put('/api/auth/password', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Password updated successfully'
+  });
+});
+
 // Catch all for other routes
 app.use('*', (req, res) => {
   res.status(404).json({
