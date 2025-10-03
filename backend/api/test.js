@@ -40,7 +40,7 @@ app.get('/auth/me', (req, res) => {
     user: {
       id: 'test-user-1',
       email: 'skallerup+5@gmail.com',
-      name: 'Test User',
+      name: 'Martin Skallerup',
       isAuthenticated: true
     }
   });
@@ -52,7 +52,7 @@ app.get('/api/auth/me', (req, res) => {
     user: {
       id: 'test-user-1',
       email: 'skallerup+5@gmail.com',
-      name: 'Test User',
+      name: 'Martin Skallerup',
       isAuthenticated: true
     }
   });
@@ -69,7 +69,7 @@ app.post('/auth/login', (req, res) => {
       user: {
         id: 'test-user-1',
         email: email,
-        name: 'Test User',
+        name: 'Martin Skallerup',
         isAuthenticated: true
       },
       token: 'mock-token-' + Date.now()
@@ -93,7 +93,7 @@ app.post('/api/auth/login', (req, res) => {
       user: {
         id: 'test-user-1',
         email: email,
-        name: 'Test User',
+        name: 'Martin Skallerup',
         isAuthenticated: true
       },
       token: 'mock-token-' + Date.now()
@@ -833,6 +833,21 @@ app.patch('/auth/password', (req, res) => {
   res.json({
     success: true,
     message: 'Password updated successfully'
+  });
+});
+
+// Additional missing auth endpoints
+app.post('/auth/logout', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Logout successful'
+  });
+});
+
+app.get('/forgot-password', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Password reset email sent'
   });
 });
 
