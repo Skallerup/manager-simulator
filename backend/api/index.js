@@ -472,285 +472,346 @@ let firedPlayers = new Set();
 // Transfer list is now stored in Supabase database
 
 // Team endpoints
-app.get("/api/teams/my-team", (req, res) => {
+app.get("/api/teams/my-team", async (req, res) => {
   console.log("🔍 TEAMS/MY-TEAM - Headers:", req.headers);
   console.log("🔍 TEAMS/MY-TEAM - Origin:", req.headers.origin);
   console.log("🔍 TEAMS/MY-TEAM - Fired players:", Array.from(firedPlayers));
   
-  const allPlayers = [
-    // Starters (11 players)
-    {
-      id: "1",
-      name: "Lars Andersen",
-      position: "GOALKEEPER",
-      rating: 75,
-      age: 25,
-      isStarter: true,
-      isCaptain: true,
-      formationPosition: "gk",
-      speed: 60,
-      shooting: 40,
-      passing: 70,
-      defending: 80,
-      stamina: 85,
-      reflexes: 90
-    },
-    {
-      id: "2", 
-      name: "Mikkel Hansen",
-      position: "DEFENDER",
-      rating: 80,
-      age: 27,
-      isStarter: true,
-      isCaptain: false,
-      formationPosition: "cb1",
-      speed: 70,
-      shooting: 50,
-      passing: 75,
-      defending: 90,
-      stamina: 80,
-      reflexes: 60
-    },
-    {
-      id: "3",
-      name: "Jesper Nielsen", 
-      position: "DEFENDER",
-      rating: 78,
-      age: 24,
-      isStarter: true,
-      isCaptain: false,
-      formationPosition: "cb2",
-      speed: 72,
-      shooting: 45,
-      passing: 70,
-      defending: 85,
-      stamina: 82,
-      reflexes: 65
-    },
-    {
-      id: "4",
-      name: "Christian Larsen",
-      position: "DEFENDER", 
-      rating: 76,
-      age: 26,
-      isStarter: true,
-      isCaptain: false,
-      formationPosition: "lb",
-      speed: 75,
-      shooting: 55,
-      passing: 80,
-      defending: 82,
-      stamina: 85,
-      reflexes: 70
-    },
-    {
-      id: "5",
-      name: "Thomas Møller",
-      position: "DEFENDER", 
-      rating: 74,
-      age: 28,
-      isStarter: true,
-      isCaptain: false,
-      formationPosition: "rb",
-      speed: 73,
-      shooting: 50,
-      passing: 75,
-      defending: 80,
-      stamina: 83,
-      reflexes: 68
-    },
-    {
-      id: "6",
-      name: "Michael Sørensen",
-      position: "MIDFIELDER", 
-      rating: 85,
-      age: 24,
-      isStarter: true,
-      isCaptain: false,
-      formationPosition: "cm1",
-      speed: 80,
-      shooting: 70,
-      passing: 90,
-      defending: 75,
-      stamina: 85,
-      reflexes: 65
-    },
-    {
-      id: "7",
-      name: "Henrik Madsen",
-      position: "MIDFIELDER", 
-      rating: 82,
-      age: 25,
-      isStarter: true,
-      isCaptain: false,
-      formationPosition: "cm2",
-      speed: 78,
-      shooting: 75,
-      passing: 85,
-      defending: 70,
-      stamina: 88,
-      reflexes: 62
-    },
-    {
-      id: "8",
-      name: "Steen Christensen",
-      position: "MIDFIELDER", 
-      rating: 79,
-      age: 26,
-      isStarter: true,
-      isCaptain: false,
-      formationPosition: "cm3",
-      speed: 76,
-      shooting: 68,
-      passing: 82,
-      defending: 72,
-      stamina: 86,
-      reflexes: 67
-    },
-    {
-      id: "9",
-      name: "Flemming Jørgensen",
-      position: "ATTACKER", 
-      rating: 90,
-      age: 26,
-      isStarter: true,
-      isCaptain: false,
-      formationPosition: "st1",
-      speed: 90,
-      shooting: 95,
-      passing: 80,
-      defending: 40,
-      stamina: 85,
-      reflexes: 70
-    },
-    {
-      id: "10",
-      name: "Rasmus Poulsen",
-      position: "ATTACKER", 
-      rating: 87,
-      age: 23,
-      isStarter: true,
-      isCaptain: false,
-      formationPosition: "st2",
-      speed: 88,
-      shooting: 92,
-      passing: 75,
-      defending: 35,
-      stamina: 87,
-      reflexes: 72
-    },
-    {
-      id: "11",
-      name: "Daniel Simonsen",
-      position: "ATTACKER", 
-      rating: 84,
-      age: 24,
-      isStarter: true,
-      isCaptain: false,
-      formationPosition: "st3",
-      speed: 85,
-      shooting: 88,
-      passing: 78,
-      defending: 38,
-      stamina: 84,
-      reflexes: 68
-    },
-    // Substitutes (5 players)
-    {
-      id: "12",
-      name: "Nikolaj Andersen",
-      position: "DEFENDER", 
-      rating: 72,
-      age: 22,
-      isStarter: false,
-      isCaptain: false,
-      formationPosition: null,
-      speed: 70,
-      shooting: 45,
-      passing: 68,
-      defending: 75,
-      stamina: 80,
-      reflexes: 60
-    },
-    {
-      id: "13",
-      name: "Mads Larsen",
-      position: "MIDFIELDER", 
-      rating: 76,
-      age: 21,
-      isStarter: false,
-      isCaptain: false,
-      formationPosition: null,
-      speed: 75,
-      shooting: 65,
-      passing: 80,
-      defending: 68,
-      stamina: 82,
-      reflexes: 63
-    },
-    {
-      id: "14",
-      name: "Simon Hansen",
-      position: "ATTACKER", 
-      rating: 81,
-      age: 20,
-      isStarter: false,
-      isCaptain: false,
-      formationPosition: null,
-      speed: 82,
-      shooting: 85,
-      passing: 72,
-      defending: 32,
-      stamina: 83,
-      reflexes: 65
-    },
-    {
-      id: "15",
-      name: "Claus Nielsen",
-      position: "GOALKEEPER", 
-      rating: 68,
-      age: 19,
-      isStarter: false,
-      isCaptain: false,
-      formationPosition: null,
-      speed: 55,
-      shooting: 30,
-      passing: 65,
-      defending: 70,
-      stamina: 75,
-      reflexes: 85
-    },
-    {
-      id: "16",
-      name: "Ole Møller",
-      position: "DEFENDER", 
-      rating: 70,
-      age: 23,
-      isStarter: false,
-      isCaptain: false,
-      formationPosition: null,
-      speed: 68,
-      shooting: 42,
-      passing: 70,
-      defending: 78,
-      stamina: 79,
-      reflexes: 62
+  try {
+    // Try to get team data from Supabase first
+    const { data: teamData, error: teamError } = await supabase
+      .from('teams')
+      .select('*')
+      .limit(1)
+      .single();
+    
+    if (teamError) {
+      console.log('Supabase team error:', teamError);
+      throw new Error('Team data not available');
     }
-  ];
-  
-  // Filter out fired players
-  const activePlayers = allPlayers.filter(player => !firedPlayers.has(player.id));
-  
-        res.json({
-          id: "1",
-          name: "Test Team",
-          logo: "/avatars/default.svg",
-          budget: 500000, // Reduced budget to show facility purchases
-          leagueId: "1",
-          overallRating: 80,
-          formation: "5-3-2",
-          players: activePlayers
-        });
+    
+    // Get players for this team
+    const { data: playersData, error: playersError } = await supabase
+      .from('players')
+      .select('*')
+      .eq('team_id', teamData.id);
+    
+    if (playersError) {
+      console.log('Supabase players error:', playersError);
+      throw new Error('Players data not available');
+    }
+    
+    // Transform players data to match frontend expectations
+    const players = (playersData || []).map(player => ({
+      id: player.id.toString(),
+      name: player.name || `Player ${player.id}`,
+      position: player.position || 'MIDFIELDER',
+      rating: player.rating || 70,
+      age: player.age || 25,
+      isStarter: player.is_starter || false,
+      isCaptain: player.is_captain || false,
+      formationPosition: player.formation_position || null,
+      speed: player.speed || 70,
+      shooting: player.shooting || 65,
+      passing: player.passing || 75,
+      defending: player.defending || 60,
+      stamina: player.stamina || 80,
+      reflexes: player.reflexes || 70
+    }));
+    
+    // Filter out fired players
+    const activePlayers = players.filter(player => !firedPlayers.has(player.id));
+    
+    res.json({
+      id: teamData.id.toString(),
+      name: teamData.name || 'Test Team',
+      logo: teamData.logo || '/avatars/default.svg',
+      budget: teamData.budget || 500000,
+      leagueId: teamData.league_id || '1',
+      overallRating: teamData.overall_rating || 80,
+      formation: teamData.formation || '5-3-2',
+      players: activePlayers
+    });
+    
+  } catch (error) {
+    console.log('Supabase data not available, using fallback:', error.message);
+    
+    // Fallback to mock data if Supabase fails
+    const allPlayers = [
+      // Starters (11 players)
+      {
+        id: "1",
+        name: "Lars Andersen",
+        position: "GOALKEEPER",
+        rating: 75,
+        age: 25,
+        isStarter: true,
+        isCaptain: true,
+        formationPosition: "gk",
+        speed: 60,
+        shooting: 40,
+        passing: 70,
+        defending: 80,
+        stamina: 85,
+        reflexes: 90
+      },
+      {
+        id: "2", 
+        name: "Mikkel Hansen",
+        position: "DEFENDER",
+        rating: 80,
+        age: 27,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "cb1",
+        speed: 70,
+        shooting: 50,
+        passing: 75,
+        defending: 90,
+        stamina: 80,
+        reflexes: 60
+      },
+      {
+        id: "3",
+        name: "Jesper Nielsen", 
+        position: "DEFENDER",
+        rating: 78,
+        age: 24,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "cb2",
+        speed: 72,
+        shooting: 45,
+        passing: 70,
+        defending: 85,
+        stamina: 82,
+        reflexes: 65
+      },
+      {
+        id: "4",
+        name: "Christian Larsen",
+        position: "DEFENDER", 
+        rating: 76,
+        age: 26,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "lb",
+        speed: 75,
+        shooting: 55,
+        passing: 80,
+        defending: 82,
+        stamina: 85,
+        reflexes: 70
+      },
+      {
+        id: "5",
+        name: "Thomas Møller",
+        position: "DEFENDER", 
+        rating: 74,
+        age: 28,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "rb",
+        speed: 73,
+        shooting: 50,
+        passing: 75,
+        defending: 80,
+        stamina: 83,
+        reflexes: 68
+      },
+      {
+        id: "6",
+        name: "Michael Sørensen",
+        position: "MIDFIELDER", 
+        rating: 85,
+        age: 24,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "cm1",
+        speed: 80,
+        shooting: 70,
+        passing: 90,
+        defending: 75,
+        stamina: 85,
+        reflexes: 65
+      },
+      {
+        id: "7",
+        name: "Henrik Madsen",
+        position: "MIDFIELDER", 
+        rating: 82,
+        age: 25,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "cm2",
+        speed: 78,
+        shooting: 75,
+        passing: 85,
+        defending: 70,
+        stamina: 88,
+        reflexes: 62
+      },
+      {
+        id: "8",
+        name: "Steen Christensen",
+        position: "MIDFIELDER", 
+        rating: 79,
+        age: 26,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "cm3",
+        speed: 76,
+        shooting: 68,
+        passing: 82,
+        defending: 72,
+        stamina: 86,
+        reflexes: 67
+      },
+      {
+        id: "9",
+        name: "Flemming Jørgensen",
+        position: "ATTACKER", 
+        rating: 90,
+        age: 26,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "st1",
+        speed: 90,
+        shooting: 95,
+        passing: 80,
+        defending: 40,
+        stamina: 85,
+        reflexes: 70
+      },
+      {
+        id: "10",
+        name: "Rasmus Poulsen",
+        position: "ATTACKER", 
+        rating: 87,
+        age: 23,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "st2",
+        speed: 88,
+        shooting: 92,
+        passing: 75,
+        defending: 35,
+        stamina: 87,
+        reflexes: 72
+      },
+      {
+        id: "11",
+        name: "Daniel Simonsen",
+        position: "ATTACKER", 
+        rating: 84,
+        age: 24,
+        isStarter: true,
+        isCaptain: false,
+        formationPosition: "st3",
+        speed: 85,
+        shooting: 88,
+        passing: 78,
+        defending: 38,
+        stamina: 84,
+        reflexes: 68
+      },
+      // Substitutes (5 players)
+      {
+        id: "12",
+        name: "Nikolaj Andersen",
+        position: "DEFENDER", 
+        rating: 72,
+        age: 22,
+        isStarter: false,
+        isCaptain: false,
+        formationPosition: null,
+        speed: 70,
+        shooting: 45,
+        passing: 68,
+        defending: 75,
+        stamina: 80,
+        reflexes: 60
+      },
+      {
+        id: "13",
+        name: "Mads Larsen",
+        position: "MIDFIELDER", 
+        rating: 76,
+        age: 21,
+        isStarter: false,
+        isCaptain: false,
+        formationPosition: null,
+        speed: 75,
+        shooting: 65,
+        passing: 80,
+        defending: 68,
+        stamina: 82,
+        reflexes: 63
+      },
+      {
+        id: "14",
+        name: "Simon Hansen",
+        position: "ATTACKER", 
+        rating: 81,
+        age: 20,
+        isStarter: false,
+        isCaptain: false,
+        formationPosition: null,
+        speed: 82,
+        shooting: 85,
+        passing: 72,
+        defending: 32,
+        stamina: 83,
+        reflexes: 65
+      },
+      {
+        id: "15",
+        name: "Claus Nielsen",
+        position: "GOALKEEPER", 
+        rating: 68,
+        age: 19,
+        isStarter: false,
+        isCaptain: false,
+        formationPosition: null,
+        speed: 55,
+        shooting: 30,
+        passing: 65,
+        defending: 70,
+        stamina: 75,
+        reflexes: 85
+      },
+      {
+        id: "16",
+        name: "Ole Møller",
+        position: "DEFENDER", 
+        rating: 70,
+        age: 23,
+        isStarter: false,
+        isCaptain: false,
+        formationPosition: null,
+        speed: 68,
+        shooting: 42,
+        passing: 70,
+        defending: 78,
+        stamina: 79,
+        reflexes: 62
+      }
+    ];
+    
+    // Filter out fired players
+    const activePlayers = allPlayers.filter(player => !firedPlayers.has(player.id));
+    
+    res.json({
+      id: "1",
+      name: "Test Team",
+      logo: "/avatars/default.svg",
+      budget: 500000,
+      leagueId: "1",
+      overallRating: 80,
+      formation: "5-3-2",
+      players: activePlayers
+    });
+  }
 });
 
 app.post("/api/teams", (req, res) => {
@@ -1099,26 +1160,142 @@ app.get("/api/dashboard", (req, res) => {
 });
 
 // Transfers endpoints
-app.get("/api/transfers/available", (req, res) => {
+app.get("/api/transfers/available", async (req, res) => {
   console.log("🔍 TRANSFERS/AVAILABLE - Headers:", req.headers);
   console.log("🔍 TRANSFERS/AVAILABLE - Origin:", req.headers.origin);
   
-  // Return empty array - no available transfers
-  res.json([]);
+  try {
+    const { data, error } = await supabase
+      .from('transfers')
+      .select('*')
+      .eq('status', 'available');
+    
+    if (error) {
+      console.log('Supabase transfers error:', error);
+      res.json([]);
+      return;
+    }
+    
+    // Transform data to include player information
+    const transformedData = (data || []).map(transfer => ({
+      id: transfer.id.toString(),
+      playerId: transfer.player_id,
+      askingPrice: transfer.asking_price,
+      status: transfer.status,
+      createdAt: transfer.created_at,
+      player: {
+        id: transfer.player_id,
+        name: `Player ${transfer.player_id}`,
+        age: 25,
+        position: 'MIDFIELDER',
+        speed: 70,
+        shooting: 65,
+        passing: 75,
+        defending: 60,
+        stamina: 80,
+        reflexes: 70,
+        rating: 70,
+        isGenerated: true
+      }
+    }));
+    
+    res.json(transformedData);
+  } catch (error) {
+    console.log('Transfer data not available:', error.message);
+    res.json([]);
+  }
 });
 
 // Frontend expects "/api/transfers/my-team" returning an array
-app.get("/api/transfers/my-team", (req, res) => {
+app.get("/api/transfers/my-team", async (req, res) => {
   console.log("🔍 TRANSFERS/MY-TRANSFERS - Headers:", req.headers);
-  res.json([]);
+  
+  try {
+    const { data, error } = await supabase
+      .from('transfers')
+      .select('*')
+      .in('player_id', ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16']);
+    
+    if (error) {
+      console.log('Supabase my-team transfers error:', error);
+      res.json([]);
+      return;
+    }
+    
+    // Transform data to include player information
+    const transformedData = (data || []).map(transfer => ({
+      id: transfer.id.toString(),
+      playerId: transfer.player_id,
+      askingPrice: transfer.asking_price,
+      status: transfer.status,
+      createdAt: transfer.created_at,
+      player: {
+        id: transfer.player_id,
+        name: `Player ${transfer.player_id}`,
+        age: 25,
+        position: 'MIDFIELDER',
+        speed: 70,
+        shooting: 65,
+        passing: 75,
+        defending: 60,
+        stamina: 80,
+        reflexes: 70,
+        rating: 70,
+        isGenerated: true
+      }
+    }));
+    
+    res.json(transformedData);
+  } catch (error) {
+    console.log('My-team transfer data not available:', error.message);
+    res.json([]);
+  }
 });
 
-app.get("/api/transfers/free-transfer", (req, res) => {
+app.get("/api/transfers/free-transfer", async (req, res) => {
   console.log("🔍 TRANSFERS/FREE-TRANSFER - Headers:", req.headers);
   console.log("🔍 TRANSFERS/FREE-TRANSFER - Origin:", req.headers.origin);
   
-  // Return empty array - no free transfers
-  res.json([]);
+  try {
+    const { data, error } = await supabase
+      .from('transfers')
+      .select('*')
+      .eq('status', 'free');
+    
+    if (error) {
+      console.log('Supabase free transfers error:', error);
+      res.json([]);
+      return;
+    }
+    
+    // Transform data to include player information
+    const transformedData = (data || []).map(transfer => ({
+      id: transfer.id.toString(),
+      playerId: transfer.player_id,
+      askingPrice: transfer.asking_price,
+      status: transfer.status,
+      createdAt: transfer.created_at,
+      player: {
+        id: transfer.player_id,
+        name: `Player ${transfer.player_id}`,
+        age: 25,
+        position: 'MIDFIELDER',
+        speed: 70,
+        shooting: 65,
+        passing: 75,
+        defending: 60,
+        stamina: 80,
+        reflexes: 70,
+        rating: 70,
+        isGenerated: true
+      }
+    }));
+    
+    res.json(transformedData);
+  } catch (error) {
+    console.log('Free transfer data not available:', error.message);
+    res.json([]);
+  }
 });
 
 // Get minimum price for a player
