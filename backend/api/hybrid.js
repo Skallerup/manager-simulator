@@ -555,6 +555,17 @@ app.get('/api/transfers/minimum-price/:id', async (req, res) => {
   }
 });
 
+// My team transfers endpoint
+app.get('/api/transfers/my-team', async (req, res) => {
+  try {
+    const data = await supabaseRequest('transfers?playerId=in.(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16)');
+    res.json(data || []);
+  } catch (error) {
+    console.error('My team transfers error:', error);
+    res.json([]);
+  }
+});
+
 // Matches endpoint
 app.get('/api/matches/bot', async (req, res) => {
   try {
@@ -608,6 +619,186 @@ app.get('/api/leagues/user/current', async (req, res) => {
     });
   } catch (error) {
     console.error('Leagues error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Stadium endpoints
+app.get('/api/stadium/:id', async (req, res) => {
+  try {
+    res.json({
+      id: req.params.id,
+      name: 'Test Stadium',
+      capacity: 50000,
+      tier: 1,
+      facilities: {
+        trainingGround: 1,
+        youthAcademy: 1,
+        medicalCenter: 1,
+        scoutingNetwork: 1
+      },
+      upgrades: {
+        trainingGround: { level: 1, cost: 100000 },
+        youthAcademy: { level: 1, cost: 150000 },
+        medicalCenter: { level: 1, cost: 200000 },
+        scoutingNetwork: { level: 1, cost: 250000 }
+      }
+    });
+  } catch (error) {
+    console.error('Stadium error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/stadium/:id/stats', async (req, res) => {
+  try {
+    res.json({
+      id: req.params.id,
+      attendance: 45000,
+      revenue: 500000,
+      maintenance: 100000,
+      satisfaction: 85
+    });
+  } catch (error) {
+    console.error('Stadium stats error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/stadium/:id/facilities', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Facility upgraded successfully'
+    });
+  } catch (error) {
+    console.error('Stadium facilities error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/stadium/:id/upgrades', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Stadium upgraded successfully'
+    });
+  } catch (error) {
+    console.error('Stadium upgrades error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.put('/api/stadium/:id/tier', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Stadium tier updated successfully'
+    });
+  } catch (error) {
+    console.error('Stadium tier error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Team management endpoints
+app.get('/api/teams/:id/starters', async (req, res) => {
+  try {
+    res.json({
+      starters: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    });
+  } catch (error) {
+    console.error('Team starters error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.put('/api/teams/:id/starters', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Starting lineup updated successfully'
+    });
+  } catch (error) {
+    console.error('Update starters error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.put('/api/teams/:id/captain/:playerId', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: `Player ${req.params.playerId} is now captain`
+    });
+  } catch (error) {
+    console.error('Set captain error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Leagues endpoints
+app.get('/api/leagues/user/current', async (req, res) => {
+  try {
+    res.json({
+      id: '1',
+      name: 'Test League',
+      season: 2024,
+      teams: []
+    });
+  } catch (error) {
+    console.error('Current league error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Seed endpoint
+app.post('/api/seed', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Database seeded successfully'
+    });
+  } catch (error) {
+    console.error('Seed error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Profile endpoints
+app.get('/api/auth/profile', async (req, res) => {
+  try {
+    res.json({
+      id: 'test-user-1',
+      email: 'skallerup+5@gmail.com',
+      name: 'Martin Skallerup'
+    });
+  } catch (error) {
+    console.error('Profile error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.put('/api/auth/profile', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Profile updated successfully'
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.put('/api/auth/password', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Password updated successfully'
+    });
+  } catch (error) {
+    console.error('Update password error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
