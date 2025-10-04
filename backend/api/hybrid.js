@@ -741,6 +741,126 @@ app.get('/api/transfers/my-team', async (req, res) => {
   }
 });
 
+// Leagues endpoints
+app.get('/api/leagues', async (req, res) => {
+  try {
+    res.json([
+      {
+        id: '1',
+        name: 'Superligaen',
+        country: 'Denmark',
+        level: 1,
+        teams: 12,
+        currentSeason: '2024/25',
+        logo: '/logos/superligaen.png'
+      },
+      {
+        id: '2',
+        name: 'Premier League',
+        country: 'England',
+        level: 1,
+        teams: 20,
+        currentSeason: '2024/25',
+        logo: '/logos/premier-league.png'
+      },
+      {
+        id: '3',
+        name: 'La Liga',
+        country: 'Spain',
+        level: 1,
+        teams: 20,
+        currentSeason: '2024/25',
+        logo: '/logos/la-liga.png'
+      }
+    ]);
+  } catch (error) {
+    console.error('Leagues error:', error);
+    res.json([]);
+  }
+});
+
+app.get('/api/leagues/browse', async (req, res) => {
+  try {
+    res.json([
+      {
+        id: '1',
+        name: 'Superligaen',
+        country: 'Denmark',
+        level: 1,
+        teams: 12,
+        currentSeason: '2024/25',
+        logo: '/logos/superligaen.png'
+      },
+      {
+        id: '2',
+        name: 'Premier League',
+        country: 'England',
+        level: 1,
+        teams: 20,
+        currentSeason: '2024/25',
+        logo: '/logos/premier-league.png'
+      },
+      {
+        id: '3',
+        name: 'La Liga',
+        country: 'Spain',
+        level: 1,
+        teams: 20,
+        currentSeason: '2024/25',
+        logo: '/logos/la-liga.png'
+      }
+    ]);
+  } catch (error) {
+    console.error('Browse leagues error:', error);
+    res.json([]);
+  }
+});
+
+app.get('/api/leagues/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const league = {
+      id: id,
+      name: id === '1' ? 'Superligaen' : id === '2' ? 'Premier League' : 'La Liga',
+      country: id === '1' ? 'Denmark' : id === '2' ? 'England' : 'Spain',
+      level: 1,
+      teams: id === '1' ? 12 : 20,
+      currentSeason: '2024/25',
+      logo: `/logos/${id === '1' ? 'superligaen' : id === '2' ? 'premier-league' : 'la-liga'}.png`,
+      standings: [
+        { position: 1, team: 'FC København', points: 45, played: 15, won: 14, drawn: 3, lost: 0, goalsFor: 38, goalsAgainst: 8, goalDifference: 30 },
+        { position: 2, team: 'Brøndby IF', points: 42, played: 15, won: 13, drawn: 3, lost: 0, goalsFor: 35, goalsAgainst: 12, goalDifference: 23 },
+        { position: 3, team: 'AGF', points: 38, played: 15, won: 12, drawn: 2, lost: 1, goalsFor: 32, goalsAgainst: 15, goalDifference: 17 },
+        { position: 4, team: 'FC Midtjylland', points: 35, played: 15, won: 11, drawn: 2, lost: 2, goalsFor: 28, goalsAgainst: 18, goalDifference: 10 },
+        { position: 5, team: 'Randers FC', points: 32, played: 15, won: 10, drawn: 2, lost: 3, goalsFor: 25, goalsAgainst: 20, goalDifference: 5 }
+      ]
+    };
+    res.json(league);
+  } catch (error) {
+    console.error('League details error:', error);
+    res.status(500).json({ error: 'Failed to get league details' });
+  }
+});
+
+app.get('/api/leagues/user/current', async (req, res) => {
+  try {
+    res.json({
+      league: {
+        id: '1',
+        name: 'Superligaen',
+        country: 'Denmark',
+        level: 1,
+        teams: 12,
+        currentSeason: '2024/25',
+        logo: '/logos/superligaen.png'
+      }
+    });
+  } catch (error) {
+    console.error('Current league error:', error);
+    res.status(500).json({ error: 'Failed to get current league' });
+  }
+});
+
 // Training matches endpoints
 app.get('/api/training-matches/league-teams', async (req, res) => {
   try {
