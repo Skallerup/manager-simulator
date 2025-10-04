@@ -741,6 +741,65 @@ app.get('/api/transfers/my-team', async (req, res) => {
   }
 });
 
+// Training matches endpoints
+app.get('/api/training-matches/league-teams', async (req, res) => {
+  try {
+    res.json([
+      { id: '1', name: 'Team Alpha', rating: 85 },
+      { id: '2', name: 'Team Beta', rating: 82 },
+      { id: '3', name: 'Team Gamma', rating: 78 },
+      { id: '4', name: 'Team Delta', rating: 80 },
+      { id: '5', name: 'Team Epsilon', rating: 83 }
+    ]);
+  } catch (error) {
+    console.error('League teams error:', error);
+    res.json([]);
+  }
+});
+
+app.get('/api/training-matches', async (req, res) => {
+  try {
+    res.json([]);
+  } catch (error) {
+    console.error('Training matches error:', error);
+    res.json([]);
+  }
+});
+
+app.post('/api/training-matches', async (req, res) => {
+  try {
+    const { opponent, date, type } = req.body;
+    res.json({
+      id: Date.now().toString(),
+      opponent: opponent || 'Training Team',
+      date: date || new Date().toISOString(),
+      type: type || 'training',
+      status: 'scheduled'
+    });
+  } catch (error) {
+    console.error('Create training match error:', error);
+    res.status(500).json({ error: 'Failed to create training match' });
+  }
+});
+
+app.get('/api/training-matches/:id/simulate', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const playerGoals = Math.floor(Math.random() * 4);
+    const opponentGoals = Math.floor(Math.random() * 4);
+    
+    res.json({
+      id: id,
+      playerScore: playerGoals,
+      opponentScore: opponentGoals,
+      result: playerGoals > opponentGoals ? 'win' : playerGoals < opponentGoals ? 'loss' : 'draw'
+    });
+  } catch (error) {
+    console.error('Simulate training match error:', error);
+    res.status(500).json({ error: 'Failed to simulate training match' });
+  }
+});
+
 // Matches endpoint
 app.get('/api/matches/bot', async (req, res) => {
   try {
