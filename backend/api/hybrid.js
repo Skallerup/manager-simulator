@@ -194,7 +194,8 @@ app.get('/api/teams/my-team', async (req, res) => {
         return;
       }
     } catch (supabaseError) {
-      console.log('Supabase team data not available, using fallback');
+      console.log('Supabase team/player tables not available yet, using fallback data');
+      console.log('Note: Need to create teams and players tables in Supabase for full integration');
     }
     
     // Fallback to mock data if Supabase fails
