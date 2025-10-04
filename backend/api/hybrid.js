@@ -850,7 +850,20 @@ app.get('/api/leagues/user/current', async (req, res) => {
         name: 'Superligaen',
         country: 'Denmark',
         level: 1,
-        teams: 12,
+        teams: [
+          { id: '1', name: 'FC København', isBot: false, rating: 85 },
+          { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
+          { id: '3', name: 'AGF', isBot: false, rating: 78 },
+          { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
+          { id: '5', name: 'Randers FC', isBot: false, rating: 75 },
+          { id: '6', name: 'Viborg FF', isBot: false, rating: 73 },
+          { id: '7', name: 'OB', isBot: false, rating: 71 },
+          { id: '8', name: 'Silkeborg IF', isBot: false, rating: 69 },
+          { id: '9', name: 'Lyngby BK', isBot: false, rating: 67 },
+          { id: '10', name: 'Horsens', isBot: false, rating: 65 },
+          { id: '11', name: 'Nordsjælland', isBot: false, rating: 63 },
+          { id: '12', name: 'Vejle', isBot: false, rating: 61 }
+        ],
         currentSeason: '2024/25',
         logo: '/logos/superligaen.png'
       }
