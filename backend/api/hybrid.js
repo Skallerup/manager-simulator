@@ -930,21 +930,111 @@ app.get('/api/leagues/browse', async (req, res) => {
 app.get('/api/leagues/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const league = {
-      id: id,
-      name: id === '1' ? 'Superligaen' : id === '2' ? 'Premier League' : 'La Liga',
-      country: id === '1' ? 'Denmark' : id === '2' ? 'England' : 'Spain',
-      level: 1,
-      teams: id === '1' ? 12 : 20,
-      currentSeason: '2024/25',
-      logo: `/logos/${id === '1' ? 'superligaen' : id === '2' ? 'premier-league' : 'la-liga'}.png`,
-      standings: [
+    
+    // Define teams arrays for each league
+    const superligaTeams = [
+      { id: '1', name: 'FC København', isBot: false, rating: 85 },
+      { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
+      { id: '3', name: 'AGF', isBot: false, rating: 78 },
+      { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
+      { id: '5', name: 'Randers FC', isBot: false, rating: 75 },
+      { id: '6', name: 'Viborg FF', isBot: false, rating: 73 },
+      { id: '7', name: 'OB', isBot: false, rating: 71 },
+      { id: '8', name: 'Silkeborg IF', isBot: false, rating: 69 },
+      { id: '9', name: 'Lyngby BK', isBot: false, rating: 67 },
+      { id: '10', name: 'Horsens', isBot: false, rating: 65 },
+      { id: '11', name: 'Nordsjælland', isBot: false, rating: 63 },
+      { id: '12', name: 'Vejle', isBot: false, rating: 61 }
+    ];
+    
+    const premierLeagueTeams = [
+      { id: '1', name: 'Manchester City', isBot: false, rating: 90 },
+      { id: '2', name: 'Arsenal', isBot: false, rating: 88 },
+      { id: '3', name: 'Liverpool', isBot: false, rating: 87 },
+      { id: '4', name: 'Chelsea', isBot: false, rating: 85 },
+      { id: '5', name: 'Manchester United', isBot: false, rating: 83 },
+      { id: '6', name: 'Tottenham', isBot: false, rating: 81 },
+      { id: '7', name: 'Newcastle', isBot: false, rating: 79 },
+      { id: '8', name: 'Brighton', isBot: false, rating: 77 },
+      { id: '9', name: 'West Ham', isBot: false, rating: 75 },
+      { id: '10', name: 'Aston Villa', isBot: false, rating: 73 },
+      { id: '11', name: 'Crystal Palace', isBot: false, rating: 71 },
+      { id: '12', name: 'Fulham', isBot: false, rating: 69 },
+      { id: '13', name: 'Brentford', isBot: false, rating: 67 },
+      { id: '14', name: 'Wolves', isBot: false, rating: 65 },
+      { id: '15', name: 'Everton', isBot: false, rating: 63 },
+      { id: '16', name: 'Nottingham Forest', isBot: false, rating: 61 },
+      { id: '17', name: 'Leicester', isBot: false, rating: 59 },
+      { id: '18', name: 'Leeds', isBot: false, rating: 57 },
+      { id: '19', name: 'Southampton', isBot: false, rating: 55 },
+      { id: '20', name: 'Burnley', isBot: false, rating: 53 }
+    ];
+    
+    const laLigaTeams = [
+      { id: '1', name: 'Real Madrid', isBot: false, rating: 92 },
+      { id: '2', name: 'Barcelona', isBot: false, rating: 90 },
+      { id: '3', name: 'Atletico Madrid', isBot: false, rating: 88 },
+      { id: '4', name: 'Real Sociedad', isBot: false, rating: 82 },
+      { id: '5', name: 'Villarreal', isBot: false, rating: 80 },
+      { id: '6', name: 'Real Betis', isBot: false, rating: 78 },
+      { id: '7', name: 'Sevilla', isBot: false, rating: 76 },
+      { id: '8', name: 'Athletic Bilbao', isBot: false, rating: 74 },
+      { id: '9', name: 'Valencia', isBot: false, rating: 72 },
+      { id: '10', name: 'Osasuna', isBot: false, rating: 70 },
+      { id: '11', name: 'Getafe', isBot: false, rating: 68 },
+      { id: '12', name: 'Girona', isBot: false, rating: 66 },
+      { id: '13', name: 'Rayo Vallecano', isBot: false, rating: 64 },
+      { id: '14', name: 'Celta Vigo', isBot: false, rating: 62 },
+      { id: '15', name: 'Mallorca', isBot: false, rating: 60 },
+      { id: '16', name: 'Cadiz', isBot: false, rating: 58 },
+      { id: '17', name: 'Las Palmas', isBot: false, rating: 56 },
+      { id: '18', name: 'Alaves', isBot: false, rating: 54 },
+      { id: '19', name: 'Granada', isBot: false, rating: 52 },
+      { id: '20', name: 'Almeria', isBot: false, rating: 50 }
+    ];
+    
+    // Select teams based on league ID
+    let teams;
+    let standings;
+    
+    if (id === '1') {
+      teams = superligaTeams;
+      standings = [
         { position: 1, team: 'FC København', points: 45, played: 15, won: 14, drawn: 3, lost: 0, goalsFor: 38, goalsAgainst: 8, goalDifference: 30 },
         { position: 2, team: 'Brøndby IF', points: 42, played: 15, won: 13, drawn: 3, lost: 0, goalsFor: 35, goalsAgainst: 12, goalDifference: 23 },
         { position: 3, team: 'AGF', points: 38, played: 15, won: 12, drawn: 2, lost: 1, goalsFor: 32, goalsAgainst: 15, goalDifference: 17 },
         { position: 4, team: 'FC Midtjylland', points: 35, played: 15, won: 11, drawn: 2, lost: 2, goalsFor: 28, goalsAgainst: 18, goalDifference: 10 },
         { position: 5, team: 'Randers FC', points: 32, played: 15, won: 10, drawn: 2, lost: 3, goalsFor: 25, goalsAgainst: 20, goalDifference: 5 }
-      ]
+      ];
+    } else if (id === '2') {
+      teams = premierLeagueTeams;
+      standings = [
+        { position: 1, team: 'Manchester City', points: 48, played: 16, won: 15, drawn: 3, lost: 0, goalsFor: 42, goalsAgainst: 10, goalDifference: 32 },
+        { position: 2, team: 'Arsenal', points: 45, played: 16, won: 14, drawn: 3, lost: 0, goalsFor: 38, goalsAgainst: 12, goalDifference: 26 },
+        { position: 3, team: 'Liverpool', points: 42, played: 16, won: 13, drawn: 3, lost: 0, goalsFor: 35, goalsAgainst: 15, goalDifference: 20 },
+        { position: 4, team: 'Chelsea', points: 39, played: 16, won: 12, drawn: 3, lost: 1, goalsFor: 32, goalsAgainst: 18, goalDifference: 14 },
+        { position: 5, team: 'Manchester United', points: 36, played: 16, won: 11, drawn: 3, lost: 2, goalsFor: 28, goalsAgainst: 20, goalDifference: 8 }
+      ];
+    } else {
+      teams = laLigaTeams;
+      standings = [
+        { position: 1, team: 'Real Madrid', points: 51, played: 17, won: 16, drawn: 3, lost: 0, goalsFor: 45, goalsAgainst: 12, goalDifference: 33 },
+        { position: 2, team: 'Barcelona', points: 48, played: 17, won: 15, drawn: 3, lost: 0, goalsFor: 41, goalsAgainst: 15, goalDifference: 26 },
+        { position: 3, team: 'Atletico Madrid', points: 45, played: 17, won: 14, drawn: 3, lost: 0, goalsFor: 38, goalsAgainst: 18, goalDifference: 20 },
+        { position: 4, team: 'Real Sociedad', points: 42, played: 17, won: 13, drawn: 3, lost: 1, goalsFor: 35, goalsAgainst: 20, goalDifference: 15 },
+        { position: 5, team: 'Villarreal', points: 39, played: 17, won: 12, drawn: 3, lost: 2, goalsFor: 32, goalsAgainst: 22, goalDifference: 10 }
+      ];
+    }
+    
+    const league = {
+      id: id,
+      name: id === '1' ? 'Superligaen' : id === '2' ? 'Premier League' : 'La Liga',
+      country: id === '1' ? 'Denmark' : id === '2' ? 'England' : 'Spain',
+      level: 1,
+      teams: teams,
+      currentSeason: '2024/25',
+      logo: `/logos/${id === '1' ? 'superligaen' : id === '2' ? 'premier-league' : 'la-liga'}.png`,
+      standings: standings
     };
     res.json(league);
   } catch (error) {
