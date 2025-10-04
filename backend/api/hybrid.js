@@ -751,7 +751,7 @@ app.get('/api/leagues', async (req, res) => {
         country: 'Denmark',
         level: 1,
         teams: [
-          { id: '1', name: 'FC København', isBot: false, rating: 85 },
+          { id: '1', name: 'Test Team', isBot: false, rating: 80, isUserTeam: true }, // User's team
           { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
           { id: '3', name: 'AGF', isBot: false, rating: 78 },
           { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
@@ -844,7 +844,7 @@ app.get('/api/leagues/browse', async (req, res) => {
         country: 'Denmark',
         level: 1,
         teams: [
-          { id: '1', name: 'FC København', isBot: false, rating: 85 },
+          { id: '1', name: 'Test Team', isBot: false, rating: 80, isUserTeam: true }, // User's team
           { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
           { id: '3', name: 'AGF', isBot: false, rating: 78 },
           { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
@@ -933,7 +933,7 @@ app.get('/api/leagues/:id', async (req, res) => {
     
     // Define teams arrays for each league
     const superligaTeams = [
-      { id: '1', name: 'FC København', isBot: false, rating: 85 },
+      { id: '1', name: 'Test Team', isBot: false, rating: 80, isUserTeam: true }, // User's team
       { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
       { id: '3', name: 'AGF', isBot: false, rating: 78 },
       { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
@@ -998,9 +998,23 @@ app.get('/api/leagues/:id', async (req, res) => {
     let standings;
     
     if (id === '1') {
-      teams = superligaTeams;
+      // Replace one of the dummy teams with user's team
+      teams = [
+        { id: '1', name: 'Test Team', isBot: false, rating: 80, isUserTeam: true }, // User's team
+        { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
+        { id: '3', name: 'AGF', isBot: false, rating: 78 },
+        { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
+        { id: '5', name: 'Randers FC', isBot: false, rating: 75 },
+        { id: '6', name: 'Viborg FF', isBot: false, rating: 73 },
+        { id: '7', name: 'OB', isBot: false, rating: 71 },
+        { id: '8', name: 'Silkeborg IF', isBot: false, rating: 69 },
+        { id: '9', name: 'Lyngby BK', isBot: false, rating: 67 },
+        { id: '10', name: 'Horsens', isBot: false, rating: 65 },
+        { id: '11', name: 'Nordsjælland', isBot: false, rating: 63 },
+        { id: '12', name: 'Vejle', isBot: false, rating: 61 }
+      ];
       standings = [
-        { position: 1, team: 'FC København', points: 45, played: 15, won: 14, drawn: 3, lost: 0, goalsFor: 38, goalsAgainst: 8, goalDifference: 30 },
+        { position: 1, team: 'Test Team', points: 45, played: 15, won: 14, drawn: 3, lost: 0, goalsFor: 38, goalsAgainst: 8, goalDifference: 30, isUserTeam: true },
         { position: 2, team: 'Brøndby IF', points: 42, played: 15, won: 13, drawn: 3, lost: 0, goalsFor: 35, goalsAgainst: 12, goalDifference: 23 },
         { position: 3, team: 'AGF', points: 38, played: 15, won: 12, drawn: 2, lost: 1, goalsFor: 32, goalsAgainst: 15, goalDifference: 17 },
         { position: 4, team: 'FC Midtjylland', points: 35, played: 15, won: 11, drawn: 2, lost: 2, goalsFor: 28, goalsAgainst: 18, goalDifference: 10 },
@@ -1052,7 +1066,7 @@ app.get('/api/leagues/user/current', async (req, res) => {
         country: 'Denmark',
         level: 1,
         teams: [
-          { id: '1', name: 'FC København', isBot: false, rating: 85 },
+          { id: '1', name: 'Test Team', isBot: false, rating: 80, isUserTeam: true }, // User's team
           { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
           { id: '3', name: 'AGF', isBot: false, rating: 78 },
           { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
