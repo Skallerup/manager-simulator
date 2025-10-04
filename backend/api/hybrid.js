@@ -155,7 +155,49 @@ app.post('/auth/logout', (req, res) => {
 // Teams endpoint with Supabase data
 app.get('/api/teams/my-team', async (req, res) => {
   try {
-    // For now, return the same data as localhost to ensure consistency
+    // Try to get team data from Supabase first
+    try {
+      const teamData = await supabaseRequest('teams?select=*&limit=1');
+      if (teamData && teamData.length > 0) {
+        const team = teamData[0];
+        
+        // Get players for this team
+        const playersData = await supabaseRequest(`players?team_id=eq.${team.id}&select=*`);
+        
+        const players = (playersData || []).map(player => ({
+          id: player.id.toString(),
+          name: player.name || `Player ${player.id}`,
+          position: player.position || 'MIDFIELDER',
+          rating: player.rating || 70,
+          age: player.age || 25,
+          isStarter: player.is_starter || false,
+          isCaptain: player.is_captain || false,
+          formationPosition: player.formation_position || null,
+          speed: player.speed || 70,
+          shooting: player.shooting || 65,
+          passing: player.passing || 75,
+          defending: player.defending || 60,
+          stamina: player.stamina || 80,
+          reflexes: player.reflexes || 70
+        }));
+        
+        res.json({
+          id: team.id.toString(),
+          name: team.name || 'My Team',
+          logo: team.logo || '/avatars/default.svg',
+          budget: team.budget || 500000,
+          leagueId: team.league_id || '1',
+          overallRating: team.overall_rating || 80,
+          formation: team.formation || '5-3-2',
+          players: players
+        });
+        return;
+      }
+    } catch (supabaseError) {
+      console.log('Supabase team data not available, using fallback');
+    }
+    
+    // Fallback to mock data if Supabase fails
     res.json({
       id: '1',
       name: 'Test Team',
