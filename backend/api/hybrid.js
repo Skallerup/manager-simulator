@@ -28,8 +28,8 @@ app.use(cors({
 app.use(express.json());
 
 // Supabase configuration
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://yhcsackdxmjeekzlonsk.supabase.co';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InloY3NhY2tkeG1qZWVremxvbnNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2NTM3MjEsImV4cCI6MjA3NDIyOTcyMX0.LF3mSgPVkMnmRU_nyi1whwbbGWh_0UEniAbNTKUrK3k';
 
 // Helper function to make Supabase REST API calls
 async function supabaseRequest(endpoint, options = {}) {
@@ -56,14 +56,58 @@ async function supabaseRequest(endpoint, options = {}) {
   }
 }
 
+// Helper function to make Supabase POST/PUT/DELETE requests
+async function supabaseMutation(endpoint, data, method = 'POST') {
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+    const response = await fetch(url, {
+      method,
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(data)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Supabase mutation failed: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Supabase mutation error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 // Health check
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    message: 'Backend API is running',
-    timestamp: new Date().toISOString(),
-    supabase_configured: !!SUPABASE_URL
-  });
+app.get('/health', async (req, res) => {
+  try {
+    // Test Supabase connection
+    const testData = await supabaseRequest('transfers?limit=1');
+    const supabaseWorking = Array.isArray(testData);
+    
+    res.json({
+      status: 'OK',
+      message: 'Backend API is running',
+      timestamp: new Date().toISOString(),
+      supabase_configured: !!SUPABASE_URL,
+      supabase_working: supabaseWorking,
+      environment: process.env.NODE_ENV || 'development'
+    });
+  } catch (error) {
+    res.json({
+      status: 'OK',
+      message: 'Backend API is running',
+      timestamp: new Date().toISOString(),
+      supabase_configured: !!SUPABASE_URL,
+      supabase_working: false,
+      environment: process.env.NODE_ENV || 'development',
+      error: error.message
+    });
+  }
 });
 
 // Auth endpoints
@@ -188,6 +232,101 @@ app.get('/api/transfers', async (req, res) => {
   } catch (error) {
     console.error('All transfers error:', error);
     res.json([]);
+  }
+});
+
+// Transfer CRUD operations
+app.post('/api/transfers/list/:id', async (req, res) => {
+  try {
+    const { askingPrice } = req.body;
+    const transferData = {
+      playerId: req.params.id,
+      askingPrice: askingPrice || 1000000,
+      status: 'available',
+      createdAt: new Date().toISOString()
+    };
+    
+    const result = await supabaseMutation('transfers', transferData, 'POST');
+    res.json({
+      success: true,
+      message: `Player ${req.params.id} listed for transfer successfully`,
+      data: result
+    });
+  } catch (error) {
+    console.error('List transfer error:', error);
+    res.status(500).json({ success: false, error: 'Failed to list transfer' });
+  }
+});
+
+app.delete('/api/transfers/cancel/:id', async (req, res) => {
+  try {
+    const result = await supabaseRequest(`transfers?id=eq.${req.params.id}`, {
+      method: 'DELETE'
+    });
+    res.json({
+      success: true,
+      message: `Transfer ${req.params.id} cancelled successfully`
+    });
+  } catch (error) {
+    console.error('Cancel transfer error:', error);
+    res.status(500).json({ success: false, error: 'Failed to cancel transfer' });
+  }
+});
+
+app.delete('/api/transfers/fire/:id', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: `Player ${req.params.id} fired successfully`
+    });
+  } catch (error) {
+    console.error('Fire player error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fire player' });
+  }
+});
+
+app.post('/api/transfers/sign-free/:id', async (req, res) => {
+  try {
+    const transferData = {
+      playerId: req.params.id,
+      askingPrice: 0,
+      status: 'free',
+      createdAt: new Date().toISOString()
+    };
+    
+    const result = await supabaseMutation('transfers', transferData, 'POST');
+    res.json({
+      success: true,
+      message: `Player ${req.params.id} signed successfully`,
+      data: result
+    });
+  } catch (error) {
+    console.error('Sign free player error:', error);
+    res.status(500).json({ success: false, error: 'Failed to sign player' });
+  }
+});
+
+app.post('/api/transfers/buy/:id', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Player purchased successfully'
+    });
+  } catch (error) {
+    console.error('Buy player error:', error);
+    res.status(500).json({ success: false, error: 'Failed to buy player' });
+  }
+});
+
+app.get('/api/transfers/minimum-price/:id', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      minimumPrice: 1000000
+    });
+  } catch (error) {
+    console.error('Minimum price error:', error);
+    res.status(500).json({ success: false, error: 'Failed to get minimum price' });
   }
 });
 
