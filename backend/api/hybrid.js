@@ -433,7 +433,31 @@ app.get('/api/teams/my-team', async (req, res) => {
 app.get('/api/transfers/available', async (req, res) => {
   try {
     const data = await supabaseRequest('transfers?status=eq.available');
-    res.json(data || []);
+    
+    // Transform data to include player information
+    const transformedData = (data || []).map(transfer => ({
+      id: transfer.id.toString(),
+      playerId: transfer.player_id,
+      askingPrice: transfer.asking_price,
+      status: transfer.status,
+      createdAt: transfer.created_at,
+      player: {
+        id: transfer.player_id,
+        name: `Player ${transfer.player_id}`,
+        age: 25,
+        position: 'MIDFIELDER',
+        speed: 70,
+        shooting: 65,
+        passing: 75,
+        defending: 60,
+        stamina: 80,
+        reflexes: 70,
+        rating: 70,
+        isGenerated: true
+      }
+    }));
+    
+    res.json(transformedData);
   } catch (error) {
     console.error('Transfers error:', error);
     res.json([]);
@@ -443,7 +467,31 @@ app.get('/api/transfers/available', async (req, res) => {
 app.get('/api/transfers/free-transfer', async (req, res) => {
   try {
     const data = await supabaseRequest('transfers?status=eq.free');
-    res.json(data || []);
+    
+    // Transform data to include player information
+    const transformedData = (data || []).map(transfer => ({
+      id: transfer.id.toString(),
+      playerId: transfer.player_id,
+      askingPrice: transfer.asking_price,
+      status: transfer.status,
+      createdAt: transfer.created_at,
+      player: {
+        id: transfer.player_id,
+        name: `Player ${transfer.player_id}`,
+        age: 25,
+        position: 'MIDFIELDER',
+        speed: 70,
+        shooting: 65,
+        passing: 75,
+        defending: 60,
+        stamina: 80,
+        reflexes: 70,
+        rating: 70,
+        isGenerated: true
+      }
+    }));
+    
+    res.json(transformedData);
   } catch (error) {
     console.error('Free transfers error:', error);
     res.json([]);
@@ -453,10 +501,34 @@ app.get('/api/transfers/free-transfer', async (req, res) => {
 app.get('/api/transfers', async (req, res) => {
   try {
     const data = await supabaseRequest('transfers');
-    res.json(data || []);
+    
+    // Transform data to include player information
+    const transformedData = (data || []).map(transfer => ({
+      id: transfer.id.toString(),
+      playerId: transfer.player_id,
+      askingPrice: transfer.asking_price,
+      status: transfer.status,
+      createdAt: transfer.created_at,
+      player: {
+        id: transfer.player_id,
+        name: `Player ${transfer.player_id}`,
+        age: 25,
+        position: 'MIDFIELDER',
+        speed: 70,
+        shooting: 65,
+        passing: 75,
+        defending: 60,
+        stamina: 80,
+        reflexes: 70,
+        rating: 70,
+        isGenerated: true
+      }
+    }));
+    
+    res.json({ transfers: transformedData });
   } catch (error) {
     console.error('All transfers error:', error);
-    res.json([]);
+    res.json({ transfers: [] });
   }
 });
 
@@ -558,8 +630,32 @@ app.get('/api/transfers/minimum-price/:id', async (req, res) => {
 // My team transfers endpoint
 app.get('/api/transfers/my-team', async (req, res) => {
   try {
-    const data = await supabaseRequest('transfers?playerId=in.(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16)');
-    res.json(data || []);
+    const data = await supabaseRequest('transfers?player_id=in.(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16)');
+    
+    // Transform data to include player information
+    const transformedData = (data || []).map(transfer => ({
+      id: transfer.id.toString(),
+      playerId: transfer.player_id,
+      askingPrice: transfer.asking_price,
+      status: transfer.status,
+      createdAt: transfer.created_at,
+      player: {
+        id: transfer.player_id,
+        name: `Player ${transfer.player_id}`,
+        age: 25,
+        position: 'MIDFIELDER',
+        speed: 70,
+        shooting: 65,
+        passing: 75,
+        defending: 60,
+        stamina: 80,
+        reflexes: 70,
+        rating: 70,
+        isGenerated: true
+      }
+    }));
+    
+    res.json(transformedData);
   } catch (error) {
     console.error('My team transfers error:', error);
     res.json([]);
