@@ -988,4 +988,12 @@ app.use('*', (req, res) => {
   });
 });
 
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Backend server running on port ${PORT}`);
+  console.log(`📊 Supabase configured: ${SUPABASE_URL && SUPABASE_ANON_KEY ? 'YES' : 'NO'}`);
+  console.log(`🌐 CORS enabled for: localhost:3001, app.martinskallerup.dk`);
+});
+
 module.exports = app;
