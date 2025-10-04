@@ -82,6 +82,30 @@ async function supabaseMutation(endpoint, data, method = 'POST') {
   }
 }
 
+// Helper function to get player data from Supabase
+async function getPlayerData(playerId) {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/players?id=eq.${playerId}&select=*`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      const playerArray = await response.json();
+      if (playerArray && playerArray.length > 0) {
+        return playerArray[0];
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching player data:', error);
+    return null;
+  }
+}
+
 // Health check
 app.get('/health', async (req, res) => {
   try {
@@ -478,26 +502,29 @@ app.get('/api/transfers/available', async (req, res) => {
     const data = await supabaseRequest('transfers?status=eq.available');
     
     // Transform data to include player information
-    const transformedData = (data || []).map(transfer => ({
-      id: transfer.id.toString(),
-      playerId: transfer.player_id,
-      askingPrice: transfer.asking_price,
-      status: transfer.status,
-      createdAt: transfer.created_at,
-      player: {
-        id: transfer.player_id,
-        name: `Player ${transfer.player_id}`,
-        age: 25,
-        position: 'MIDFIELDER',
-        speed: 70,
-        shooting: 65,
-        passing: 75,
-        defending: 60,
-        stamina: 80,
-        reflexes: 70,
-        rating: 70,
-        isGenerated: true
-      }
+    const transformedData = await Promise.all((data || []).map(async (transfer) => {
+      const playerData = await getPlayerData(transfer.player_id);
+      return {
+        id: transfer.id.toString(),
+        playerId: transfer.player_id,
+        askingPrice: transfer.asking_price,
+        status: transfer.status,
+        createdAt: transfer.created_at,
+        player: {
+          id: transfer.player_id,
+          name: playerData?.name || `Player ${transfer.player_id}`,
+          age: playerData?.age || 25,
+          position: playerData?.position || 'MIDFIELDER',
+          speed: playerData?.speed || 70,
+          shooting: playerData?.shooting || 65,
+          passing: playerData?.passing || 75,
+          defending: playerData?.defending || 60,
+          stamina: playerData?.stamina || 80,
+          reflexes: playerData?.reflexes || 70,
+          rating: playerData?.rating || 70,
+          isGenerated: !playerData
+        }
+      };
     }));
     
     res.json(transformedData);
@@ -512,26 +539,29 @@ app.get('/api/transfers/free-transfer', async (req, res) => {
     const data = await supabaseRequest('transfers?status=eq.free');
     
     // Transform data to include player information
-    const transformedData = (data || []).map(transfer => ({
-      id: transfer.id.toString(),
-      playerId: transfer.player_id,
-      askingPrice: transfer.asking_price,
-      status: transfer.status,
-      createdAt: transfer.created_at,
-      player: {
-        id: transfer.player_id,
-        name: `Player ${transfer.player_id}`,
-        age: 25,
-        position: 'MIDFIELDER',
-        speed: 70,
-        shooting: 65,
-        passing: 75,
-        defending: 60,
-        stamina: 80,
-        reflexes: 70,
-        rating: 70,
-        isGenerated: true
-      }
+    const transformedData = await Promise.all((data || []).map(async (transfer) => {
+      const playerData = await getPlayerData(transfer.player_id);
+      return {
+        id: transfer.id.toString(),
+        playerId: transfer.player_id,
+        askingPrice: transfer.asking_price,
+        status: transfer.status,
+        createdAt: transfer.created_at,
+        player: {
+          id: transfer.player_id,
+          name: playerData?.name || `Player ${transfer.player_id}`,
+          age: playerData?.age || 25,
+          position: playerData?.position || 'MIDFIELDER',
+          speed: playerData?.speed || 70,
+          shooting: playerData?.shooting || 65,
+          passing: playerData?.passing || 75,
+          defending: playerData?.defending || 60,
+          stamina: playerData?.stamina || 80,
+          reflexes: playerData?.reflexes || 70,
+          rating: playerData?.rating || 70,
+          isGenerated: !playerData
+        }
+      };
     }));
     
     res.json(transformedData);
@@ -546,26 +576,29 @@ app.get('/api/transfers', async (req, res) => {
     const data = await supabaseRequest('transfers');
     
     // Transform data to include player information
-    const transformedData = (data || []).map(transfer => ({
-      id: transfer.id.toString(),
-      playerId: transfer.player_id,
-      askingPrice: transfer.asking_price,
-      status: transfer.status,
-      createdAt: transfer.created_at,
-      player: {
-        id: transfer.player_id,
-        name: `Player ${transfer.player_id}`,
-        age: 25,
-        position: 'MIDFIELDER',
-        speed: 70,
-        shooting: 65,
-        passing: 75,
-        defending: 60,
-        stamina: 80,
-        reflexes: 70,
-        rating: 70,
-        isGenerated: true
-      }
+    const transformedData = await Promise.all((data || []).map(async (transfer) => {
+      const playerData = await getPlayerData(transfer.player_id);
+      return {
+        id: transfer.id.toString(),
+        playerId: transfer.player_id,
+        askingPrice: transfer.asking_price,
+        status: transfer.status,
+        createdAt: transfer.created_at,
+        player: {
+          id: transfer.player_id,
+          name: playerData?.name || `Player ${transfer.player_id}`,
+          age: playerData?.age || 25,
+          position: playerData?.position || 'MIDFIELDER',
+          speed: playerData?.speed || 70,
+          shooting: playerData?.shooting || 65,
+          passing: playerData?.passing || 75,
+          defending: playerData?.defending || 60,
+          stamina: playerData?.stamina || 80,
+          reflexes: playerData?.reflexes || 70,
+          rating: playerData?.rating || 70,
+          isGenerated: !playerData
+        }
+      };
     }));
     
     res.json({ transfers: transformedData });
@@ -676,26 +709,29 @@ app.get('/api/transfers/my-team', async (req, res) => {
     const data = await supabaseRequest('transfers?player_id=in.(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16)');
     
     // Transform data to include player information
-    const transformedData = (data || []).map(transfer => ({
-      id: transfer.id.toString(),
-      playerId: transfer.player_id,
-      askingPrice: transfer.asking_price,
-      status: transfer.status,
-      createdAt: transfer.created_at,
-      player: {
-        id: transfer.player_id,
-        name: `Player ${transfer.player_id}`,
-        age: 25,
-        position: 'MIDFIELDER',
-        speed: 70,
-        shooting: 65,
-        passing: 75,
-        defending: 60,
-        stamina: 80,
-        reflexes: 70,
-        rating: 70,
-        isGenerated: true
-      }
+    const transformedData = await Promise.all((data || []).map(async (transfer) => {
+      const playerData = await getPlayerData(transfer.player_id);
+      return {
+        id: transfer.id.toString(),
+        playerId: transfer.player_id,
+        askingPrice: transfer.asking_price,
+        status: transfer.status,
+        createdAt: transfer.created_at,
+        player: {
+          id: transfer.player_id,
+          name: playerData?.name || `Player ${transfer.player_id}`,
+          age: playerData?.age || 25,
+          position: playerData?.position || 'MIDFIELDER',
+          speed: playerData?.speed || 70,
+          shooting: playerData?.shooting || 65,
+          passing: playerData?.passing || 75,
+          defending: playerData?.defending || 60,
+          stamina: playerData?.stamina || 80,
+          reflexes: playerData?.reflexes || 70,
+          rating: playerData?.rating || 70,
+          isGenerated: !playerData
+        }
+      };
     }));
     
     res.json(transformedData);
