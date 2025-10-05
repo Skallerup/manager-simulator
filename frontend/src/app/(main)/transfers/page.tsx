@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { authApiFetch } from "@/lib/api";
@@ -84,8 +84,7 @@ export default function TransfersPage() {
   const [askingPrice, setAskingPrice] = useState<string>("");
   const [playerMinimumPrices, setPlayerMinimumPrices] = useState<Record<string, any>>({});
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = useCallback(async () => {
       try {
         setLoading(true);
         
@@ -117,12 +116,13 @@ export default function TransfersPage() {
       } finally {
         setLoading(false);
       }
-    };
+  }, [user]);
 
+  useEffect(() => {
     if (user) {
       fetchData();
     }
-  }, [user]);
+  }, [user, fetchData]);
 
   const buyPlayer = async (transferId: string) => {
     try {
