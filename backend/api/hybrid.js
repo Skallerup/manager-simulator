@@ -207,7 +207,7 @@ app.get('/api/teams/my-team', async (req, res) => {
         
         res.json({
           id: team.id.toString(),
-          name: team.name || 'My Team',
+          name: 'Skallerup FC',
           logo: team.logo || '/avatars/default.svg',
           budget: team.budget || 500000,
           leagueId: team.league_id || '1',
@@ -225,7 +225,7 @@ app.get('/api/teams/my-team', async (req, res) => {
     // Fallback to mock data if Supabase fails
     res.json({
       id: '1',
-      name: 'Test Team',
+      name: 'Skallerup FC',
       logo: '/avatars/default.svg',
       budget: 500000,
       leagueId: '1',
@@ -751,7 +751,7 @@ app.get('/api/leagues', async (req, res) => {
         country: 'Denmark',
         level: 1,
         teams: [
-          { id: '1', name: 'Test Team', isBot: false, rating: 80, isUserTeam: true }, // User's team
+          { id: '1', name: 'Skallerup FC', isBot: false, rating: 80, isUserTeam: true }, // User's team
           { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
           { id: '3', name: 'AGF', isBot: false, rating: 78 },
           { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
@@ -844,7 +844,7 @@ app.get('/api/leagues/browse', async (req, res) => {
         country: 'Denmark',
         level: 1,
         teams: [
-          { id: '1', name: 'Test Team', isBot: false, rating: 80, isUserTeam: true }, // User's team
+          { id: '1', name: 'Skallerup FC', isBot: false, rating: 80, isUserTeam: true }, // User's team
           { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
           { id: '3', name: 'AGF', isBot: false, rating: 78 },
           { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
@@ -933,7 +933,7 @@ app.get('/api/leagues/:id', async (req, res) => {
     
     // Define teams arrays for each league
     const superligaTeams = [
-      { id: '1', name: 'Test Team', isBot: false, rating: 80, isUserTeam: true }, // User's team
+      { id: '1', name: 'Skallerup FC', isBot: false, rating: 80, isUserTeam: true }, // User's team
       { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
       { id: '3', name: 'AGF', isBot: false, rating: 78 },
       { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
@@ -1000,7 +1000,7 @@ app.get('/api/leagues/:id', async (req, res) => {
     if (id === '1') {
       // Replace one of the dummy teams with user's team
       teams = [
-        { id: '1', name: 'Test Team', isBot: false, rating: 80, isUserTeam: true }, // User's team
+        { id: '1', name: 'Skallerup FC', isBot: false, rating: 80, isUserTeam: true }, // User's team
         { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
         { id: '3', name: 'AGF', isBot: false, rating: 78 },
         { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
@@ -1014,7 +1014,7 @@ app.get('/api/leagues/:id', async (req, res) => {
         { id: '12', name: 'Vejle', isBot: false, rating: 61 }
       ];
       standings = [
-        { position: 1, team: 'Test Team', points: 45, played: 15, won: 14, drawn: 3, lost: 0, goalsFor: 38, goalsAgainst: 8, goalDifference: 30, isUserTeam: true },
+        { position: 1, team: 'Skallerup FC', points: 45, played: 15, won: 14, drawn: 3, lost: 0, goalsFor: 38, goalsAgainst: 8, goalDifference: 30, isUserTeam: true },
         { position: 2, team: 'Brøndby IF', points: 42, played: 15, won: 13, drawn: 3, lost: 0, goalsFor: 35, goalsAgainst: 12, goalDifference: 23 },
         { position: 3, team: 'AGF', points: 38, played: 15, won: 12, drawn: 2, lost: 1, goalsFor: 32, goalsAgainst: 15, goalDifference: 17 },
         { position: 4, team: 'FC Midtjylland', points: 35, played: 15, won: 11, drawn: 2, lost: 2, goalsFor: 28, goalsAgainst: 18, goalDifference: 10 },
@@ -1066,7 +1066,7 @@ app.get('/api/leagues/user/current', async (req, res) => {
         country: 'Denmark',
         level: 1,
         teams: [
-          { id: '1', name: 'Test Team', isBot: false, rating: 80, isUserTeam: true }, // User's team
+          { id: '1', name: 'Skallerup FC', isBot: false, rating: 80, isUserTeam: true }, // User's team
           { id: '2', name: 'Brøndby IF', isBot: false, rating: 82 },
           { id: '3', name: 'AGF', isBot: false, rating: 78 },
           { id: '4', name: 'FC Midtjylland', isBot: false, rating: 80 },
@@ -1166,7 +1166,7 @@ app.post('/api/matches/bot', async (req, res) => {
         id: 'match-1',
         userTeam: {
           id: '1',
-          name: 'Test Team',
+          name: 'Skallerup FC',
           rating: 80
         },
         botTeam: {
@@ -1194,7 +1194,7 @@ app.get('/api/leagues/user/current', async (req, res) => {
       name: 'Test League',
       tier: 1,
       teams: [
-        { id: '1', name: 'Test Team', points: 15, played: 5, won: 5, drawn: 0, lost: 0 },
+        { id: '1', name: 'Skallerup FC', points: 15, played: 5, won: 5, drawn: 0, lost: 0 },
         { id: '2', name: 'Team 2', points: 12, played: 5, won: 4, drawn: 0, lost: 1 },
         { id: '3', name: 'Team 3', points: 9, played: 5, won: 3, drawn: 0, lost: 2 }
       ]

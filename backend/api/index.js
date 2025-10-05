@@ -524,7 +524,7 @@ app.get("/api/teams/my-team", async (req, res) => {
     
     res.json({
       id: teamData.id.toString(),
-      name: teamData.name || 'Test Team',
+      name: teamData.name || 'Skallerup FC',
       logo: teamData.logo || '/avatars/default.svg',
       budget: teamData.budget || 500000,
       leagueId: teamData.league_id || '1',
@@ -803,7 +803,7 @@ app.get("/api/teams/my-team", async (req, res) => {
     
     res.json({
       id: "1",
-      name: "Test Team",
+      name: "Skallerup FC",
       logo: "/avatars/default.svg",
       budget: 500000,
       leagueId: "1",

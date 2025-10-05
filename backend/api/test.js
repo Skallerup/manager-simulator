@@ -118,7 +118,7 @@ app.get('/teams/my-team', (req, res) => {
     success: true,
     team: {
       id: 'test-team-1',
-      name: 'Test Team',
+      name: 'Skallerup FC',
       players: [
         {
           id: '1',
@@ -142,7 +142,7 @@ app.get('/teams/my-team', (req, res) => {
 app.get('/api/teams/my-team', (req, res) => {
   res.json({
     id: '1',
-    name: 'Test Team',
+    name: 'Skallerup FC',
     logo: '/avatars/default.svg',
     budget: 500000,
     leagueId: '1',
@@ -522,12 +522,12 @@ app.get('/api/teams', (req, res) => {
     teams: [
       {
         id: 'test-team-1',
-        name: 'Test Team 1',
+        name: 'Skallerup FC 1',
         leagueId: 'test-league-1'
       },
       {
         id: 'test-team-2',
-        name: 'Test Team 2',
+        name: 'Skallerup FC 2',
         leagueId: 'test-league-1'
       }
     ]
@@ -539,7 +539,7 @@ app.get('/api/teams/:id', (req, res) => {
     success: true,
     team: {
       id: req.params.id,
-      name: 'Test Team',
+      name: 'Skallerup FC',
       leagueId: 'test-league-1',
       players: []
     }
@@ -591,7 +591,7 @@ app.post('/api/matches/bot', (req, res) => {
       id: 'match-1',
       userTeam: {
         id: '1',
-        name: 'Test Team',
+        name: 'Skallerup FC',
         rating: 80
       },
       botTeam: {
