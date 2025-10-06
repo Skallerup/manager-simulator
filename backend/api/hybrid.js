@@ -499,15 +499,14 @@ app.get('/api/teams/my-team', async (req, res) => {
 // Transfers endpoint with Supabase REST API
 app.get('/api/transfers/available', async (req, res) => {
   try {
+    let combined = [];
     // Try Supabase first
     try {
       const data = await supabaseRequest('transfers?status=eq.available');
-      
-      // Transform data to include player information
       const transformedData = await Promise.all((data || []).map(async (transfer) => {
         const playerData = await getPlayerData(transfer.player_id);
         return {
-          id: transfer.id.toString(),
+          id: transfer.id?.toString?.() || String(transfer.id),
           playerId: transfer.player_id,
           askingPrice: transfer.asking_price,
           status: transfer.status,
@@ -528,16 +527,13 @@ app.get('/api/transfers/available', async (req, res) => {
           }
         };
       }));
-      
-      res.json(transformedData);
-      return;
+      combined = transformedData;
     } catch (supabaseError) {
-      console.log('Supabase transfers not available, using in-memory fallback');
+      console.log('Supabase transfers not available, will use in-memory only');
     }
-    
-    // In-memory fallback
+    // Merge with in-memory
     const inMemoryTransfers = global.transferList ? Array.from(global.transferList.values()) : [];
-    res.json(inMemoryTransfers);
+    res.json([...combined, ...inMemoryTransfers]);
   } catch (error) {
     console.error('Transfers error:', error);
     res.json([]);
@@ -686,13 +682,19 @@ app.post('/api/transfers/list/:id', async (req, res) => {
 
 app.delete('/api/transfers/cancel/:id', async (req, res) => {
   try {
-    const result = await supabaseRequest(`transfers?id=eq.${req.params.id}`, {
-      method: 'DELETE'
-    });
-    res.json({
-      success: true,
-      message: `Transfer ${req.params.id} cancelled successfully`
-    });
+    const transferId = req.params.id;
+    let supabaseFailed = false;
+    try {
+      await supabaseRequest(`transfers?id=eq.${transferId}`, { method: 'DELETE' });
+    } catch (e) {
+      supabaseFailed = true;
+      console.log('Supabase cancel failed or not available, trying in-memory');
+    }
+    // In-memory removal
+    if (global.transferList && global.transferList.has(transferId)) {
+      global.transferList.delete(transferId);
+    }
+    res.json({ success: true, message: `Transfer ${transferId} cancelled successfully`, supabaseFailed });
   } catch (error) {
     console.error('Cancel transfer error:', error);
     res.status(500).json({ success: false, error: 'Failed to cancel transfer' });
